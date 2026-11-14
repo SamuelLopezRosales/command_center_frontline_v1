@@ -1,4 +1,4 @@
-.PHONY: setup lint format test ci hooks
+.PHONY: setup lint format test ci hooks test-env test-env-down
 
 PY := uv run --python 3.12
 
@@ -22,3 +22,9 @@ test:
 # Pipeline mínimo de integración (T-016): lint, pruebas, cdk synth y docker build, sin AWS
 ci:
 	powershell -NoProfile -ExecutionPolicy Bypass -File scripts/ci.ps1
+
+test-env:
+	docker compose up -d --wait
+
+test-env-down:
+	docker compose down

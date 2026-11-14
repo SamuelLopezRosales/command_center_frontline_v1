@@ -278,7 +278,7 @@ Objetivo: dejar listas las protecciones antes de cualquier despliegue y desplega
   - Verificación: AWS. PA completo. `aws resourcegroupstaggingapi get-resources --tag-filters Key=proyecto,Values=command-center` lista los recursos del stack y todos llevan las tres etiquetas con los valores correctos
   - Requiere aprobación: no (solo lectura)
 
-- [ ] T-020. Punto de control de la Fase 0
+- [x] T-020. Punto de control de la Fase 0
   - Fase: 0
   - Requisitos: CC-NFR-008, CC-NFR-011, CC-NFR-013
   - Diseño: design.md §13
@@ -293,7 +293,7 @@ Objetivo: dejar listas las protecciones antes de cualquier despliegue y desplega
 
 Objetivo: biblioteca común, esquema completo de PostgreSQL, servicio `dashboard` (acceso, invitaciones y bitácora), Cognito y la primera infraestructura de datos en `cc-test`.
 
-- [ ] T-021. Crear la base de `cc_common`: configuración, errores, logging y tipos de validación
+- [x] T-021. Crear la base de `cc_common`: configuración, errores, logging y tipos de validación
   - Fase: 1
   - Requisitos: CC-REQ-025, CC-REQ-162, CC-NFR-010, CC-NFR-014
   - Diseño: design.md §9.1, §9.4, §10.1, §10.2, §15.1
@@ -302,7 +302,7 @@ Objetivo: biblioteca común, esquema completo de PostgreSQL, servicio `dashboard
   - Verificación: pruebas unitarias: el manejador problem+json no incluye el valor recibido; el filtro enmascara celular, RFC, CURP, NSS y correo; `Celular10`, `Rfc13`, `RfcOrg`, `Curp`, `Nss`, `RegistroPatronal` y `NumeroEmpleado` aceptan y rechazan la tabla de casos de §10.1 (con `hypothesis`)
   - Requiere aprobación: no
 
-- [ ] T-022. Montar el entorno local de pruebas (PostgreSQL 16 y LocalStack)
+- [x] T-022. Montar el entorno local de pruebas (PostgreSQL 16 y LocalStack)
   - Fase: 1
   - Requisitos: CC-NFR-012
   - Diseño: design.md §16.1
@@ -311,7 +311,7 @@ Objetivo: biblioteca común, esquema completo de PostgreSQL, servicio `dashboard
   - Verificación: `make test-env` levanta PostgreSQL 16 con `pg_trgm` y `unaccent`, y LocalStack con S3, SQS, EventBridge, SNS y SES; las fixtures de Testcontainers crean y destruyen la base por prueba
   - Requiere aprobación: no
 
-- [ ] T-023. Implementar `cc_common.db` (motor, sesión, `app.empresa_id` y paginación)
+- [x] T-023. Implementar `cc_common.db` (motor, sesión, `app.empresa_id` y paginación)
   - Fase: 1
   - Requisitos: CC-REQ-150
   - Diseño: design.md §2.1, §3.1, §8.2
@@ -320,7 +320,7 @@ Objetivo: biblioteca común, esquema completo de PostgreSQL, servicio `dashboard
   - Verificación: prueba de integración: una sesión con `app.empresa_id = 1` no lee filas de la empresa 2 (con política RLS de prueba); el host de la base es configurable (instancia directa o RDS Proxy) para usar el mismo código en `test` y `prod`; reintento ante `serialization_failure`; paginación por cursor estable
   - Requiere aprobación: no
 
-- [ ] T-024. Implementar `cc_common.crypto` (cifrado de sobre y HMAC)
+- [x] T-024. Implementar `cc_common.crypto` (cifrado de sobre y HMAC)
   - Fase: 1
   - Requisitos: CC-REQ-151, CC-REQ-152
   - Diseño: design.md §8.3, §8.4
@@ -329,7 +329,7 @@ Objetivo: biblioteca común, esquema completo de PostgreSQL, servicio `dashboard
   - Verificación: pruebas unitarias con KMS simulado: ida y vuelta de AES-GCM; un valor copiado a otra fila (AAD distinta) no descifra; una versión de DEK distinta descifra con su versión; el HMAC del celular es determinista y usa la llave inyectada; ningún método registra el valor
   - Requiere aprobación: no
 
-- [ ] T-025. Implementar `cc_common.auth` (claims, usuario actual y permisos)
+- [x] T-025. Implementar `cc_common.auth` (claims, usuario actual y permisos)
   - Fase: 1
   - Requisitos: CC-REQ-009, CC-REQ-153, CC-NFR-017
   - Diseño: design.md §11.1, §11.6
@@ -338,7 +338,7 @@ Objetivo: biblioteca común, esquema completo de PostgreSQL, servicio `dashboard
   - Verificación: pruebas unitarias: valida firma, `iss`, `token_use`, `client_id`, exp, y presencia de `empresa_id` y `rol`; `ROL_PERMISOS['RH']` contiene todos los permisos; una prueba recorre las rutas de un servicio de ejemplo y falla si alguna no declara permiso
   - Requiere aprobación: no
 
-- [ ] T-026. Implementar bitácora, outbox, eventos y cliente interno en `cc_common`
+- [x] T-026. Implementar bitácora, outbox, eventos y cliente interno en `cc_common`
   - Fase: 1
   - Requisitos: CC-REQ-154, CC-REQ-156, CC-REQ-161, CC-NFR-007
   - Diseño: design.md §2.7, §3.8, §9.3
@@ -347,7 +347,7 @@ Objetivo: biblioteca común, esquema completo de PostgreSQL, servicio `dashboard
   - Verificación: pruebas de integración: `registrar()` rechaza claves de `detalle` no permitidas; el relay publica del `outbox` con `FOR UPDATE SKIP LOCKED` sin duplicar con dos relays; el consumidor ignora un `event_id` repetido; el cliente interno aplica tiempo máximo, reintentos solo en idempotentes y corte de circuito
   - Requiere aprobación: no
 
-- [ ] T-027. Escribir las migraciones de `identidad` y `auditoria`
+- [x] T-027. Escribir las migraciones de `identidad` y `auditoria`
   - Fase: 1
   - Requisitos: CC-REQ-007, CC-REQ-008, CC-REQ-010, CC-REQ-154, CC-REQ-155, CC-REQ-156
   - Diseño: design.md §2.2 (identidad, auditoria), §2.7, §2.8
@@ -356,7 +356,7 @@ Objetivo: biblioteca común, esquema completo de PostgreSQL, servicio `dashboard
   - Verificación: la migración sube y baja en el contenedor local; existen `empresa`, `usuario`, `invitacion_registro` y `bitacora` con sus restricciones; el `UPDATE` y el `DELETE` sobre `bitacora` fallan por el trigger
   - Requiere aprobación: no
 
-- [ ] T-028. Escribir las migraciones de `campos` y `colaboradores`
+- [x] T-028. Escribir las migraciones de `campos` y `colaboradores`
   - Fase: 1
   - Requisitos: CC-REQ-020, CC-REQ-023, CC-REQ-024, CC-REQ-043, CC-REQ-044, CC-REQ-045, CC-REQ-047, CC-REQ-049, CC-REQ-050
   - Diseño: design.md §2.2 (campos, colaboradores), §2.3, §2.4
@@ -365,7 +365,7 @@ Objetivo: biblioteca común, esquema completo de PostgreSQL, servicio `dashboard
   - Verificación: las tablas coinciden con el `.dot` más los cambios de §2.3; existen los índices de §2.4 (incluido el trigrama); `UNIQUE (empresa_id, numero_empleado)` y `UNIQUE (empresa_id, celular_hash)` rechazan duplicados; los `CHECK` de `tipo_empleado`, `estatus` y `num_nonnulls` de `valor_campo` funcionan
   - Requiere aprobación: no
 
-- [ ] T-029. Escribir las migraciones de `whatsapp`, `constancias` y `notificaciones`, con vistas y funciones
+- [x] T-029. Escribir las migraciones de `whatsapp`, `constancias` y `notificaciones`, con vistas y funciones
   - Fase: 1
   - Requisitos: CC-REQ-011, CC-REQ-012, CC-REQ-013, CC-REQ-064, CC-REQ-066, CC-REQ-079, CC-REQ-081, CC-REQ-082, CC-REQ-084, CC-REQ-087, CC-REQ-090, CC-REQ-100, CC-REQ-101, CC-REQ-106, CC-REQ-112, CC-REQ-114, CC-REQ-117, CC-NFR-007
   - Diseño: design.md §2.2 (whatsapp, constancias, notificaciones), §2.3, §2.6, §2.7
@@ -374,7 +374,7 @@ Objetivo: biblioteca común, esquema completo de PostgreSQL, servicio `dashboard
   - Verificación: tablas, `CHECK` de estados y enumeraciones, índices parciales y únicos (`folio` por empresa, `solicitud_id`, `codigo_verificacion`, `token_hash`, conversación abierta por número); triggers que rechazan `UPDATE` y `DELETE` sobre `version_plantilla` y los cambios no permitidos sobre `constancia_generada`; función `rango_estado_envio`; vistas `security_invoker` contractuales de `dashboard`
   - Requiere aprobación: no
 
-- [ ] T-030. Escribir el script de roles de base de datos y políticas RLS
+- [x] T-030. Escribir el script de roles de base de datos y políticas RLS
   - Fase: 1
   - Requisitos: CC-REQ-150, CC-REQ-155, CC-NFR-012
   - Diseño: design.md §2.1, §2.6
@@ -383,7 +383,7 @@ Objetivo: biblioteca común, esquema completo de PostgreSQL, servicio `dashboard
   - Verificación: script idempotente que crea `svc_*` y `migrador`, habilita RLS con la política por `app.empresa_id` en todas las tablas con `empresa_id`, concede solo `INSERT` en `auditoria.bitacora` y los permisos de §2.6; se ejecuta dos veces sin error
   - Requiere aprobación: no
 
-- [ ] T-031. Construir el script `migrar_todo` y la imagen de migraciones
+- [x] T-031. Construir el script `migrar_todo` y la imagen de migraciones
   - Fase: 1
   - Requisitos: CC-NFR-012
   - Diseño: design.md §2.8
@@ -392,7 +392,7 @@ Objetivo: biblioteca común, esquema completo de PostgreSQL, servicio `dashboard
   - Verificación: la imagen aplica las migraciones en el orden `identidad`, `auditoria`, `campos`, `colaboradores`, `whatsapp`, `constancias`, `notificaciones`, y después `roles.sql`, `rls.sql` y `grants.sql`, contra PostgreSQL local; termina con código distinto de cero si una migración falla
   - Requiere aprobación: no
 
-- [ ] T-032. Probar el esquema: restricciones, inmutabilidad, RLS y permisos entre esquemas
+- [x] T-032. Probar el esquema: restricciones, inmutabilidad, RLS y permisos entre esquemas
   - Fase: 1
   - Requisitos: CC-REQ-023, CC-REQ-024, CC-REQ-150, CC-REQ-155, CC-NFR-012
   - Diseño: design.md §2.6, §2.7, §16.1
@@ -401,7 +401,7 @@ Objetivo: biblioteca común, esquema completo de PostgreSQL, servicio `dashboard
   - Verificación: pruebas de integración: unicidad por empresa; `CHECK`; triggers de inmutabilidad; la lectura de otra empresa devuelve cero filas; un `SELECT` de `svc_notificaciones` sobre una tabla de `colaboradores` da `permission denied`
   - Requiere aprobación: no
 
-- [ ] T-033. Crear el esqueleto del servicio `dashboard` y la exportación de OpenAPI
+- [x] T-033. Crear el esqueleto del servicio `dashboard` y la exportación de OpenAPI
   - Fase: 1
   - Requisitos: CC-NFR-012
   - Diseño: design.md §3.1, §3.2, §1.3
@@ -410,7 +410,7 @@ Objetivo: biblioteca común, esquema completo de PostgreSQL, servicio `dashboard
   - Verificación: `GET /salud` responde 200; la exportación de OpenAPI es determinista; las respuestas de error usan problem+json con `correlacion_id`
   - Requiere aprobación: no
 
-- [ ] T-034. Implementar DSH-06, DSH-07 y DSH-10 (sesión, usuario actual e invitaciones)
+- [x] T-034. Implementar DSH-06, DSH-07 y DSH-10 (sesión, usuario actual e invitaciones)
   - Fase: 1
   - Requisitos: CC-REQ-005, CC-REQ-007, CC-REQ-008, CC-REQ-009
   - Diseño: design.md §3.2, §11.2

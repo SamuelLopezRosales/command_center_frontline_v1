@@ -39,5 +39,5 @@ Si `make` está instalado, `make lint` y `make test` hacen lo mismo.
 
 ## Seguridad
 
-- No hay llaves de AWS en el repositorio. El acceso a AWS usa únicamente el perfil `cc-test` con IAM Identity Center.
+- No hay llaves de AWS en el repositorio. El acceso a AWS usa únicamente el perfil `cc-test` con credenciales temporales obtenidas por `aws login --profile cc-test --region us-east-1`.
 - Las reglas completas están en `.kiro/specs/tasks.md`, sección 0.
