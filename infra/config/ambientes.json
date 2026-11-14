@@ -1,0 +1,37 @@
+{
+  "proyecto": "command-center",
+  "ambientes": {
+    "test": {
+      "cuentas_permitidas": ["034362033822"],
+      "region": "us-east-1",
+      "perfil": "cc-test",
+      "etiquetas": {
+        "proyecto": "command-center",
+        "ambiente": "test",
+        "responsable": "Samuel Lopez"
+      },
+      "presupuesto": {
+        "monto_usd": 50,
+        "correo": "samuel.lopez@honne.com",
+        "alertas": [
+          {"tipo": "ACTUAL", "umbral_pct": 80},
+          {"tipo": "ACTUAL", "umbral_pct": 100},
+          {"tipo": "PRONOSTICADO", "umbral_pct": 100}
+        ]
+      },
+      "economia": {
+        "nat": "instancia",
+        "rds_clase": "db.t4g.micro",
+        "rds_multi_az": false,
+        "rds_proxy": false,
+        "waf_habilitado": false,
+        "workers_min_tareas": 0,
+        "tareas_por_servicio": 1,
+        "concurrencia_aprovisionada_webhook": 0,
+        "retencion_respaldos_dias": 1,
+        "permite_borrado": true
+      },
+      "dominio": null
+    }
+  }
+}

@@ -1,0 +1,134 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900" font-family="Arial, Helvetica, sans-serif">
+<rect x="200" y="0" width="1240" height="900" rx="0" fill="#F3F4F6"/>
+<rect x="0" y="0" width="200" height="900" rx="0" fill="#1B2B4B"/>
+<g transform="translate(18,22) scale(0.62)">
+<polygon points="0,6 12,0 12,34 0,40" fill="#FFFFFF"/>
+<polygon points="18,14 30,8 30,34 18,40" fill="#FFFFFF"/>
+<polygon points="36,0 48,6 48,40 36,34" fill="#FFFFFF"/>
+<text x="62" y="32" font-size="34" font-weight="normal" fill="#FFFFFF" letter-spacing="2">HONNE</text>
+</g>
+<line x1="0" y1="84" x2="200" y2="84" stroke="#2E3F66" stroke-width="1"/>
+<circle cx="38" cy="118" r="16" fill="#F0954A"/>
+<text x="38" y="123" font-size="12" font-weight="bold" fill="#FFFFFF" text-anchor="middle">DB</text>
+<text x="64" y="114" font-size="13" font-weight="bold" fill="#FFFFFF" text-anchor="start">David Bet</text>
+<text x="64" y="130" font-size="11" font-weight="normal" fill="#9AA7BF" text-anchor="start">RH</text>
+<line x1="0" y1="150" x2="200" y2="150" stroke="#2E3F66" stroke-width="1"/>
+<text x="44" y="190" font-size="14" font-weight="normal" fill="#D5DCE8" text-anchor="start">Dashboard</text>
+<text x="44" y="236" font-size="14" font-weight="normal" fill="#D5DCE8" text-anchor="start">Colaboradores</text>
+<text x="44" y="282" font-size="14" font-weight="normal" fill="#D5DCE8" text-anchor="start">Constancias</text>
+<rect x="12" y="302" width="176" height="40" rx="8" fill="#2C3E63"/>
+<rect x="12" y="302" width="4" height="40" rx="2" fill="#F0954A"/>
+<text x="44" y="328" font-size="14" font-weight="bold" fill="#F0954A" text-anchor="start">Notificaciones</text>
+<text x="24" y="864" font-size="13" font-weight="normal" fill="#D5DCE8" text-anchor="start">Cerrar sesión</text>
+<text x="240" y="62" font-size="26" font-weight="bold" fill="#1F2937" text-anchor="start">Nueva notificación</text>
+<text x="240" y="88" font-size="13" font-weight="normal" fill="#6B7280" text-anchor="start">Notificaciones / Nueva</text>
+<rect x="1072" y="30" width="140" height="36" rx="6" fill="#FFFFFF" stroke="#1B2B4B" stroke-width="1.2"/>
+<text x="1142.0" y="52.2" font-size="12" font-weight="bold" fill="#1B2B4B" text-anchor="middle">Guardar borrador</text>
+<rect x="1222" y="30" width="178" height="36" rx="6" fill="#F0954A"/>
+<text x="1311.0" y="52.55" font-size="13" font-weight="bold" fill="#FFFFFF" text-anchor="middle">Revisar y enviar</text>
+<rect x="240" y="116" width="640" height="380" rx="12" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+<text x="264" y="150" font-size="15" font-weight="bold" fill="#1F2937" text-anchor="start">¿A quién le escribimos?</text>
+<rect x="264" y="166" width="130" height="34" rx="8" fill="#F0954A"/>
+<text x="329" y="188" font-size="12" font-weight="bold" fill="#FFFFFF" text-anchor="middle">Por criterios</text>
+<rect x="404" y="166" width="110" height="34" rx="8" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+<text x="459" y="188" font-size="12" font-weight="bold" fill="#1F2937" text-anchor="middle">Individual</text>
+<rect x="524" y="166" width="140" height="34" rx="8" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+<text x="594" y="188" font-size="12" font-weight="bold" fill="#1F2937" text-anchor="middle">Grupo guardado</text>
+<rect x="264" y="216" width="190" height="40" rx="6" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<text x="276" y="241.0" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">Planta</text>
+<text x="432" y="241.0" font-size="13" font-weight="normal" fill="#6B7280" text-anchor="middle">▾</text>
+<rect x="470" y="216" width="80" height="40" rx="6" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<text x="482" y="241.0" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">es</text>
+<text x="528" y="241.0" font-size="13" font-weight="normal" fill="#6B7280" text-anchor="middle">▾</text>
+<rect x="566" y="216" width="200" height="40" rx="6" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<text x="578" y="241.0" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">Apodaca</text>
+<text x="744" y="241.0" font-size="13" font-weight="normal" fill="#6B7280" text-anchor="middle">▾</text>
+<rect x="264" y="260" width="28" height="22" rx="11" fill="#FDEBD9"/>
+<text x="278.0" y="275" font-size="10" font-weight="bold" fill="#B45309" text-anchor="middle">Y</text>
+<rect x="264" y="286" width="190" height="40" rx="6" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<text x="276" y="311.0" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">Tipo de empleado</text>
+<text x="432" y="311.0" font-size="13" font-weight="normal" fill="#6B7280" text-anchor="middle">▾</text>
+<rect x="470" y="286" width="80" height="40" rx="6" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<text x="482" y="311.0" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">es</text>
+<text x="528" y="311.0" font-size="13" font-weight="normal" fill="#6B7280" text-anchor="middle">▾</text>
+<rect x="566" y="286" width="200" height="40" rx="6" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<text x="578" y="311.0" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">Operativo</text>
+<text x="744" y="311.0" font-size="13" font-weight="normal" fill="#6B7280" text-anchor="middle">▾</text>
+<rect x="264" y="330" width="28" height="22" rx="11" fill="#FDEBD9"/>
+<text x="278.0" y="345" font-size="10" font-weight="bold" fill="#B45309" text-anchor="middle">Y</text>
+<rect x="264" y="356" width="190" height="40" rx="6" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<text x="276" y="381.0" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">Antigüedad</text>
+<text x="432" y="381.0" font-size="13" font-weight="normal" fill="#6B7280" text-anchor="middle">▾</text>
+<rect x="470" y="356" width="80" height="40" rx="6" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<text x="482" y="381.0" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">≥</text>
+<text x="528" y="381.0" font-size="13" font-weight="normal" fill="#6B7280" text-anchor="middle">▾</text>
+<rect x="566" y="356" width="200" height="40" rx="6" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<text x="578" y="381.0" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">5 años</text>
+<text x="744" y="381.0" font-size="13" font-weight="normal" fill="#6B7280" text-anchor="middle">▾</text>
+<text x="264" y="436" font-size="12" font-weight="bold" fill="#1E5AA8" text-anchor="start">+ Agregar criterio (organización, departamento, área, turno, estatus…)</text>
+<rect x="240" y="512" width="640" height="348" rx="12" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+<text x="264" y="546" font-size="15" font-weight="bold" fill="#1F2937" text-anchor="start">Mensaje</text>
+<text x="264" y="572" font-size="11" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.4">Canal</text>
+<circle cx="272" cy="596" r="7" fill="#F0954A"/>
+<text x="288" y="601" font-size="12" font-weight="normal" fill="#1F2937" text-anchor="start">Plantilla aprobada por Meta</text>
+<circle cx="540" cy="596" r="7" fill="#FFFFFF"/>
+<circle cx="540" cy="596" r="7" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.5"/>
+<text x="556" y="601" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Respuesta dentro de 24 h</text>
+<text x="264" y="628" font-size="12" font-weight="normal" fill="#1F2937" text-anchor="start">Plantilla</text>
+<rect x="264" y="636" width="592" height="40" rx="6" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<text x="276" y="661.0" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">recordatorio_uniformes_v1 · APROBADA</text>
+<text x="834" y="661.0" font-size="13" font-weight="normal" fill="#6B7280" text-anchor="middle">▾</text>
+<text x="264" y="690" font-size="11" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.4">VARIABLES</text>
+<rect x="264" y="700" width="170" height="30" rx="6" fill="#F3F4F6"/>
+<text x="276" y="720" font-size="11" font-weight="normal" fill="#1F2937" text-anchor="start">{{1}} = {{nombre}}</text>
+<rect x="446" y="700" width="210" height="30" rx="6" fill="#F3F4F6"/>
+<text x="458" y="720" font-size="11" font-weight="normal" fill="#1F2937" text-anchor="start">{{2}} = 13 nov 2026, Planta Apodaca</text>
+<rect x="264" y="746" width="592" height="98" rx="10" fill="#E5DDD5"/>
+<rect x="278" y="758" width="420" height="74" rx="10" fill="#DCF8C6"/>
+<text x="292" y="782" font-size="12" font-weight="normal" fill="#1F2937" text-anchor="start">Hola Ana Lucía, te recordamos que mañana 13 nov</text>
+<text x="292" y="802" font-size="12" font-weight="normal" fill="#1F2937" text-anchor="start">se entregan uniformes en Planta Apodaca.</text>
+<text x="292" y="822" font-size="12" font-weight="normal" fill="#1F2937" text-anchor="start">Preséntate con tu credencial y tu talla.</text>
+<rect x="896" y="116" width="504" height="744" rx="12" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+<text x="920" y="150" font-size="15" font-weight="bold" fill="#1F2937" text-anchor="start">Resumen del envío</text>
+<text x="920" y="188" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Seleccionados</text>
+<rect x="920" y="196" width="456" height="12" rx="6" fill="#F3F4F6"/>
+<rect x="920" y="196" width="456.0" height="12" rx="6" fill="#F0954A"/>
+<text x="1376" y="188" font-size="13" font-weight="bold" fill="#1F2937" text-anchor="end">61</text>
+<text x="920" y="234" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Con consentimiento</text>
+<rect x="920" y="242" width="456" height="12" rx="6" fill="#F3F4F6"/>
+<rect x="920" y="242" width="418.62295081967216" height="12" rx="6" fill="#15803D"/>
+<text x="1376" y="234" font-size="13" font-weight="bold" fill="#1F2937" text-anchor="end">56</text>
+<text x="920" y="280" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Estatus ACTIVO</text>
+<rect x="920" y="288" width="456" height="12" rx="6" fill="#F3F4F6"/>
+<rect x="920" y="288" width="403.672131147541" height="12" rx="6" fill="#15803D"/>
+<text x="1376" y="280" font-size="13" font-weight="bold" fill="#1F2937" text-anchor="end">54</text>
+<text x="920" y="326" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Celular válido</text>
+<rect x="920" y="334" width="456" height="12" rx="6" fill="#F3F4F6"/>
+<rect x="920" y="334" width="403.672131147541" height="12" rx="6" fill="#15803D"/>
+<text x="1376" y="326" font-size="13" font-weight="bold" fill="#1F2937" text-anchor="end">54</text>
+<rect x="920" y="364" width="456" height="46" rx="8" fill="#FEF3C7"/>
+<text x="936" y="384" font-size="12" font-weight="bold" fill="#B45309" text-anchor="start">7 excluidos: 5 sin consentimiento y 2 con estatus BAJA.</text>
+<text x="936" y="402" font-size="11" font-weight="normal" fill="#B45309" text-anchor="start">Se omiten automáticamente y quedan registrados.</text>
+<text x="920" y="448" font-size="11" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.4">CUÁNDO</text>
+<circle cx="928" cy="472" r="7" fill="#F0954A"/>
+<text x="944" y="477" font-size="13" font-weight="bold" fill="#1F2937" text-anchor="start">Enviar ahora</text>
+<circle cx="928" cy="502" r="7" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.5"/>
+<text x="944" y="507" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">Programar</text>
+<rect x="920" y="518" width="220" height="38" rx="6" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<text x="932" y="542.0" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">15/11/2026</text>
+<rect x="1156" y="518" width="220" height="38" rx="6" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<text x="1168" y="542.0" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">08:00</text>
+<text x="920" y="580" font-size="11" font-weight="normal" fill="#6B7280" text-anchor="start">Horario de envío: 08:00 a 20:00 (America/Mexico_City)</text>
+<rect x="920" y="600" width="18" height="18" rx="4" fill="#F0954A"/>
+<text x="929" y="614" font-size="12" font-weight="bold" fill="#FFFFFF" text-anchor="middle">✓</text>
+<text x="948" y="614" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">Si WhatsApp no entrega en 24 h, enviar por correo</text>
+<text x="948" y="634" font-size="11" font-weight="normal" fill="#6B7280" text-anchor="start">Usa el correo registrado: 49 de 54 colaboradores tienen uno.</text>
+<line x1="920" y1="656" x2="1376" y2="656" stroke="#E5E7EB" stroke-width="1"/>
+<text x="920" y="680" font-size="11" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.4">Respuestas</text>
+<text x="920" y="702" font-size="12" font-weight="normal" fill="#1F2937" text-anchor="start">Las respuestas llegan al chat de RH y se pueden</text>
+<text x="920" y="720" font-size="12" font-weight="normal" fill="#1F2937" text-anchor="start">asignar a una persona de RH.</text>
+<rect x="920" y="790" width="150" height="42" rx="6" fill="#FFFFFF" stroke="#1B2B4B" stroke-width="1.2"/>
+<text x="995.0" y="815.2" font-size="12" font-weight="bold" fill="#1B2B4B" text-anchor="middle">Guardar borrador</text>
+<rect x="1086" y="790" width="300" height="42" rx="6" fill="#F0954A"/>
+<text x="1236.0" y="815.55" font-size="13" font-weight="bold" fill="#FFFFFF" text-anchor="middle">Enviar a 54 colaboradores</text>
+</svg>

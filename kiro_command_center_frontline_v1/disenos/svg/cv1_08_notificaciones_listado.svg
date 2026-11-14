@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900" font-family="Arial, Helvetica, sans-serif">
+<rect x="200" y="0" width="1240" height="900" rx="0" fill="#F3F4F6"/>
+<rect x="0" y="0" width="200" height="900" rx="0" fill="#1B2B4B"/>
+<g transform="translate(18,22) scale(0.62)">
+<polygon points="0,6 12,0 12,34 0,40" fill="#FFFFFF"/>
+<polygon points="18,14 30,8 30,34 18,40" fill="#FFFFFF"/>
+<polygon points="36,0 48,6 48,40 36,34" fill="#FFFFFF"/>
+<text x="62" y="32" font-size="34" font-weight="normal" fill="#FFFFFF" letter-spacing="2">HONNE</text>
+</g>
+<line x1="0" y1="84" x2="200" y2="84" stroke="#2E3F66" stroke-width="1"/>
+<circle cx="38" cy="118" r="16" fill="#F0954A"/>
+<text x="38" y="123" font-size="12" font-weight="bold" fill="#FFFFFF" text-anchor="middle">DB</text>
+<text x="64" y="114" font-size="13" font-weight="bold" fill="#FFFFFF" text-anchor="start">David Bet</text>
+<text x="64" y="130" font-size="11" font-weight="normal" fill="#9AA7BF" text-anchor="start">RH</text>
+<line x1="0" y1="150" x2="200" y2="150" stroke="#2E3F66" stroke-width="1"/>
+<text x="44" y="190" font-size="14" font-weight="normal" fill="#D5DCE8" text-anchor="start">Dashboard</text>
+<text x="44" y="236" font-size="14" font-weight="normal" fill="#D5DCE8" text-anchor="start">Colaboradores</text>
+<text x="44" y="282" font-size="14" font-weight="normal" fill="#D5DCE8" text-anchor="start">Constancias</text>
+<rect x="12" y="302" width="176" height="40" rx="8" fill="#2C3E63"/>
+<rect x="12" y="302" width="4" height="40" rx="2" fill="#F0954A"/>
+<text x="44" y="328" font-size="14" font-weight="bold" fill="#F0954A" text-anchor="start">Notificaciones</text>
+<text x="24" y="864" font-size="13" font-weight="normal" fill="#D5DCE8" text-anchor="start">Cerrar sesión</text>
+<text x="240" y="62" font-size="26" font-weight="bold" fill="#1F2937" text-anchor="start">Notificaciones</text>
+<text x="240" y="88" font-size="13" font-weight="normal" fill="#6B7280" text-anchor="start">Mensajes a colaboradores por WhatsApp, por grupo o de forma individual</text>
+<rect x="1000" y="30" width="210" height="36" rx="6" fill="#FFFFFF" stroke="#1B2B4B" stroke-width="1.2"/>
+<text x="1105.0" y="52.2" font-size="12" font-weight="bold" fill="#1B2B4B" text-anchor="middle">Plantillas de mensaje</text>
+<rect x="1222" y="30" width="178" height="36" rx="6" fill="#F0954A"/>
+<text x="1311.0" y="52.55" font-size="13" font-weight="bold" fill="#FFFFFF" text-anchor="middle">+ Nueva notificación</text>
+<rect x="240" y="116" width="272" height="104" rx="12" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+<rect x="260" y="144" width="48" height="48" rx="10" fill="#FDEBD9"/>
+<circle cx="284" cy="168" r="9" fill="#F0954A" fill-opacity="0.9"/>
+<text x="324" y="150" font-size="11" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.6">ENVIADAS ESTE MES</text>
+<text x="324" y="188" font-size="28" font-weight="bold" fill="#1F2937" text-anchor="start">1,284</text>
+<rect x="536" y="116" width="272" height="104" rx="12" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+<rect x="556" y="144" width="48" height="48" rx="10" fill="#DCFCE7"/>
+<circle cx="580" cy="168" r="9" fill="#15803D" fill-opacity="0.9"/>
+<text x="620" y="150" font-size="11" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.6">ENTREGADAS</text>
+<text x="620" y="188" font-size="28" font-weight="bold" fill="#1F2937" text-anchor="start">96%</text>
+<rect x="832" y="116" width="272" height="104" rx="12" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+<rect x="852" y="144" width="48" height="48" rx="10" fill="#DBEAFE"/>
+<circle cx="876" cy="168" r="9" fill="#1D4ED8" fill-opacity="0.9"/>
+<text x="916" y="150" font-size="11" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.6">LEÍDAS</text>
+<text x="916" y="188" font-size="28" font-weight="bold" fill="#1F2937" text-anchor="start">71%</text>
+<rect x="1128" y="116" width="272" height="104" rx="12" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+<rect x="1148" y="144" width="48" height="48" rx="10" fill="#FEE2E2"/>
+<circle cx="1172" cy="168" r="9" fill="#B91C1C" fill-opacity="0.9"/>
+<text x="1212" y="150" font-size="11" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.6">FALLIDAS</text>
+<text x="1212" y="188" font-size="28" font-weight="bold" fill="#1F2937" text-anchor="start">14</text>
+<rect x="240" y="244" width="120" height="38" rx="8" fill="#F0954A"/>
+<text x="300.0" y="268" font-size="13" font-weight="bold" fill="#FFFFFF" text-anchor="middle">Envíos (24)</text>
+<rect x="370" y="244" width="150" height="38" rx="8" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+<text x="445.0" y="268" font-size="13" font-weight="bold" fill="#1F2937" text-anchor="middle">Programadas (2)</text>
+<rect x="530" y="244" width="140" height="38" rx="8" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+<text x="600.0" y="268" font-size="13" font-weight="bold" fill="#1F2937" text-anchor="middle">Borradores (1)</text>
+<rect x="240" y="298" width="1160" height="562" rx="12" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+<rect x="240" y="308" width="1160" height="36" rx="0" fill="#F9FAFB"/>
+<text x="262" y="330" font-size="11" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.4">ENVÍO</text>
+<text x="520" y="330" font-size="11" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.4">AUDIENCIA</text>
+<text x="740" y="330" font-size="11" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.4">PLANTILLA</text>
+<text x="930" y="330" font-size="11" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.4">DESTINATARIOS</text>
+<text x="1090" y="330" font-size="11" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.4">ESTADO</text>
+<text x="1214" y="330" font-size="11" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.4">FECHA</text>
+<text x="1320" y="330" font-size="11" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.4">ACCIÓN</text>
+<text x="262" y="374" font-size="13" font-weight="bold" fill="#1F2937" text-anchor="start">Aviso de cierre de nómina</text>
+<text x="520" y="374" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Todos · Grupo Industrial Norte</text>
+<text x="740" y="374" font-size="12" font-weight="normal" fill="#B45309" text-anchor="start">aviso_nomina_v2</text>
+<text x="930" y="374" font-size="12" font-weight="normal" fill="#1F2937" text-anchor="start">118 · 6 excluidos</text>
+<rect x="1090" y="363" width="96" height="22" rx="11" fill="#DCFCE7"/>
+<text x="1138.0" y="378" font-size="10" font-weight="bold" fill="#15803D" text-anchor="middle">COMPLETADO</text>
+<text x="1214" y="374" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">12 nov, 16:00</text>
+<text x="1320" y="374" font-size="12" font-weight="bold" fill="#1E5AA8" text-anchor="start">Ver detalle</text>
+<line x1="240" y1="402" x2="1400" y2="402" stroke="#E5E7EB" stroke-width="1"/>
+<text x="262" y="432" font-size="13" font-weight="bold" fill="#1F2937" text-anchor="start">Entrega de uniformes</text>
+<text x="520" y="432" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Planta Apodaca · Operativo</text>
+<text x="740" y="432" font-size="12" font-weight="normal" fill="#B45309" text-anchor="start">uniformes_v1</text>
+<text x="930" y="432" font-size="12" font-weight="normal" fill="#1F2937" text-anchor="start">61 de 61</text>
+<rect x="1090" y="421" width="78" height="22" rx="11" fill="#FEF3C7"/>
+<text x="1129.0" y="436" font-size="10" font-weight="bold" fill="#B45309" text-anchor="middle">ENVIANDO</text>
+<text x="1214" y="432" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">13 nov, 09:00</text>
+<text x="1320" y="432" font-size="12" font-weight="bold" fill="#1E5AA8" text-anchor="start">Ver detalle</text>
+<line x1="240" y1="460" x2="1400" y2="460" stroke="#E5E7EB" stroke-width="1"/>
+<text x="262" y="490" font-size="13" font-weight="bold" fill="#1F2937" text-anchor="start">Felicitación por aniversario</text>
+<text x="520" y="490" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Antigüedad de 5 años o más</text>
+<text x="740" y="490" font-size="12" font-weight="normal" fill="#B45309" text-anchor="start">felicitacion_v1</text>
+<text x="930" y="490" font-size="12" font-weight="normal" fill="#1F2937" text-anchor="start">18 programados</text>
+<rect x="1090" y="479" width="90" height="22" rx="11" fill="#DBEAFE"/>
+<text x="1135.0" y="494" font-size="10" font-weight="bold" fill="#1D4ED8" text-anchor="middle">PROGRAMADO</text>
+<text x="1214" y="490" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">15 nov, 08:00</text>
+<text x="1320" y="490" font-size="12" font-weight="bold" fill="#1E5AA8" text-anchor="start">Ver detalle</text>
+<line x1="240" y1="518" x2="1400" y2="518" stroke="#E5E7EB" stroke-width="1"/>
+<text x="262" y="548" font-size="13" font-weight="bold" fill="#1F2937" text-anchor="start">Cambio de horario nocturno</text>
+<text x="520" y="548" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Turno Nocturno · ORG02</text>
+<text x="740" y="548" font-size="12" font-weight="normal" fill="#B45309" text-anchor="start">cambio_turno_v1</text>
+<text x="930" y="548" font-size="12" font-weight="normal" fill="#1F2937" text-anchor="start">9 de 9</text>
+<rect x="1090" y="537" width="92" height="22" rx="11" fill="#FEE2E2"/>
+<text x="1136.0" y="552" font-size="10" font-weight="bold" fill="#B91C1C" text-anchor="middle">CON FALLAS</text>
+<text x="1214" y="548" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">10 nov, 18:30</text>
+<text x="1320" y="548" font-size="12" font-weight="bold" fill="#1E5AA8" text-anchor="start">Ver detalle</text>
+<line x1="240" y1="576" x2="1400" y2="576" stroke="#E5E7EB" stroke-width="1"/>
+<text x="262" y="606" font-size="13" font-weight="bold" fill="#1F2937" text-anchor="start">Constancia lista · Ricardo</text>
+<text x="520" y="606" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Individual</text>
+<text x="740" y="606" font-size="12" font-weight="normal" fill="#B45309" text-anchor="start">constancia_lista_v1</text>
+<text x="930" y="606" font-size="12" font-weight="normal" fill="#1F2937" text-anchor="start">1 de 1</text>
+<rect x="1090" y="595" width="96" height="22" rx="11" fill="#DCFCE7"/>
+<text x="1138.0" y="610" font-size="10" font-weight="bold" fill="#15803D" text-anchor="middle">COMPLETADO</text>
+<text x="1214" y="606" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">09 nov, 11:15</text>
+<text x="1320" y="606" font-size="12" font-weight="bold" fill="#1E5AA8" text-anchor="start">Ver detalle</text>
+<line x1="240" y1="634" x2="1400" y2="634" stroke="#E5E7EB" stroke-width="1"/>
+<text x="262" y="664" font-size="13" font-weight="bold" fill="#1F2937" text-anchor="start">Bienvenida nueva planta</text>
+<text x="520" y="664" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Planta Monterrey · Nuevo ingreso</text>
+<text x="740" y="664" font-size="12" font-weight="normal" fill="#B45309" text-anchor="start">bienvenida_v1</text>
+<text x="930" y="664" font-size="12" font-weight="normal" fill="#1F2937" text-anchor="start">Sin enviar</text>
+<rect x="1090" y="653" width="76" height="22" rx="11" fill="#E5E7EB"/>
+<text x="1128.0" y="668" font-size="10" font-weight="bold" fill="#6B7280" text-anchor="middle">BORRADOR</text>
+<text x="1214" y="664" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">—</text>
+<text x="1320" y="664" font-size="12" font-weight="bold" fill="#1E5AA8" text-anchor="start">Ver detalle</text>
+<line x1="240" y1="692" x2="1400" y2="692" stroke="#E5E7EB" stroke-width="1"/>
+</svg>

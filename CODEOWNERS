@@ -1,0 +1,12 @@
+# Propiedad por carpeta (design.md §1.1). Un servicio solo toca su esquema de base de datos.
+*                     @samuel-lopez
+/infra/               @samuel-lopez
+/services/dashboard/       @samuel-lopez
+/services/colaboradores/   @samuel-lopez
+/services/campos/          @samuel-lopez
+/services/constancias/     @samuel-lopez
+/services/notificaciones/  @samuel-lopez
+/services/whatsapp/        @samuel-lopez
+/lambdas/             @samuel-lopez
+/frontend/            @samuel-lopez
+/contracts/           @samuel-lopez

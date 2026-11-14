@@ -1,0 +1,140 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900" font-family="Arial, Helvetica, sans-serif">
+<rect x="200" y="0" width="1240" height="900" rx="0" fill="#F3F4F6"/>
+<rect x="0" y="0" width="200" height="900" rx="0" fill="#1B2B4B"/>
+<g transform="translate(18,22) scale(0.62)">
+<polygon points="0,6 12,0 12,34 0,40" fill="#FFFFFF"/>
+<polygon points="18,14 30,8 30,34 18,40" fill="#FFFFFF"/>
+<polygon points="36,0 48,6 48,40 36,34" fill="#FFFFFF"/>
+<text x="62" y="32" font-size="34" font-weight="normal" fill="#FFFFFF" letter-spacing="2">HONNE</text>
+</g>
+<line x1="0" y1="84" x2="200" y2="84" stroke="#2E3F66" stroke-width="1"/>
+<circle cx="38" cy="118" r="16" fill="#F0954A"/>
+<text x="38" y="123" font-size="12" font-weight="bold" fill="#FFFFFF" text-anchor="middle">DB</text>
+<text x="64" y="114" font-size="13" font-weight="bold" fill="#FFFFFF" text-anchor="start">David Bet</text>
+<text x="64" y="130" font-size="11" font-weight="normal" fill="#9AA7BF" text-anchor="start">RH</text>
+<line x1="0" y1="150" x2="200" y2="150" stroke="#2E3F66" stroke-width="1"/>
+<text x="44" y="190" font-size="14" font-weight="normal" fill="#D5DCE8" text-anchor="start">Dashboard</text>
+<text x="44" y="236" font-size="14" font-weight="normal" fill="#D5DCE8" text-anchor="start">Colaboradores</text>
+<rect x="12" y="256" width="176" height="40" rx="8" fill="#2C3E63"/>
+<rect x="12" y="256" width="4" height="40" rx="2" fill="#F0954A"/>
+<text x="44" y="282" font-size="14" font-weight="bold" fill="#F0954A" text-anchor="start">Constancias</text>
+<text x="44" y="328" font-size="14" font-weight="normal" fill="#D5DCE8" text-anchor="start">Notificaciones</text>
+<text x="24" y="864" font-size="13" font-weight="normal" fill="#D5DCE8" text-anchor="start">Cerrar sesión</text>
+<text x="240" y="62" font-size="26" font-weight="bold" fill="#1F2937" text-anchor="start">Constancias</text>
+<text x="240" y="88" font-size="13" font-weight="normal" fill="#6B7280" text-anchor="start">Historial de constancias generadas</text>
+<rect x="240" y="112" width="130" height="38" rx="8" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+<text x="305.0" y="136" font-size="13" font-weight="bold" fill="#1F2937" text-anchor="middle">Plantillas (4)</text>
+<rect x="380" y="112" width="110" height="38" rx="8" fill="#F0954A"/>
+<text x="435.0" y="136" font-size="13" font-weight="bold" fill="#FFFFFF" text-anchor="middle">Historial</text>
+<rect x="240" y="168" width="300" height="40" rx="6" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<text x="252" y="193.0" font-size="13" font-weight="normal" fill="#9CA3AF" text-anchor="start">Buscar colaborador o folio</text>
+<rect x="556" y="168" width="150" height="40" rx="6" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<text x="568" y="193.0" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">01/11/2026</text>
+<rect x="722" y="168" width="150" height="40" rx="6" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<text x="734" y="193.0" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">13/11/2026</text>
+<rect x="888" y="168" width="250" height="40" rx="6" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<text x="900" y="193.0" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">Todas las plantillas</text>
+<text x="1116" y="193.0" font-size="13" font-weight="normal" fill="#6B7280" text-anchor="middle">▾</text>
+<rect x="1154" y="168" width="246" height="40" rx="6" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<text x="1166" y="193.0" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">Todos los estados</text>
+<text x="1378" y="193.0" font-size="13" font-weight="normal" fill="#6B7280" text-anchor="middle">▾</text>
+<rect x="240" y="226" width="1160" height="634" rx="12" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+<rect x="240" y="232" width="1160" height="36" rx="0" fill="#F9FAFB"/>
+<text x="262" y="254" font-size="11" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.4">FOLIO</text>
+<text x="400" y="254" font-size="11" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.4">COLABORADOR</text>
+<text x="620" y="254" font-size="11" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.4">PLANTILLA</text>
+<text x="830" y="254" font-size="11" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.4">VERSIÓN</text>
+<text x="900" y="254" font-size="11" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.4">FECHA</text>
+<text x="1040" y="254" font-size="11" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.4">CANAL</text>
+<text x="1140" y="254" font-size="11" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.4">ESTADO</text>
+<text x="1290" y="254" font-size="11" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.4">ACCIÓN</text>
+<text x="262" y="299.0" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">CG-2026-0142</text>
+<text x="400" y="299.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Samuel López Rosales</text>
+<text x="620" y="299.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Constancia laboral</text>
+<rect x="830" y="283.0" width="36" height="22" rx="11" fill="#DBEAFE"/>
+<text x="848.0" y="298.0" font-size="10" font-weight="bold" fill="#1D4ED8" text-anchor="middle">v3</text>
+<text x="900" y="299.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">13 nov, 09:42</text>
+<rect x="1040" y="283.0" width="74" height="22" rx="11" fill="#E5E7EB"/>
+<text x="1077.0" y="298.0" font-size="10" font-weight="bold" fill="#1F2937" text-anchor="middle">WhatsApp</text>
+<rect x="1140" y="283.0" width="86" height="22" rx="11" fill="#DCFCE7"/>
+<text x="1183.0" y="298.0" font-size="10" font-weight="bold" fill="#15803D" text-anchor="middle">ENTREGADA</text>
+<text x="1290" y="299.0" font-size="12" font-weight="bold" fill="#1E5AA8" text-anchor="start">Descargar</text>
+<line x1="240" y1="320" x2="1400" y2="320" stroke="#E5E7EB" stroke-width="1"/>
+<text x="262" y="351.0" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">CG-2026-0141</text>
+<text x="400" y="351.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Ana Lucía Ramírez Torres</text>
+<text x="620" y="351.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Constancia guardería</text>
+<rect x="830" y="335.0" width="36" height="22" rx="11" fill="#DBEAFE"/>
+<text x="848.0" y="350.0" font-size="10" font-weight="bold" fill="#1D4ED8" text-anchor="middle">v2</text>
+<text x="900" y="351.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">13 nov, 08:15</text>
+<rect x="1040" y="335.0" width="74" height="22" rx="11" fill="#E5E7EB"/>
+<text x="1077.0" y="350.0" font-size="10" font-weight="bold" fill="#1F2937" text-anchor="middle">WhatsApp</text>
+<rect x="1140" y="335.0" width="86" height="22" rx="11" fill="#DCFCE7"/>
+<text x="1183.0" y="350.0" font-size="10" font-weight="bold" fill="#15803D" text-anchor="middle">ENTREGADA</text>
+<text x="1290" y="351.0" font-size="12" font-weight="bold" fill="#1E5AA8" text-anchor="start">Descargar</text>
+<line x1="240" y1="372" x2="1400" y2="372" stroke="#E5E7EB" stroke-width="1"/>
+<text x="262" y="403.0" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">CG-2026-0140</text>
+<text x="400" y="403.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Miguel Ángel Herrera Cruz</text>
+<text x="620" y="403.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Constancia consulado</text>
+<rect x="830" y="387.0" width="36" height="22" rx="11" fill="#DBEAFE"/>
+<text x="848.0" y="402.0" font-size="10" font-weight="bold" fill="#1D4ED8" text-anchor="middle">v4</text>
+<text x="900" y="403.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">12 nov, 17:30</text>
+<rect x="1040" y="387.0" width="74" height="22" rx="11" fill="#E5E7EB"/>
+<text x="1077.0" y="402.0" font-size="10" font-weight="bold" fill="#1F2937" text-anchor="middle">WhatsApp</text>
+<rect x="1140" y="387.0" width="72" height="22" rx="11" fill="#FEE2E2"/>
+<text x="1176.0" y="402.0" font-size="10" font-weight="bold" fill="#B91C1C" text-anchor="middle">FALLIDA</text>
+<text x="1290" y="403.0" font-size="12" font-weight="bold" fill="#B91C1C" text-anchor="start">Reenviar</text>
+<line x1="240" y1="424" x2="1400" y2="424" stroke="#E5E7EB" stroke-width="1"/>
+<text x="262" y="455.0" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">CG-2026-0139</text>
+<text x="400" y="455.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Fernanda Ortiz Vélez</text>
+<text x="620" y="455.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Constancia laboral</text>
+<rect x="830" y="439.0" width="36" height="22" rx="11" fill="#DBEAFE"/>
+<text x="848.0" y="454.0" font-size="10" font-weight="bold" fill="#1D4ED8" text-anchor="middle">v3</text>
+<text x="900" y="455.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">12 nov, 11:04</text>
+<rect x="1040" y="439.0" width="74" height="22" rx="11" fill="#E5E7EB"/>
+<text x="1077.0" y="454.0" font-size="10" font-weight="bold" fill="#1F2937" text-anchor="middle">RH</text>
+<rect x="1140" y="439.0" width="86" height="22" rx="11" fill="#DCFCE7"/>
+<text x="1183.0" y="454.0" font-size="10" font-weight="bold" fill="#15803D" text-anchor="middle">ENTREGADA</text>
+<text x="1290" y="455.0" font-size="12" font-weight="bold" fill="#1E5AA8" text-anchor="start">Descargar</text>
+<line x1="240" y1="476" x2="1400" y2="476" stroke="#E5E7EB" stroke-width="1"/>
+<text x="262" y="507.0" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">CG-2026-0138</text>
+<text x="400" y="507.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Jorge Luis Medina Paredes</text>
+<text x="620" y="507.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Constancia consulado</text>
+<rect x="830" y="491.0" width="36" height="22" rx="11" fill="#DBEAFE"/>
+<text x="848.0" y="506.0" font-size="10" font-weight="bold" fill="#1D4ED8" text-anchor="middle">v4</text>
+<text x="900" y="507.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">11 nov, 16:50</text>
+<rect x="1040" y="491.0" width="74" height="22" rx="11" fill="#E5E7EB"/>
+<text x="1077.0" y="506.0" font-size="10" font-weight="bold" fill="#1F2937" text-anchor="middle">WhatsApp</text>
+<rect x="1140" y="491.0" width="86" height="22" rx="11" fill="#DCFCE7"/>
+<text x="1183.0" y="506.0" font-size="10" font-weight="bold" fill="#15803D" text-anchor="middle">ENTREGADA</text>
+<text x="1290" y="507.0" font-size="12" font-weight="bold" fill="#1E5AA8" text-anchor="start">Descargar</text>
+<line x1="240" y1="528" x2="1400" y2="528" stroke="#E5E7EB" stroke-width="1"/>
+<text x="262" y="559.0" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">CG-2026-0137</text>
+<text x="400" y="559.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Daniela Flores Campos</text>
+<text x="620" y="559.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Constancia laboral</text>
+<rect x="830" y="543.0" width="36" height="22" rx="11" fill="#DBEAFE"/>
+<text x="848.0" y="558.0" font-size="10" font-weight="bold" fill="#1D4ED8" text-anchor="middle">v3</text>
+<text x="900" y="559.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">11 nov, 10:20</text>
+<rect x="1040" y="543.0" width="74" height="22" rx="11" fill="#E5E7EB"/>
+<text x="1077.0" y="558.0" font-size="10" font-weight="bold" fill="#1F2937" text-anchor="middle">WhatsApp</text>
+<rect x="1140" y="543.0" width="86" height="22" rx="11" fill="#DCFCE7"/>
+<text x="1183.0" y="558.0" font-size="10" font-weight="bold" fill="#15803D" text-anchor="middle">ENTREGADA</text>
+<text x="1290" y="559.0" font-size="12" font-weight="bold" fill="#1E5AA8" text-anchor="start">Descargar</text>
+<line x1="240" y1="580" x2="1400" y2="580" stroke="#E5E7EB" stroke-width="1"/>
+<text x="262" y="611.0" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">CG-2026-0136</text>
+<text x="400" y="611.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Ricardo Salinas Ibarra</text>
+<text x="620" y="611.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Constancia guardería</text>
+<rect x="830" y="595.0" width="36" height="22" rx="11" fill="#DBEAFE"/>
+<text x="848.0" y="610.0" font-size="10" font-weight="bold" fill="#1D4ED8" text-anchor="middle">v2</text>
+<text x="900" y="611.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">10 nov, 13:12</text>
+<rect x="1040" y="595.0" width="74" height="22" rx="11" fill="#E5E7EB"/>
+<text x="1077.0" y="610.0" font-size="10" font-weight="bold" fill="#1F2937" text-anchor="middle">WhatsApp</text>
+<rect x="1140" y="595.0" width="78" height="22" rx="11" fill="#FEF3C7"/>
+<text x="1179.0" y="610.0" font-size="10" font-weight="bold" fill="#B45309" text-anchor="middle">PENDIENTE</text>
+<text x="1290" y="611.0" font-size="12" font-weight="bold" fill="#1E5AA8" text-anchor="start">Descargar</text>
+<line x1="240" y1="632" x2="1400" y2="632" stroke="#E5E7EB" stroke-width="1"/>
+<text x="262" y="690" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Mostrando 1–7 de 142 constancias</text>
+<rect x="1150" y="668" width="100" height="34" rx="6" fill="#FFFFFF" stroke="#1B2B4B" stroke-width="1.2"/>
+<text x="1200.0" y="689.2" font-size="12" font-weight="bold" fill="#1B2B4B" text-anchor="middle">Anterior</text>
+<rect x="1262" y="668" width="100" height="34" rx="6" fill="#FFFFFF" stroke="#1B2B4B" stroke-width="1.2"/>
+<text x="1312.0" y="689.2" font-size="12" font-weight="bold" fill="#1B2B4B" text-anchor="middle">Siguiente</text>
+</svg>

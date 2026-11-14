@@ -1,0 +1,4 @@
+# Dependencias de la aplicación de CDK (para CodeBuild; en local las gestiona uv).
+aws-cdk-lib>=2.277.0
+constructs>=10.8.1
+cdk-nag>=3.0.2

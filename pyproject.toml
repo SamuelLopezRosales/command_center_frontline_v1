@@ -1,0 +1,46 @@
+[project]
+name = "command-center"
+version = "0.1.0"
+description = "Command Center v1: herramientas de desarrollo del monorepo"
+requires-python = ">=3.12,<3.13"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "ruff>=0.6",
+    "mypy>=1.11",
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    "hypothesis>=6.100",
+    "pre-commit>=3.8",
+    "detect-secrets>=1.5",
+]
+infra = [
+    "aws-cdk-lib>=2.277.0",
+    "cdk-nag>=3.0.2",
+    "constructs>=10.8.1",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["cdk.out", "node_modules", ".venv", "kiro_command_center_frontline_v1"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "S", "ASYNC"]
+ignore = ["S101"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/**" = ["S105", "S106", "S311"]
+
+[tool.mypy]
+python_version = "3.12"
+ignore_missing_imports = true
+exclude = ["cdk.out", "node_modules", ".venv", "kiro_command_center_frontline_v1"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+pythonpath = ["."]
+testpaths = ["tests", "infra/tests", "services", "lambdas", "scripts"]
+addopts = "-ra"

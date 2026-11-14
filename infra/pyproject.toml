@@ -1,0 +1,4 @@
+# Solo configuración de herramientas: las dependencias se gestionan en el pyproject.toml raíz
+# (grupo "infra") y en requirements.txt para CodeBuild.
+[tool.ruff]
+extend = "../pyproject.toml"

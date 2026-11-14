@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.hypothesis/
+*.egg-info/
+
+# CDK
+cdk.out/
+.cdk.staging/
+
+# Secretos y credenciales (nunca al repositorio)
+.env
+.env.*
+*.pem
+*.key
+*.p12
+.aws/
+credentials
+*.secrets
+!.secrets.baseline
+
+# Node
+node_modules/
+dist/
+coverage/
+
+# Sistema y editores
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Artefactos locales
+*.zip
+*.log
+
+# Salidas temporales de verificación
+.tmp_*

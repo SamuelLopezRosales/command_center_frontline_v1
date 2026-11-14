@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900" font-family="Arial, Helvetica, sans-serif">
+<rect x="200" y="0" width="1240" height="900" rx="0" fill="#F3F4F6"/>
+<rect x="0" y="0" width="200" height="900" rx="0" fill="#1B2B4B"/>
+<g transform="translate(18,22) scale(0.62)">
+<polygon points="0,6 12,0 12,34 0,40" fill="#FFFFFF"/>
+<polygon points="18,14 30,8 30,34 18,40" fill="#FFFFFF"/>
+<polygon points="36,0 48,6 48,40 36,34" fill="#FFFFFF"/>
+<text x="62" y="32" font-size="34" font-weight="normal" fill="#FFFFFF" letter-spacing="2">HONNE</text>
+</g>
+<line x1="0" y1="84" x2="200" y2="84" stroke="#2E3F66" stroke-width="1"/>
+<circle cx="38" cy="118" r="16" fill="#F0954A"/>
+<text x="38" y="123" font-size="12" font-weight="bold" fill="#FFFFFF" text-anchor="middle">DB</text>
+<text x="64" y="114" font-size="13" font-weight="bold" fill="#FFFFFF" text-anchor="start">David Bet</text>
+<text x="64" y="130" font-size="11" font-weight="normal" fill="#9AA7BF" text-anchor="start">RH</text>
+<line x1="0" y1="150" x2="200" y2="150" stroke="#2E3F66" stroke-width="1"/>
+<rect x="12" y="164" width="176" height="40" rx="8" fill="#2C3E63"/>
+<rect x="12" y="164" width="4" height="40" rx="2" fill="#F0954A"/>
+<text x="44" y="190" font-size="14" font-weight="bold" fill="#F0954A" text-anchor="start">Dashboard</text>
+<text x="44" y="236" font-size="14" font-weight="normal" fill="#D5DCE8" text-anchor="start">Colaboradores</text>
+<text x="44" y="282" font-size="14" font-weight="normal" fill="#D5DCE8" text-anchor="start">Constancias</text>
+<text x="44" y="328" font-size="14" font-weight="normal" fill="#D5DCE8" text-anchor="start">Notificaciones</text>
+<text x="24" y="864" font-size="13" font-weight="normal" fill="#D5DCE8" text-anchor="start">Cerrar sesión</text>
+<text x="240" y="62" font-size="26" font-weight="bold" fill="#1F2937" text-anchor="start">Dashboard</text>
+<text x="240" y="88" font-size="13" font-weight="normal" fill="#6B7280" text-anchor="start">Bienvenido, David Bet · Grupo Industrial Norte S.A. de C.V.</text>
+<rect x="1232" y="30" width="168" height="36" rx="6" fill="#FFFFFF" stroke="#1B2B4B" stroke-width="1.2"/>
+<text x="1316.0" y="52.2" font-size="12" font-weight="bold" fill="#1B2B4B" text-anchor="middle">Ver historial</text>
+<rect x="240" y="116" width="272" height="104" rx="12" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+<rect x="260" y="144" width="48" height="48" rx="10" fill="#DCFCE7"/>
+<circle cx="284" cy="168" r="9" fill="#15803D" fill-opacity="0.9"/>
+<text x="324" y="150" font-size="11" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.6">ACTIVOS</text>
+<text x="324" y="188" font-size="28" font-weight="bold" fill="#1F2937" text-anchor="start">118</text>
+<rect x="536" y="116" width="272" height="104" rx="12" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+<rect x="556" y="144" width="48" height="48" rx="10" fill="#FDEBD9"/>
+<circle cx="580" cy="168" r="9" fill="#F0954A" fill-opacity="0.9"/>
+<text x="620" y="150" font-size="11" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.6">CONSTANCIAS ESTE MES</text>
+<text x="620" y="188" font-size="28" font-weight="bold" fill="#1F2937" text-anchor="start">37</text>
+<rect x="832" y="116" width="272" height="104" rx="12" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+<rect x="852" y="144" width="48" height="48" rx="10" fill="#FEF3C7"/>
+<circle cx="876" cy="168" r="9" fill="#B45309" fill-opacity="0.9"/>
+<text x="916" y="150" font-size="11" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.6">EN PROCESO</text>
+<text x="916" y="188" font-size="28" font-weight="bold" fill="#1F2937" text-anchor="start">2</text>
+<rect x="1128" y="116" width="272" height="104" rx="12" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+<rect x="1148" y="144" width="48" height="48" rx="10" fill="#DBEAFE"/>
+<circle cx="1172" cy="168" r="9" fill="#1D4ED8" fill-opacity="0.9"/>
+<text x="1212" y="150" font-size="11" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.6">PLANTILLAS ACTIVAS</text>
+<text x="1212" y="188" font-size="28" font-weight="bold" fill="#1F2937" text-anchor="start">3</text>
+<rect x="240" y="244" width="560" height="300" rx="12" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+<text x="264" y="284" font-size="15" font-weight="bold" fill="#1F2937" text-anchor="start">Solicitudes recientes</text>
+<text x="264" y="320" font-size="13" font-weight="bold" fill="#1F2937" text-anchor="start">Samuel López Rosales</text>
+<text x="264" y="338" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Constancia laboral · v3</text>
+<rect x="680" y="312" width="96" height="22" rx="11" fill="#FEF3C7"/>
+<text x="728.0" y="327" font-size="10" font-weight="bold" fill="#B45309" text-anchor="middle">EN PROCESO</text>
+<text x="264" y="376" font-size="13" font-weight="bold" fill="#1F2937" text-anchor="start">Ana Lucía Ramírez Torres</text>
+<text x="264" y="394" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Constancia guardería · v2</text>
+<rect x="680" y="368" width="86" height="22" rx="11" fill="#DCFCE7"/>
+<text x="723.0" y="383" font-size="10" font-weight="bold" fill="#15803D" text-anchor="middle">ENTREGADA</text>
+<text x="264" y="432" font-size="13" font-weight="bold" fill="#1F2937" text-anchor="start">Miguel Ángel Herrera Cruz</text>
+<text x="264" y="450" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Constancia consulado · v4</text>
+<rect x="680" y="424" width="72" height="22" rx="11" fill="#FEE2E2"/>
+<text x="716.0" y="439" font-size="10" font-weight="bold" fill="#B91C1C" text-anchor="middle">FALLIDA</text>
+<text x="264" y="488" font-size="13" font-weight="bold" fill="#1F2937" text-anchor="start">Fernanda Ortiz Vélez</text>
+<text x="264" y="506" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Constancia laboral · v3</text>
+<rect x="680" y="480" width="86" height="22" rx="11" fill="#DCFCE7"/>
+<text x="723.0" y="495" font-size="10" font-weight="bold" fill="#15803D" text-anchor="middle">ENTREGADA</text>
+<rect x="816" y="244" width="584" height="300" rx="12" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+<text x="840" y="284" font-size="15" font-weight="bold" fill="#1F2937" text-anchor="start">Alertas</text>
+<circle cx="848" cy="318" r="6" fill="#B45309"/>
+<text x="864" y="322" font-size="13" font-weight="bold" fill="#1F2937" text-anchor="start">3 colaboradores sin consentimiento de WhatsApp</text>
+<text x="864" y="340" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Ricardo Salinas Ibarra, Valeria Núñez Ortega y 1 más</text>
+<rect x="1300" y="308" width="84" height="28" rx="5" fill="#F0954A"/>
+<text x="1342.0" y="325.85" font-size="11" font-weight="bold" fill="#FFFFFF" text-anchor="middle">Revisar</text>
+<circle cx="848" cy="390" r="6" fill="#B91C1C"/>
+<text x="864" y="394" font-size="13" font-weight="bold" fill="#1F2937" text-anchor="start">Constancia consulado fallida</text>
+<text x="864" y="412" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Miguel Ángel Herrera Cruz · entrega sin confirmar</text>
+<rect x="1300" y="380" width="84" height="28" rx="5" fill="#F0954A"/>
+<text x="1342.0" y="397.85" font-size="11" font-weight="bold" fill="#FFFFFF" text-anchor="middle">Revisar</text>
+<circle cx="848" cy="462" r="6" fill="#B45309"/>
+<text x="864" y="466" font-size="13" font-weight="bold" fill="#1F2937" text-anchor="start">NSS vacío en 2 colaboradores</text>
+<text x="864" y="484" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Afecta la constancia laboral al emitirse</text>
+<rect x="1300" y="452" width="84" height="28" rx="5" fill="#F0954A"/>
+<text x="1342.0" y="469.85" font-size="11" font-weight="bold" fill="#FFFFFF" text-anchor="middle">Revisar</text>
+<rect x="240" y="564" width="1160" height="296" rx="12" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+<text x="264" y="604" font-size="15" font-weight="bold" fill="#1F2937" text-anchor="start">Constancias recientes</text>
+<rect x="240" y="620" width="1160" height="36" rx="0" fill="#F9FAFB"/>
+<text x="264" y="642" font-size="11" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.4">FOLIO</text>
+<text x="420" y="642" font-size="11" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.4">COLABORADOR</text>
+<text x="640" y="642" font-size="11" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.4">PLANTILLA</text>
+<text x="880" y="642" font-size="11" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.4">FECHA</text>
+<text x="1010" y="642" font-size="11" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.4">ESTADO</text>
+<text x="1290" y="642" font-size="11" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.4">ACCIÓN</text>
+<text x="264" y="683.0" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">CG-2026-0142</text>
+<text x="420" y="683.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Samuel López Rosales</text>
+<text x="640" y="683.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Constancia laboral v3</text>
+<text x="880" y="683.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">13 nov, 09:42</text>
+<rect x="1010" y="667.0" width="86" height="22" rx="11" fill="#DCFCE7"/>
+<text x="1053.0" y="682.0" font-size="10" font-weight="bold" fill="#15803D" text-anchor="middle">ENTREGADA</text>
+<text x="1290" y="683.0" font-size="12" font-weight="bold" fill="#1E5AA8" text-anchor="start">Descargar</text>
+<line x1="240" y1="700" x2="1400" y2="700" stroke="#E5E7EB" stroke-width="1"/>
+<text x="264" y="727.0" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">CG-2026-0141</text>
+<text x="420" y="727.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Ana Lucía Ramírez Torres</text>
+<text x="640" y="727.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Constancia guardería v2</text>
+<text x="880" y="727.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">13 nov, 08:15</text>
+<rect x="1010" y="711.0" width="86" height="22" rx="11" fill="#DCFCE7"/>
+<text x="1053.0" y="726.0" font-size="10" font-weight="bold" fill="#15803D" text-anchor="middle">ENTREGADA</text>
+<text x="1290" y="727.0" font-size="12" font-weight="bold" fill="#1E5AA8" text-anchor="start">Descargar</text>
+<line x1="240" y1="744" x2="1400" y2="744" stroke="#E5E7EB" stroke-width="1"/>
+<text x="264" y="771.0" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">CG-2026-0140</text>
+<text x="420" y="771.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Miguel Ángel Herrera Cruz</text>
+<text x="640" y="771.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Constancia consulado v4</text>
+<text x="880" y="771.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">12 nov, 17:30</text>
+<rect x="1010" y="755.0" width="72" height="22" rx="11" fill="#FEE2E2"/>
+<text x="1046.0" y="770.0" font-size="10" font-weight="bold" fill="#B91C1C" text-anchor="middle">FALLIDA</text>
+<text x="1290" y="771.0" font-size="12" font-weight="bold" fill="#1E5AA8" text-anchor="start">Descargar</text>
+<line x1="240" y1="788" x2="1400" y2="788" stroke="#E5E7EB" stroke-width="1"/>
+<text x="264" y="815.0" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">CG-2026-0139</text>
+<text x="420" y="815.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Fernanda Ortiz Vélez</text>
+<text x="640" y="815.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Constancia laboral v3</text>
+<text x="880" y="815.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">12 nov, 11:04</text>
+<rect x="1010" y="799.0" width="86" height="22" rx="11" fill="#DCFCE7"/>
+<text x="1053.0" y="814.0" font-size="10" font-weight="bold" fill="#15803D" text-anchor="middle">ENTREGADA</text>
+<text x="1290" y="815.0" font-size="12" font-weight="bold" fill="#1E5AA8" text-anchor="start">Descargar</text>
+<line x1="240" y1="832" x2="1400" y2="832" stroke="#E5E7EB" stroke-width="1"/>
+</svg>

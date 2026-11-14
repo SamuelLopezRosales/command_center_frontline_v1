@@ -1,0 +1,7 @@
+{
+  "nombre": "command-center-{ambiente}-mensual",
+  "descripcion": "Presupuesto mensual de costo. El monto, el correo y las alertas se leen de infra/config/ambientes.json (test: 50 USD; 80 % real, 100 % real y 100 % pronosticado a samuel.lopez@honne.com).",
+  "tipo": "COST",
+  "periodo": "MONTHLY",
+  "origen_de_valores": "infra/config/ambientes.json"
+}

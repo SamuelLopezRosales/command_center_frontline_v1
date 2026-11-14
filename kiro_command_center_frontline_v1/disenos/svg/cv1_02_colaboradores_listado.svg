@@ -1,0 +1,137 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900" font-family="Arial, Helvetica, sans-serif">
+<rect x="200" y="0" width="1240" height="900" rx="0" fill="#F3F4F6"/>
+<rect x="0" y="0" width="200" height="900" rx="0" fill="#1B2B4B"/>
+<g transform="translate(18,22) scale(0.62)">
+<polygon points="0,6 12,0 12,34 0,40" fill="#FFFFFF"/>
+<polygon points="18,14 30,8 30,34 18,40" fill="#FFFFFF"/>
+<polygon points="36,0 48,6 48,40 36,34" fill="#FFFFFF"/>
+<text x="62" y="32" font-size="34" font-weight="normal" fill="#FFFFFF" letter-spacing="2">HONNE</text>
+</g>
+<line x1="0" y1="84" x2="200" y2="84" stroke="#2E3F66" stroke-width="1"/>
+<circle cx="38" cy="118" r="16" fill="#F0954A"/>
+<text x="38" y="123" font-size="12" font-weight="bold" fill="#FFFFFF" text-anchor="middle">DB</text>
+<text x="64" y="114" font-size="13" font-weight="bold" fill="#FFFFFF" text-anchor="start">David Bet</text>
+<text x="64" y="130" font-size="11" font-weight="normal" fill="#9AA7BF" text-anchor="start">RH</text>
+<line x1="0" y1="150" x2="200" y2="150" stroke="#2E3F66" stroke-width="1"/>
+<text x="44" y="190" font-size="14" font-weight="normal" fill="#D5DCE8" text-anchor="start">Dashboard</text>
+<rect x="12" y="210" width="176" height="40" rx="8" fill="#2C3E63"/>
+<rect x="12" y="210" width="4" height="40" rx="2" fill="#F0954A"/>
+<text x="44" y="236" font-size="14" font-weight="bold" fill="#F0954A" text-anchor="start">Colaboradores</text>
+<text x="44" y="282" font-size="14" font-weight="normal" fill="#D5DCE8" text-anchor="start">Constancias</text>
+<text x="44" y="328" font-size="14" font-weight="normal" fill="#D5DCE8" text-anchor="start">Notificaciones</text>
+<text x="24" y="864" font-size="13" font-weight="normal" fill="#D5DCE8" text-anchor="start">Cerrar sesión</text>
+<text x="240" y="62" font-size="26" font-weight="bold" fill="#1F2937" text-anchor="start">Colaboradores</text>
+<text x="240" y="88" font-size="13" font-weight="normal" fill="#6B7280" text-anchor="start">Grupo Industrial Norte S.A. de C.V. · 118 activos · 124 registrados</text>
+<rect x="1034" y="30" width="170" height="36" rx="6" fill="#FFFFFF" stroke="#1B2B4B" stroke-width="1.2"/>
+<text x="1119.0" y="52.2" font-size="12" font-weight="bold" fill="#1B2B4B" text-anchor="middle">Configurar campos</text>
+<rect x="1218" y="30" width="182" height="36" rx="6" fill="#F0954A"/>
+<text x="1309.0" y="52.55" font-size="13" font-weight="bold" fill="#FFFFFF" text-anchor="middle">+ Nuevo colaborador</text>
+<rect x="240" y="116" width="360" height="40" rx="6" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<text x="252" y="141.0" font-size="13" font-weight="normal" fill="#9CA3AF" text-anchor="start">Buscar por nombre o número de empleado</text>
+<rect x="616" y="116" width="220" height="40" rx="6" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<text x="628" y="141.0" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">Todas las organizaciones</text>
+<text x="814" y="141.0" font-size="13" font-weight="normal" fill="#6B7280" text-anchor="middle">▾</text>
+<rect x="852" y="116" width="180" height="40" rx="6" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<text x="864" y="141.0" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">Todas las plantas</text>
+<text x="1010" y="141.0" font-size="13" font-weight="normal" fill="#6B7280" text-anchor="middle">▾</text>
+<rect x="1048" y="116" width="160" height="40" rx="6" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<text x="1060" y="141.0" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">ACTIVO</text>
+<text x="1186" y="141.0" font-size="13" font-weight="normal" fill="#6B7280" text-anchor="middle">▾</text>
+<rect x="1224" y="116" width="176" height="40" rx="6" fill="#FFFFFF" stroke="#1B2B4B" stroke-width="1.2"/>
+<text x="1312.0" y="140.2" font-size="12" font-weight="bold" fill="#1B2B4B" text-anchor="middle">Columnas (8 de 19)</text>
+<rect x="240" y="172" width="1160" height="688" rx="12" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+<rect x="240" y="182" width="1160" height="36" rx="0" fill="#F9FAFB"/>
+<text x="262" y="204" font-size="11" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.4">Nº EMPLEADO</text>
+<text x="380" y="204" font-size="11" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.4">NOMBRE</text>
+<text x="600" y="204" font-size="11" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.4">ORGANIZACIÓN</text>
+<text x="780" y="204" font-size="11" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.4">PLANTA</text>
+<text x="900" y="204" font-size="11" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.4">PUESTO</text>
+<text x="1060" y="204" font-size="11" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.4">TIPO</text>
+<text x="1160" y="204" font-size="11" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.4">ESTATUS</text>
+<text x="1300" y="204" font-size="11" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.4">ACCIÓN</text>
+<text x="262" y="249.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">EMP-0001</text>
+<text x="380" y="249.0" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">Samuel López Rosales</text>
+<text x="600" y="249.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">ORG01</text>
+<text x="780" y="249.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Apodaca</text>
+<text x="900" y="249.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Analista de Datos</text>
+<text x="1060" y="249.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Administrativo</text>
+<rect x="1160" y="233.0" width="62" height="22" rx="11" fill="#DCFCE7"/>
+<text x="1191.0" y="248.0" font-size="10" font-weight="bold" fill="#15803D" text-anchor="middle">ACTIVO</text>
+<text x="1300" y="249.0" font-size="12" font-weight="bold" fill="#1E5AA8" text-anchor="start">Abrir</text>
+<line x1="240" y1="270" x2="1400" y2="270" stroke="#E5E7EB" stroke-width="1"/>
+<text x="262" y="301.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">EMP-0002</text>
+<text x="380" y="301.0" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">Ana Lucía Ramírez Torres</text>
+<text x="600" y="301.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">ORG01</text>
+<text x="780" y="301.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Apodaca</text>
+<text x="900" y="301.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Especialista en Nómina</text>
+<text x="1060" y="301.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Administrativo</text>
+<rect x="1160" y="285.0" width="62" height="22" rx="11" fill="#DCFCE7"/>
+<text x="1191.0" y="300.0" font-size="10" font-weight="bold" fill="#15803D" text-anchor="middle">ACTIVO</text>
+<text x="1300" y="301.0" font-size="12" font-weight="bold" fill="#1E5AA8" text-anchor="start">Abrir</text>
+<line x1="240" y1="322" x2="1400" y2="322" stroke="#E5E7EB" stroke-width="1"/>
+<text x="262" y="353.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">EMP-0003</text>
+<text x="380" y="353.0" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">Miguel Ángel Herrera Cruz</text>
+<text x="600" y="353.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">ORG02</text>
+<text x="780" y="353.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Monterrey</text>
+<text x="900" y="353.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Conductor</text>
+<text x="1060" y="353.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Operativo</text>
+<rect x="1160" y="337.0" width="62" height="22" rx="11" fill="#DCFCE7"/>
+<text x="1191.0" y="352.0" font-size="10" font-weight="bold" fill="#15803D" text-anchor="middle">ACTIVO</text>
+<text x="1300" y="353.0" font-size="12" font-weight="bold" fill="#1E5AA8" text-anchor="start">Abrir</text>
+<line x1="240" y1="374" x2="1400" y2="374" stroke="#E5E7EB" stroke-width="1"/>
+<text x="262" y="405.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">EMP-0004</text>
+<text x="380" y="405.0" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">Fernanda Ortiz Vélez</text>
+<text x="600" y="405.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">ORG01</text>
+<text x="780" y="405.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Apodaca</text>
+<text x="900" y="405.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Coordinadora de RH</text>
+<text x="1060" y="405.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Administrativo</text>
+<rect x="1160" y="389.0" width="62" height="22" rx="11" fill="#DCFCE7"/>
+<text x="1191.0" y="404.0" font-size="10" font-weight="bold" fill="#15803D" text-anchor="middle">ACTIVO</text>
+<text x="1300" y="405.0" font-size="12" font-weight="bold" fill="#1E5AA8" text-anchor="start">Abrir</text>
+<line x1="240" y1="426" x2="1400" y2="426" stroke="#E5E7EB" stroke-width="1"/>
+<text x="262" y="457.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">EMP-0005</text>
+<text x="380" y="457.0" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">Jorge Luis Medina Paredes</text>
+<text x="600" y="457.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">ORG02</text>
+<text x="780" y="457.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Monterrey</text>
+<text x="900" y="457.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Ingeniero de Software</text>
+<text x="1060" y="457.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Administrativo</text>
+<rect x="1160" y="441.0" width="62" height="22" rx="11" fill="#DCFCE7"/>
+<text x="1191.0" y="456.0" font-size="10" font-weight="bold" fill="#15803D" text-anchor="middle">ACTIVO</text>
+<text x="1300" y="457.0" font-size="12" font-weight="bold" fill="#1E5AA8" text-anchor="start">Abrir</text>
+<line x1="240" y1="478" x2="1400" y2="478" stroke="#E5E7EB" stroke-width="1"/>
+<text x="262" y="509.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">EMP-0006</text>
+<text x="380" y="509.0" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">Daniela Flores Campos</text>
+<text x="600" y="509.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">ORG01</text>
+<text x="780" y="509.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Apodaca</text>
+<text x="900" y="509.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Auxiliar Administrativo</text>
+<text x="1060" y="509.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Administrativo</text>
+<rect x="1160" y="493.0" width="62" height="22" rx="11" fill="#DCFCE7"/>
+<text x="1191.0" y="508.0" font-size="10" font-weight="bold" fill="#15803D" text-anchor="middle">ACTIVO</text>
+<text x="1300" y="509.0" font-size="12" font-weight="bold" fill="#1E5AA8" text-anchor="start">Abrir</text>
+<line x1="240" y1="530" x2="1400" y2="530" stroke="#E5E7EB" stroke-width="1"/>
+<text x="262" y="561.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">EMP-0007</text>
+<text x="380" y="561.0" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">Ricardo Salinas Ibarra</text>
+<text x="600" y="561.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">ORG01</text>
+<text x="780" y="561.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Apodaca</text>
+<text x="900" y="561.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Supervisor de Almacén</text>
+<text x="1060" y="561.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Operativo</text>
+<rect x="1160" y="545.0" width="62" height="22" rx="11" fill="#DCFCE7"/>
+<text x="1191.0" y="560.0" font-size="10" font-weight="bold" fill="#15803D" text-anchor="middle">ACTIVO</text>
+<text x="1300" y="561.0" font-size="12" font-weight="bold" fill="#1E5AA8" text-anchor="start">Abrir</text>
+<line x1="240" y1="582" x2="1400" y2="582" stroke="#E5E7EB" stroke-width="1"/>
+<text x="262" y="613.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">EMP-0008</text>
+<text x="380" y="613.0" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">Valeria Núñez Ortega</text>
+<text x="600" y="613.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">ORG02</text>
+<text x="780" y="613.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Monterrey</text>
+<text x="900" y="613.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Diseñadora UX</text>
+<text x="1060" y="613.0" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Administrativo</text>
+<rect x="1160" y="597.0" width="50" height="22" rx="11" fill="#FEE2E2"/>
+<text x="1185.0" y="612.0" font-size="10" font-weight="bold" fill="#B91C1C" text-anchor="middle">BAJA</text>
+<text x="1300" y="613.0" font-size="12" font-weight="bold" fill="#1E5AA8" text-anchor="start">Abrir</text>
+<line x1="240" y1="634" x2="1400" y2="634" stroke="#E5E7EB" stroke-width="1"/>
+<text x="262" y="676" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Mostrando 1–8 de 118 colaboradores</text>
+<rect x="1150" y="652" width="100" height="34" rx="6" fill="#FFFFFF" stroke="#1B2B4B" stroke-width="1.2"/>
+<text x="1200.0" y="673.2" font-size="12" font-weight="bold" fill="#1B2B4B" text-anchor="middle">Anterior</text>
+<rect x="1262" y="652" width="100" height="34" rx="6" fill="#FFFFFF" stroke="#1B2B4B" stroke-width="1.2"/>
+<text x="1312.0" y="673.2" font-size="12" font-weight="bold" fill="#1B2B4B" text-anchor="middle">Siguiente</text>
+</svg>

@@ -1,0 +1,184 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900" font-family="Arial, Helvetica, sans-serif">
+<rect x="0" y="0" width="200" height="900" rx="0" fill="#1B2B4B"/>
+<g transform="translate(18,22) scale(0.62)">
+<polygon points="0,6 12,0 12,34 0,40" fill="#FFFFFF"/>
+<polygon points="18,14 30,8 30,34 18,40" fill="#FFFFFF"/>
+<polygon points="36,0 48,6 48,40 36,34" fill="#FFFFFF"/>
+<text x="62" y="32" font-size="34" font-weight="normal" fill="#FFFFFF" letter-spacing="2">HONNE</text>
+</g>
+<line x1="0" y1="84" x2="200" y2="84" stroke="#2E3F66" stroke-width="1"/>
+<circle cx="38" cy="118" r="16" fill="#F0954A"/>
+<text x="38" y="123" font-size="12" font-weight="bold" fill="#FFFFFF" text-anchor="middle">DB</text>
+<text x="64" y="114" font-size="13" font-weight="bold" fill="#FFFFFF" text-anchor="start">David Bet</text>
+<text x="64" y="130" font-size="11" font-weight="normal" fill="#9AA7BF" text-anchor="start">RH</text>
+<line x1="0" y1="150" x2="200" y2="150" stroke="#2E3F66" stroke-width="1"/>
+<text x="44" y="190" font-size="14" font-weight="normal" fill="#D5DCE8" text-anchor="start">Dashboard</text>
+<text x="44" y="236" font-size="14" font-weight="normal" fill="#D5DCE8" text-anchor="start">Colaboradores</text>
+<rect x="12" y="256" width="176" height="40" rx="8" fill="#2C3E63"/>
+<rect x="12" y="256" width="4" height="40" rx="2" fill="#F0954A"/>
+<text x="44" y="282" font-size="14" font-weight="bold" fill="#F0954A" text-anchor="start">Constancias</text>
+<text x="44" y="328" font-size="14" font-weight="normal" fill="#D5DCE8" text-anchor="start">Notificaciones</text>
+<text x="24" y="864" font-size="13" font-weight="normal" fill="#D5DCE8" text-anchor="start">Cerrar sesión</text>
+<rect x="200" y="0" width="1240" height="900" rx="0" fill="#F3F4F6"/>
+<rect x="200" y="0" width="1240" height="64" rx="0" fill="#FFFFFF"/>
+<line x1="200" y1="64" x2="1440" y2="64" stroke="#E5E7EB" stroke-width="1"/>
+<text x="224" y="38" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">← Constancias</text>
+<rect x="340" y="14" width="340" height="36" rx="6" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<text x="352" y="37.0" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">Constancia laboral</text>
+<text x="700" y="38" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Borrador · última versión publicada v3 (12 nov 2026)</text>
+<rect x="1130" y="14" width="150" height="36" rx="6" fill="#FFFFFF" stroke="#1B2B4B" stroke-width="1.2"/>
+<text x="1205.0" y="36.2" font-size="12" font-weight="bold" fill="#1B2B4B" text-anchor="middle">Guardar borrador</text>
+<rect x="1292" y="14" width="108" height="36" rx="6" fill="#F0954A"/>
+<text x="1346.0" y="36.2" font-size="12" font-weight="bold" fill="#FFFFFF" text-anchor="middle">Publicar v4</text>
+<rect x="200" y="64" width="240" height="836" rx="0" fill="#FFFFFF"/>
+<line x1="440" y1="64" x2="440" y2="900" stroke="#E5E7EB" stroke-width="1"/>
+<text x="220" y="100" font-size="14" font-weight="bold" fill="#1F2937" text-anchor="start">Variables</text>
+<rect x="216" y="114" width="208" height="32" rx="6" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<text x="228" y="135.0" font-size="13" font-weight="normal" fill="#9CA3AF" text-anchor="start">Buscar variable</text>
+<text x="220" y="170" font-size="10" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.6">COLABORADOR</text>
+<rect x="216" y="184" width="208" height="24" rx="5" fill="#F3F4F6"/>
+<text x="226" y="200" font-size="11" font-weight="normal" fill="#1F2937" text-anchor="start">{{nombre_completo}}</text>
+<rect x="216" y="212" width="208" height="24" rx="5" fill="#F3F4F6"/>
+<text x="226" y="228" font-size="11" font-weight="normal" fill="#1F2937" text-anchor="start">{{puesto}}</text>
+<rect x="216" y="240" width="208" height="24" rx="5" fill="#F3F4F6"/>
+<text x="226" y="256" font-size="11" font-weight="normal" fill="#1F2937" text-anchor="start">{{fecha_ingreso}}</text>
+<rect x="216" y="268" width="208" height="24" rx="5" fill="#F3F4F6"/>
+<text x="226" y="284" font-size="11" font-weight="normal" fill="#1F2937" text-anchor="start">{{area}}</text>
+<rect x="216" y="296" width="208" height="24" rx="5" fill="#F3F4F6"/>
+<text x="226" y="312" font-size="11" font-weight="normal" fill="#1F2937" text-anchor="start">{{planta}}</text>
+<text x="220" y="332" font-size="10" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.6">ORGANIZACIÓN</text>
+<rect x="216" y="346" width="208" height="24" rx="5" fill="#F3F4F6"/>
+<text x="226" y="362" font-size="11" font-weight="normal" fill="#1F2937" text-anchor="start">{{organizacion.razon_social}}</text>
+<rect x="216" y="374" width="208" height="24" rx="5" fill="#F3F4F6"/>
+<text x="226" y="390" font-size="11" font-weight="normal" fill="#1F2937" text-anchor="start">{{organizacion.domicilio_fiscal}}</text>
+<rect x="216" y="402" width="208" height="24" rx="5" fill="#F3F4F6"/>
+<text x="226" y="418" font-size="11" font-weight="normal" fill="#1F2937" text-anchor="start">{{organizacion.nombre_firmante}}</text>
+<rect x="216" y="430" width="208" height="24" rx="5" fill="#F3F4F6"/>
+<text x="226" y="446" font-size="11" font-weight="normal" fill="#1F2937" text-anchor="start">{{organizacion.cargo_firmante}}</text>
+<rect x="216" y="458" width="208" height="24" rx="5" fill="#F3F4F6"/>
+<text x="226" y="474" font-size="11" font-weight="normal" fill="#1F2937" text-anchor="start">{{organizacion.correo_firmante}}</text>
+<rect x="216" y="486" width="208" height="24" rx="5" fill="#F3F4F6"/>
+<text x="226" y="502" font-size="11" font-weight="normal" fill="#1F2937" text-anchor="start">{{lugar}}</text>
+<rect x="216" y="514" width="208" height="24" rx="5" fill="#F3F4F6"/>
+<text x="226" y="530" font-size="11" font-weight="normal" fill="#1F2937" text-anchor="start">{{registro_patronal}}</text>
+<text x="220" y="550" font-size="10" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.6">SENSIBLES</text>
+<rect x="216" y="564" width="208" height="24" rx="5" fill="#FEE2E2"/>
+<text x="226" y="580" font-size="11" font-weight="normal" fill="#B91C1C" text-anchor="start">{{rfc}}</text>
+<rect x="216" y="592" width="208" height="24" rx="5" fill="#FEE2E2"/>
+<text x="226" y="608" font-size="11" font-weight="normal" fill="#B91C1C" text-anchor="start">{{nss}}</text>
+<rect x="216" y="620" width="208" height="24" rx="5" fill="#FEE2E2"/>
+<text x="226" y="636" font-size="11" font-weight="normal" fill="#B91C1C" text-anchor="start">{{curp}}</text>
+<rect x="216" y="648" width="208" height="24" rx="5" fill="#FEE2E2"/>
+<text x="226" y="664" font-size="11" font-weight="normal" fill="#B91C1C" text-anchor="start">{{sueldo_mensual}}</text>
+<rect x="216" y="676" width="208" height="24" rx="5" fill="#FEE2E2"/>
+<text x="226" y="692" font-size="11" font-weight="normal" fill="#B91C1C" text-anchor="start">{{sueldo_letra}}</text>
+<text x="220" y="712" font-size="10" font-weight="bold" fill="#6B7280" text-anchor="start" letter-spacing="0.6">SISTEMA</text>
+<rect x="216" y="726" width="208" height="24" rx="5" fill="#F3F4F6"/>
+<text x="226" y="742" font-size="11" font-weight="normal" fill="#1F2937" text-anchor="start">{{fecha_emision}}</text>
+<rect x="216" y="754" width="208" height="24" rx="5" fill="#F3F4F6"/>
+<text x="226" y="770" font-size="11" font-weight="normal" fill="#1F2937" text-anchor="start">{{folio}}</text>
+<rect x="216" y="782" width="208" height="24" rx="5" fill="#F3F4F6"/>
+<text x="226" y="798" font-size="11" font-weight="normal" fill="#1F2937" text-anchor="start">{{qr_verificacion}}</text>
+<rect x="440" y="64" width="660" height="44" rx="0" fill="#FFFFFF"/>
+<line x1="440" y1="108" x2="1100" y2="108" stroke="#E5E7EB" stroke-width="1"/>
+<rect x="456" y="74" width="30" height="26" rx="4" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+<text x="471" y="92" font-size="12" font-weight="bold" fill="#1F2937" text-anchor="middle">B</text>
+<rect x="492" y="74" width="30" height="26" rx="4" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+<text x="507" y="92" font-size="12" font-weight="bold" fill="#1F2937" text-anchor="middle">I</text>
+<rect x="528" y="74" width="30" height="26" rx="4" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+<text x="543" y="92" font-size="12" font-weight="bold" fill="#1F2937" text-anchor="middle">U</text>
+<rect x="576" y="72" width="96" height="30" rx="6" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<text x="588" y="92.0" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">12 pt</text>
+<text x="650" y="92.0" font-size="13" font-weight="normal" fill="#6B7280" text-anchor="middle">▾</text>
+<rect x="686" y="74" width="36" height="26" rx="4" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+<text x="704" y="92" font-size="10" font-weight="normal" fill="#1F2937" text-anchor="middle">Izq</text>
+<rect x="726" y="74" width="36" height="26" rx="4" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+<text x="744" y="92" font-size="10" font-weight="normal" fill="#1F2937" text-anchor="middle">Cen</text>
+<rect x="766" y="74" width="36" height="26" rx="4" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+<text x="784" y="92" font-size="10" font-weight="normal" fill="#1F2937" text-anchor="middle">Der</text>
+<circle cx="830" cy="87" r="8" fill="#1F2937"/>
+<rect x="900" y="72" width="180" height="30" rx="6" fill="#FFFFFF" stroke="#1B2B4B" stroke-width="1.2"/>
+<text x="990.0" y="90.85" font-size="11" font-weight="bold" fill="#1B2B4B" text-anchor="middle">Insertar logotipo</text>
+<rect x="490" y="124" width="560" height="724" rx="2" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+<rect x="530" y="150" width="200" height="56" fill="none" stroke="#9CA3AF" stroke-dasharray="5 4"/>
+<text x="546" y="183" font-size="11" font-weight="normal" fill="#6B7280" text-anchor="start">[Logotipo de la organización]</text>
+<rect x="530" y="240" width="59.5" height="18" rx="4" fill="#FDEBD9"/>
+<text x="535" y="250" font-size="11" font-weight="normal" fill="#B45309" text-anchor="start">{{lugar}}</text>
+<text x="591.5" y="250" font-size="12" font-weight="normal" fill="#1F2937" text-anchor="start">, </text>
+<rect x="604.46" y="240" width="103.5" height="18" rx="4" fill="#FDEBD9"/>
+<text x="609.46" y="250" font-size="11" font-weight="normal" fill="#B45309" text-anchor="start">{{fecha_emision}}</text>
+<text x="530" y="296" font-size="12" font-weight="normal" fill="#1F2937" text-anchor="start">A quien corresponda:</text>
+<text x="530" y="340" font-size="12" font-weight="normal" fill="#1F2937" text-anchor="start">Por medio de la presente, </text>
+<rect x="698.48" y="330" width="169.5" height="18" rx="4" fill="#FDEBD9"/>
+<text x="703.48" y="340" font-size="11" font-weight="normal" fill="#B45309" text-anchor="start">{{organizacion.razon_social}}</text>
+<text x="530" y="362" font-size="12" font-weight="normal" fill="#1F2937" text-anchor="start">hace constar que </text>
+<rect x="640.16" y="352" width="114.5" height="18" rx="4" fill="#FDEBD9"/>
+<text x="645.16" y="362" font-size="11" font-weight="normal" fill="#B45309" text-anchor="start">{{nombre_completo}}</text>
+<text x="756.66" y="362" font-size="12" font-weight="normal" fill="#1F2937" text-anchor="start">, con RFC </text>
+<rect x="821.46" y="352" width="48.5" height="18" rx="4" fill="#FEE2E2"/>
+<text x="826.46" y="362" font-size="11" font-weight="normal" fill="#B91C1C" text-anchor="start">{{rfc}}</text>
+<text x="530" y="384" font-size="12" font-weight="normal" fill="#1F2937" text-anchor="start">forma parte de nuestra organización desde el </text>
+<rect x="821.6" y="374" width="103.5" height="18" rx="4" fill="#FDEBD9"/>
+<text x="826.6" y="384" font-size="11" font-weight="normal" fill="#B45309" text-anchor="start">{{fecha_ingreso}}</text>
+<text x="927.1" y="384" font-size="12" font-weight="normal" fill="#1F2937" text-anchor="start">,</text>
+<text x="530" y="406" font-size="12" font-weight="normal" fill="#1F2937" text-anchor="start">desempeñando el puesto de </text>
+<rect x="698.48" y="396" width="65.0" height="18" rx="4" fill="#FDEBD9"/>
+<text x="703.48" y="406" font-size="11" font-weight="normal" fill="#B45309" text-anchor="start">{{puesto}}</text>
+<text x="765.48" y="406" font-size="12" font-weight="normal" fill="#1F2937" text-anchor="start">, adscrito al área de </text>
+<rect x="908.04" y="396" width="54.0" height="18" rx="4" fill="#FDEBD9"/>
+<text x="913.04" y="406" font-size="11" font-weight="normal" fill="#B45309" text-anchor="start">{{area}}</text>
+<text x="964.04" y="406" font-size="12" font-weight="normal" fill="#1F2937" text-anchor="start">.</text>
+<text x="530" y="428" font-size="12" font-weight="normal" fill="#1F2937" text-anchor="start">Con sueldo mensual bruto de </text>
+<rect x="711.44" y="418" width="109.0" height="18" rx="4" fill="#FEE2E2"/>
+<text x="716.44" y="428" font-size="11" font-weight="normal" fill="#B91C1C" text-anchor="start">{{sueldo_mensual}}</text>
+<text x="822.44" y="428" font-size="12" font-weight="normal" fill="#1F2937" text-anchor="start"> (</text>
+<rect x="835.4000000000001" y="418" width="98.0" height="18" rx="4" fill="#FEE2E2"/>
+<text x="840.4000000000001" y="428" font-size="11" font-weight="normal" fill="#B91C1C" text-anchor="start">{{sueldo_letra}}</text>
+<text x="935.4000000000001" y="428" font-size="12" font-weight="normal" fill="#1F2937" text-anchor="start"> 00/100 MN).</text>
+<text x="530" y="462" font-size="12" font-weight="normal" fill="#1F2937" text-anchor="start">Registro patronal: </text>
+<rect x="653.12" y="452" width="125.5" height="18" rx="4" fill="#FDEBD9"/>
+<text x="658.12" y="462" font-size="11" font-weight="normal" fill="#B45309" text-anchor="start">{{registro_patronal}}</text>
+<text x="530" y="484" font-size="12" font-weight="normal" fill="#1F2937" text-anchor="start">RFC empresa: </text>
+<rect x="614.24" y="474" width="120.0" height="18" rx="4" fill="#FDEBD9"/>
+<text x="619.24" y="484" font-size="11" font-weight="normal" fill="#B45309" text-anchor="start">{{organizacion.rfc}}</text>
+<text x="530" y="528" font-size="12" font-weight="normal" fill="#1F2937" text-anchor="start">Se extiende la presente para los fines que estime convenientes.</text>
+<text x="530" y="580" font-size="12" font-weight="bold" fill="#1F2937" text-anchor="start">ATENTAMENTE</text>
+<rect x="530" y="630" width="186.0" height="18" rx="4" fill="#FDEBD9"/>
+<text x="535" y="640" font-size="11" font-weight="normal" fill="#B45309" text-anchor="start">{{organizacion.nombre_firmante}}</text>
+<rect x="530" y="652" width="180.5" height="18" rx="4" fill="#FDEBD9"/>
+<text x="535" y="662" font-size="11" font-weight="normal" fill="#B45309" text-anchor="start">{{organizacion.cargo_firmante}}</text>
+<rect x="530" y="674" width="186.0" height="18" rx="4" fill="#FDEBD9"/>
+<text x="535" y="684" font-size="11" font-weight="normal" fill="#B45309" text-anchor="start">{{organizacion.correo_firmante}}</text>
+<text x="530" y="760" font-size="11" font-weight="normal" fill="#6B7280" text-anchor="start">c.c.p. Expediente del colaborador</text>
+<rect x="1116" y="64" width="284" height="836" rx="0" fill="#FFFFFF"/>
+<line x1="1116" y1="64" x2="1116" y2="900" stroke="#E5E7EB" stroke-width="1"/>
+<text x="1136" y="100" font-size="14" font-weight="bold" fill="#1F2937" text-anchor="start">Vista previa</text>
+<text x="1136" y="138" font-size="12" font-weight="normal" fill="#1F2937" text-anchor="start">Colaborador de prueba</text>
+<rect x="1136" y="146" width="248" height="40" rx="6" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1"/>
+<text x="1148" y="171.0" font-size="13" font-weight="normal" fill="#1F2937" text-anchor="start">Samuel López Rosales</text>
+<text x="1362" y="171.0" font-size="13" font-weight="normal" fill="#6B7280" text-anchor="middle">▾</text>
+<text x="1136" y="226" font-size="13" font-weight="bold" fill="#1F2937" text-anchor="start">Validación</text>
+<rect x="1136" y="252" width="44" height="22" rx="11" fill="#DCFCE7"/>
+<text x="1158.0" y="267" font-size="10" font-weight="bold" fill="#15803D" text-anchor="middle">OK</text>
+<text x="1188" y="267" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">14 variables válidas</text>
+<rect x="1136" y="288" width="60" height="22" rx="11" fill="#FEF3C7"/>
+<text x="1166.0" y="303" font-size="10" font-weight="bold" fill="#B45309" text-anchor="middle">AVISO</text>
+<text x="1204" y="303" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">rfc, nss y curp son sensibles</text>
+<rect x="1136" y="324" width="44" height="22" rx="11" fill="#DCFCE7"/>
+<text x="1158.0" y="339" font-size="10" font-weight="bold" fill="#15803D" text-anchor="middle">OK</text>
+<text x="1188" y="339" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">Obligatorios completos</text>
+<rect x="1136" y="360" width="60" height="22" rx="11" fill="#FEF3C7"/>
+<text x="1166.0" y="375" font-size="10" font-weight="bold" fill="#B45309" text-anchor="middle">AVISO</text>
+<text x="1204" y="375" font-size="12" font-weight="normal" fill="#6B7280" text-anchor="start">2 colaboradores sin NSS</text>
+<text x="1136" y="430" font-size="13" font-weight="bold" fill="#1F2937" text-anchor="start">Versiones</text>
+<text x="1136" y="466" font-size="12" font-weight="bold" fill="#1F2937" text-anchor="start">v3 · publicada 12 nov 2026</text>
+<rect x="1310" y="452" width="64" height="22" rx="11" fill="#DCFCE7"/>
+<text x="1342.0" y="467" font-size="10" font-weight="bold" fill="#15803D" text-anchor="middle">Activa</text>
+<line x1="1136" y1="480" x2="1384" y2="480" stroke="#E5E7EB" stroke-width="1"/>
+<text x="1136" y="506" font-size="12" font-weight="normal" fill="#1F2937" text-anchor="start">v2 · 05 nov 2026</text>
+<text x="1310" y="506" font-size="12" font-weight="bold" fill="#1E5AA8" text-anchor="start">Restaurar</text>
+<line x1="1136" y1="520" x2="1384" y2="520" stroke="#E5E7EB" stroke-width="1"/>
+<text x="1136" y="546" font-size="12" font-weight="normal" fill="#1F2937" text-anchor="start">v1 · 10 oct 2026</text>
+<text x="1310" y="546" font-size="12" font-weight="bold" fill="#1E5AA8" text-anchor="start">Restaurar</text>
+<line x1="1136" y1="560" x2="1384" y2="560" stroke="#E5E7EB" stroke-width="1"/>
+</svg>
