@@ -72,3 +72,33 @@ def test_plantilla_sin_credenciales(plantilla):
     texto = json.dumps(plantilla.to_json())
     assert "AKIA" not in texto
     assert Match is not None
+
+
+def test_llave_de_infraestructura_permite_a_eventbridge_ses_y_cloudwatch_solo_desde_la_cuenta(
+    plantilla,
+):
+    """EventBridge (colas ev-*), SES y CloudWatch (tema SNS) no usan un rol: la política de la
+    llave los nombra. La llave de datos no."""
+    # La plantilla no trae la ruta de CDK: se identifica cada llave por su alias.
+    destino = {
+        a["Properties"]["AliasName"]: a["Properties"]["TargetKeyId"]["Fn::GetAtt"][0]
+        for a in plantilla.find_resources("AWS::KMS::Alias").values()
+    }
+    claves = plantilla.find_resources("AWS::KMS::Key")
+    llaves = {
+        "LlaveInfra": claves[destino["alias/cc-test-infra"]],
+        "LlaveDatos": claves[destino["alias/cc-test-datos"]],
+    }
+    sentencias = llaves["LlaveInfra"]["Properties"]["KeyPolicy"]["Statement"]
+    (s,) = (x for x in sentencias if x.get("Sid") == "ServiciosDeAwsDeMensajeria")
+    assert s["Effect"] == "Allow"
+    assert set(s["Principal"]["Service"]) == {
+        "events.amazonaws.com",
+        "ses.amazonaws.com",
+        "cloudwatch.amazonaws.com",
+    }
+    assert sorted(s["Action"]) == ["kms:Decrypt", "kms:GenerateDataKey*"]
+    assert s["Condition"] == {"StringEquals": {"aws:SourceAccount": PERMITIDA}}
+    assert "ServiciosDeAwsDeMensajeria" not in json.dumps(
+        llaves["LlaveDatos"]["Properties"]["KeyPolicy"]
+    )

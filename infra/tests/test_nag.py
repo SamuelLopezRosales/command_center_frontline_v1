@@ -63,11 +63,9 @@ def test_synth_termina_sin_errores(ensamblado):
 
 def test_sin_hallazgos_sin_reconocer(ensamblado):
     proc, out = ensamblado
-    reporte = out / "policy-validation-report.json"
-    if not reporte.exists():
-        # Sin violaciones, CDK no escribe el reporte.
-        assert "AwsSolutions-" not in proc.stderr
-        return
+    reporte = out / "validation-report.json"
+    # CDK 2.277 escribe validation-report.json (antes policy-validation-report.json).
+    assert reporte.exists(), "CDK no escribió el reporte de validación"
     datos = json.loads(reporte.read_text(encoding="utf-8"))
     violaciones = [
         (r.get("ruleName"), [v.get("constructPath") for v in r.get("violatingConstructs", [])])
@@ -80,7 +78,15 @@ def test_sin_hallazgos_sin_reconocer(ensamblado):
 def test_stacks_esperados(ensamblado):
     _, out = ensamblado
     plantillas = {p.name for p in out.glob("*.template.json")}
-    assert {"CcSecurity-test.template.json", "CcNetwork-test.template.json"} <= plantillas
+    assert {
+        "CcSecurity-test.template.json",
+        "CcNetwork-test.template.json",
+        "CcStorage-test.template.json",
+        "CcData-test.template.json",
+        "CcMessaging-test.template.json",
+        "CcAuth-test.template.json",
+        "CcComputeBase-test.template.json",
+    } <= plantillas
 
 
 def test_reconocer_exige_motivo():

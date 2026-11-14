@@ -23,7 +23,8 @@ def test_test_usa_instancia_nat_y_no_nat_gateway(plantilla):
     instancias = plantilla.find_resources("AWS::EC2::Instance")
     assert len(instancias) == 1
     (nat,) = instancias.values()
-    assert nat["Properties"]["InstanceType"] == "t4g.nano"
+    # 1 GB como minimo: con 512 MB (t4g.nano) el arranque de la NAT se queda sin memoria.
+    assert nat["Properties"]["InstanceType"] == "t4g.micro"
     assert nat["Properties"]["SourceDestCheck"] is False
 
 
@@ -32,6 +33,7 @@ def test_disco_de_la_instancia_nat_cifrado(plantilla):
     (disco,) = nat["Properties"]["BlockDeviceMappings"]
     assert disco["Ebs"]["Encrypted"] is True
     assert disco["Ebs"]["VolumeType"] == "gp3"
+    assert disco["Ebs"]["VolumeSize"] == 10
 
 
 def test_zonas_fijas_sin_busqueda_en_aws(plantilla):

@@ -19,7 +19,7 @@ Documento de la tarea T-010. Fuente de los valores: `infra/config/ambientes.json
 
 | Elemento | `test` | `prod` | Motivo de la diferencia |
 |---|---|---|---|
-| NAT | Una instancia NAT `t4g.nano` (cambio A) | Una NAT Gateway por zona | Costo |
+| NAT | Una instancia NAT `t4g.micro` (cambio A; `t4g.nano` no arranca por memoria) | Una NAT Gateway por zona | Costo |
 | RDS, clase | `db.t4g.micro` (cambio E) | `db.t4g.medium` | Costo |
 | RDS, Multi-AZ | No | Sí | Costo |
 | RDS, protección contra borrado | No | Sí | Poder destruir el prototipo |

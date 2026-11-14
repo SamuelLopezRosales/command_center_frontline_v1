@@ -39,6 +39,8 @@ def ejecutar(nombre: str, contexto: list[str], cuenta: str) -> dict:
     entorno["AWS_EC2_METADATA_DISABLED"] = "true"
     entorno["PYTHONIOENCODING"] = "utf-8"
     entorno["CDK_DEFAULT_REGION"] = "us-east-1"
+    # Aquí solo se verifica la guardia de cuenta: no hace falta el paquete de las Lambdas.
+    entorno["CC_LAMBDAS_DESDE_FUENTE"] = "1"
     if cuenta:
         entorno["CDK_DEFAULT_ACCOUNT"] = cuenta
     else:

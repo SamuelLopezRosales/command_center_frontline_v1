@@ -3,7 +3,7 @@
 import httpx
 import psycopg
 import pytest
-from ayudantes_dashboard import CLIENTE, EMISOR, LLAVE
+from ayudantes_dashboard import CLIENTE, EMISOR, LLAVE, CognitoFalso
 from cc_common.auth import VerificadorToken
 from cc_common.db import crear_motor
 from cc_dashboard.config import ConfigDashboard
@@ -39,13 +39,19 @@ def datos(bd_migrada):
 
 
 @pytest.fixture
-async def cliente(datos):
+def cognito():
+    return CognitoFalso()
+
+
+@pytest.fixture
+async def cliente(datos, cognito):
     motor = crear_motor(datos["bd"].url_rol("svc_dashboard"))
     verificador = VerificadorToken(EMISOR, CLIENTE, resolver_llave=lambda _t: LLAVE.public_key())
     app = crear_app(
         ConfigDashboard(cognito_emisor=EMISOR, cognito_client_id=CLIENTE),
         motor=motor,
         verificador=verificador,
+        cognito=cognito,
     )
     async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://t") as c:
         yield c

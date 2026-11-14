@@ -11,6 +11,7 @@
 from __future__ import annotations
 
 import aws_cdk as cdk
+from aws_cdk import aws_iam as iam
 from aws_cdk import aws_kms as kms
 from aws_cdk import aws_secretsmanager as sm
 from aws_cdk import aws_ssm as ssm
@@ -71,6 +72,24 @@ class SecurityStack(cdk.Stack):
             rotation_period=cdk.Duration.days(365),
             pending_window=cdk.Duration.days(ret.kms_dias_espera),
             removal_policy=ret.removal_policy,
+        )
+
+        # Servicios de AWS que usan la llave sin un rol propio: EventBridge escribe en las colas
+        # ``ev-*`` cifradas, SES publica rebotes y quejas en el tema SNS y CloudWatch publica sus
+        # alarmas. Limitado a esta cuenta para evitar el uso desde otras cuentas.
+        self.llave_infra.add_to_resource_policy(
+            iam.PolicyStatement(
+                sid="ServiciosDeAwsDeMensajeria",
+                effect=iam.Effect.ALLOW,
+                principals=[
+                    iam.ServicePrincipal("events.amazonaws.com"),
+                    iam.ServicePrincipal("ses.amazonaws.com"),
+                    iam.ServicePrincipal("cloudwatch.amazonaws.com"),
+                ],
+                actions=["kms:Decrypt", "kms:GenerateDataKey*"],
+                resources=["*"],
+                conditions={"StringEquals": {"aws:SourceAccount": self.account}},
+            )
         )
 
         self.secretos: dict[str, sm.Secret] = {}

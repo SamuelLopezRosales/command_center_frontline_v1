@@ -40,3 +40,6 @@ Thumbs.db
 
 # Salidas temporales de verificación
 .tmp_*
+
+# Paquete de las Lambdas (scripts/empaquetar_lambdas.py)
+build/

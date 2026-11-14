@@ -1,6 +1,6 @@
 """Stack CcNetwork: VPC, NAT, endpoint de S3 y grupos de seguridad (design.md §13.3).
 
-En ``test`` la salida a internet usa una instancia NAT ``t4g.nano`` en lugar de NAT Gateway
+En ``test`` la salida a internet usa una instancia NAT ``t4g.micro`` en lugar de NAT Gateway
 (cambio A, tasks.md §0.4). En ``prod`` se usa una NAT Gateway por zona. Ningún grupo de
 seguridad admite entrada desde ``0.0.0.0/0``.
 """
@@ -30,7 +30,9 @@ class NetworkStack(cdk.Stack):
 
         if es_instancia:
             self.nat_provider: ec2.NatProvider | None = ec2.NatProvider.instance_v2(
-                instance_type=ec2.InstanceType("t4g.nano"),
+                # t4g.micro (1 GB): en t4g.nano (512 MB) iptables-services se queda sin memoria al
+                # instalarse en el arranque y la instancia nunca llega a hacer NAT (T-047).
+                instance_type=ec2.InstanceType("t4g.micro"),
                 machine_image=ec2.MachineImage.latest_amazon_linux2023(
                     cpu_type=ec2.AmazonLinuxCpuType.ARM_64
                 ),
@@ -70,7 +72,8 @@ class NetworkStack(cdk.Stack):
             self.nat_provider.security_group.add_ingress_rule(
                 ec2.Peer.ipv4(self.vpc.vpc_cidr_block),
                 ec2.Port.all_traffic(),
-                "Tráfico saliente de las subredes privadas",
+                # EC2 solo admite ASCII y algunos signos en las descripciones de reglas.
+                "Trafico saliente de las subredes privadas",
             )
             reconocer(
                 self.nat_provider.security_group,
@@ -130,7 +133,9 @@ class NetworkStack(cdk.Stack):
                             "Ebs": {
                                 "Encrypted": True,
                                 "VolumeType": "gp3",
-                                "VolumeSize": 8,
+                                # 10 GB: cambiar el disco fuerza una instancia nueva; el script
+                                # de arranque (iptables) solo corre en el primer arranque.
+                                "VolumeSize": 10,
                                 "DeleteOnTermination": True,
                             },
                         }

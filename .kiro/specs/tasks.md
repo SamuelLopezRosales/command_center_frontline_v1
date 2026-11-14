@@ -419,7 +419,7 @@ Objetivo: biblioteca común, esquema completo de PostgreSQL, servicio `dashboard
   - Verificación: pruebas de integración: la invitación devuelve el código una sola vez y guarda solo el SHA-256 con 72 horas de caducidad; `sesion/iniciar` registra `LOGIN` con la IP del encabezado de CloudFront y es idempotente por `jti`; `usuarios/yo` devuelve el rol RH
   - Requiere aprobación: no
 
-- [ ] T-035. Implementar DSH-08, DSH-09 y DSH-05 (usuarios, desactivación y bitácora)
+- [x] T-035. Implementar DSH-08, DSH-09 y DSH-05 (usuarios, desactivación y bitácora)
   - Fase: 1
   - Requisitos: CC-REQ-010, CC-REQ-015
   - Diseño: design.md §3.2, §8.1
@@ -428,7 +428,7 @@ Objetivo: biblioteca común, esquema completo de PostgreSQL, servicio `dashboard
   - Verificación: pruebas de integración: no se puede desactivar a sí mismo ni al último usuario activo (409); la desactivación llama al cliente de Cognito simulado (`AdminDisableUser`, `AdminUserGlobalSignOut`); la bitácora filtra por fecha, usuario, colaborador y acción, con orden ascendente y descendente y paginación por cursor
   - Requiere aprobación: no
 
-- [ ] T-036. Implementar las Lambdas `cognito-pre-signup` y `cognito-post-confirmation`
+- [x] T-036. Implementar las Lambdas `cognito-pre-signup` y `cognito-post-confirmation`
   - Fase: 1
   - Requisitos: CC-REQ-001, CC-REQ-007, CC-REQ-008
   - Diseño: design.md §4.6, §11.2
@@ -437,7 +437,7 @@ Objetivo: biblioteca común, esquema completo de PostgreSQL, servicio `dashboard
   - Verificación: pruebas con eventos simulados: sin código, código vencido, código usado y correo distinto se rechazan con el mismo mensaje genérico; un código válido permite el registro; `post-confirmation` crea el usuario con empresa y rol RH y marca la invitación usada en una sola transacción y registra la bitácora
   - Requiere aprobación: no
 
-- [ ] T-037. Implementar la Lambda `cognito-pre-token`
+- [x] T-037. Implementar la Lambda `cognito-pre-token`
   - Fase: 1
   - Requisitos: CC-REQ-004, CC-REQ-009, CC-REQ-010
   - Diseño: design.md §4.6, §11.2
@@ -446,7 +446,7 @@ Objetivo: biblioteca común, esquema completo de PostgreSQL, servicio `dashboard
   - Verificación: pruebas con eventos simulados: agrega `empresa_id` y `rol` al token de acceso; rechaza si el usuario está inactivo o si `ultima_actividad` tiene más de 30 minutos; no agrega nada si el usuario no existe
   - Requiere aprobación: no
 
-- [ ] T-038. Escribir `bootstrap_admin.py` (empresa e invitación inicial)
+- [x] T-038. Escribir `bootstrap_admin.py` (empresa e invitación inicial)
   - Fase: 1
   - Requisitos: CC-REQ-008
   - Diseño: design.md §11.2, §13.9
@@ -455,7 +455,7 @@ Objetivo: biblioteca común, esquema completo de PostgreSQL, servicio `dashboard
   - Verificación: prueba de integración: crea la empresa, genera una invitación y muestra el código una sola vez en la consola interactiva, sin escribirlo en logs; es idempotente si la empresa ya existe (no crea una segunda invitación sin una bandera explícita)
   - Requiere aprobación: no
 
-- [ ] T-039. Crear los stacks CcStorage y su prueba
+- [x] T-039. Crear los stacks CcStorage y su prueba
   - Fase: 1
   - Requisitos: CC-REQ-081, CC-NFR-009
   - Diseño: design.md §13.4
@@ -464,7 +464,7 @@ Objetivo: biblioteca común, esquema completo de PostgreSQL, servicio `dashboard
   - Verificación: aserciones de CDK: buckets `frontend`, `plantillas`, `constancias` (Object Lock habilitado, versionado, GOVERNANCE con retención mínima en `test`), `cargas` (expiración a 7 días, CORS de `PUT`) y `logs`; bloqueo de acceso público; política que exige TLS; cifrado con KMS; el borrado permitido en `test`
   - Requiere aprobación: no
 
-- [ ] T-040. Crear el stack CcData (RDS, RDS Proxy opcional y secretos de roles)
+- [x] T-040. Crear el stack CcData (RDS, RDS Proxy opcional y secretos de roles)
   - Fase: 1
   - Requisitos: CC-NFR-005, CC-NFR-006
   - Diseño: design.md §13.4
@@ -473,7 +473,7 @@ Objetivo: biblioteca común, esquema completo de PostgreSQL, servicio `dashboard
   - Verificación: aserciones de CDK: PostgreSQL 16, `db.t4g.micro` en una zona y sin protección contra borrado en `test` (`db.t4g.medium` Multi-AZ y con protección en `prod`), `storage_encrypted`, `rds.force_ssl = 1`, retención de respaldos de 1 día en `test`, RDS Proxy con TLS obligatorio solo en `prod` (en `test` no se despliega y las Lambdas se conectan directo a la instancia con TLS obligatorio), un secreto por rol de base de datos
   - Requiere aprobación: no
 
-- [ ] T-041. Crear el stack CcMessaging (colas, bus, Scheduler, SNS y SES)
+- [x] T-041. Crear el stack CcMessaging (colas, bus, Scheduler, SNS y SES)
   - Fase: 1
   - Requisitos: CC-NFR-007, CC-NFR-016, CC-REQ-164
   - Diseño: design.md §4.1, §13.5
@@ -482,7 +482,7 @@ Objetivo: biblioteca común, esquema completo de PostgreSQL, servicio `dashboard
   - Verificación: aserciones de CDK: las colas de §4.1 con su DLQ, visibilidad, máximo de recepciones, retención de 4 y 14 días y cifrado con KMS; el bus `cc-eventos` con sus reglas hacia las colas `ev-*`; el grupo de Scheduler y su rol de destino; el tema `alertas-rh` cifrado; la identidad de SES por correo (el dominio queda para PQ-22)
   - Requiere aprobación: no
 
-- [ ] T-042. Crear el stack CcAuth (Cognito y triggers)
+- [x] T-042. Crear el stack CcAuth (Cognito y triggers)
   - Fase: 1
   - Requisitos: CC-REQ-001, CC-REQ-002, CC-REQ-003, CC-REQ-006, CC-REQ-004
   - Diseño: design.md §11.2, §13.1
@@ -491,7 +491,7 @@ Objetivo: biblioteca común, esquema completo de PostgreSQL, servicio `dashboard
   - Verificación: aserciones de CDK: MFA `REQUIRED` con TOTP y sin SMS; contraseña de al menos 12 caracteres con las cuatro clases; token de acceso de 15 minutos y de actualización de 8 horas con rotación; registro propio habilitado con el trigger de pre-registro; recuperación de contraseña por correo; plan de funciones Essentials (DS-20; **tiene costo**, se indica en el diff); Lambdas en la VPC con concurrencia reservada de 5
   - Requiere aprobación: no
 
-- [ ] T-043. Crear el stack base de CcCompute (clúster, ECR y tareas `migrar` y `ops`)
+- [x] T-043. Crear el stack base de CcCompute (clúster, ECR y tareas `migrar` y `ops`)
   - Fase: 1
   - Requisitos: CC-NFR-012, CC-NFR-013
   - Diseño: design.md §13.6, §2.8, §13.9
@@ -509,7 +509,7 @@ Objetivo: biblioteca común, esquema completo de PostgreSQL, servicio `dashboard
   - Verificación: AWS. PA completo. `cdk diff` de `CcNetwork`, `CcStorage`, `CcData`, `CcMessaging`, `CcAuth` y `CcComputeBase` en `test`, junto con el cálculo de costo mensual esperado con la calculadora de precios de AWS contra el presupuesto de 50 USD y la táctica de la sección 0.4. Se espera aprobación escrita
   - Requiere aprobación: no (solo lectura; el despliegue de T-045 depende de su aprobación)
 
-- [ ] T-045. Desplegar los stacks de la Fase 1 en cc-test
+- [x] T-045. Desplegar los stacks de la Fase 1 en cc-test
   - Fase: 1
   - Requisitos: CC-NFR-005, CC-NFR-007, CC-NFR-016
   - Diseño: design.md §13.1
@@ -518,7 +518,7 @@ Objetivo: biblioteca común, esquema completo de PostgreSQL, servicio `dashboard
   - Verificación: AWS. PA completo y aprobación escrita del diff de T-044. Cada stack termina en `CREATE_COMPLETE`
   - Requiere aprobación: sí
 
-- [ ] T-046. Construir y publicar la imagen de migraciones en ECR
+- [x] T-046. Construir y publicar la imagen de migraciones en ECR
   - Fase: 1
   - Requisitos: CC-NFR-012
   - Diseño: design.md §2.8, §14.2
@@ -527,7 +527,7 @@ Objetivo: biblioteca común, esquema completo de PostgreSQL, servicio `dashboard
   - Verificación: AWS. PA completo. Inicio de sesión de Docker en ECR con el perfil `cc-test`, `docker push`, y la imagen visible con su resumen en el repositorio
   - Requiere aprobación: sí
 
-- [ ] T-047. Ejecutar las migraciones, los roles y las políticas RLS en cc-test
+- [x] T-047. Ejecutar las migraciones, los roles y las políticas RLS en cc-test
   - Fase: 1
   - Requisitos: CC-REQ-150, CC-NFR-012
   - Diseño: design.md §2.8, §14.2
@@ -536,7 +536,7 @@ Objetivo: biblioteca común, esquema completo de PostgreSQL, servicio `dashboard
   - Verificación: AWS. PA completo. `ecs run-task` de la tarea `migrar` termina con código 0; el registro muestra las migraciones en el orden de §2.8; se vuelve a ejecutar y no cambia nada. No se imprimen credenciales
   - Requiere aprobación: sí
 
-- [ ] T-048. Verificar los recursos de la Fase 1 (lectura)
+- [x] T-048. Verificar los recursos de la Fase 1 (lectura)
   - Fase: 1
   - Requisitos: CC-NFR-005, CC-NFR-007, CC-NFR-009, CC-NFR-016
   - Diseño: design.md §13.4, §13.5
@@ -545,7 +545,7 @@ Objetivo: biblioteca común, esquema completo de PostgreSQL, servicio `dashboard
   - Verificación: AWS. PA completo. El script (solo lectura) confirma: RDS cifrado y sin acceso público; Object Lock activo en `constancias`; colas con su DLQ y cifrado; pool de Cognito con MFA `REQUIRED`; todas las etiquetas presentes
   - Requiere aprobación: no (solo lectura)
 
-- [ ] T-049. Ejecutar bootstrap_admin en cc-test
+- [x] T-049. Ejecutar bootstrap_admin en cc-test
   - Fase: 1
   - Requisitos: CC-REQ-008
   - Diseño: design.md §11.2, §13.9

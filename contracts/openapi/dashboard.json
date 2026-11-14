@@ -1,6 +1,34 @@
 {
   "components": {
     "schemas": {
+      "BitacoraSalida": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/RegistroBitacora"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "siguiente": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Siguiente"
+          }
+        },
+        "required": [
+          "items",
+          "siguiente"
+        ],
+        "title": "BitacoraSalida",
+        "type": "object"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -56,6 +84,158 @@
         "title": "InvitacionSalida",
         "type": "object"
       },
+      "RegistroBitacora": {
+        "properties": {
+          "accion": {
+            "title": "Accion",
+            "type": "string"
+          },
+          "colaborador_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Colaborador Id"
+          },
+          "detalle": {
+            "additionalProperties": true,
+            "title": "Detalle",
+            "type": "object"
+          },
+          "entidad": {
+            "title": "Entidad",
+            "type": "string"
+          },
+          "entidad_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Entidad Id"
+          },
+          "fecha_hora": {
+            "format": "date-time",
+            "title": "Fecha Hora",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "ip": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ip"
+          },
+          "origen": {
+            "title": "Origen",
+            "type": "string"
+          },
+          "usuario_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Usuario Id"
+          },
+          "usuario_nombre": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Usuario Nombre"
+          }
+        },
+        "required": [
+          "id",
+          "fecha_hora",
+          "usuario_id",
+          "usuario_nombre",
+          "colaborador_id",
+          "accion",
+          "entidad",
+          "entidad_id",
+          "ip",
+          "origen",
+          "detalle"
+        ],
+        "title": "RegistroBitacora",
+        "type": "object"
+      },
+      "UsuarioItem": {
+        "properties": {
+          "activo": {
+            "title": "Activo",
+            "type": "boolean"
+          },
+          "correo": {
+            "title": "Correo",
+            "type": "string"
+          },
+          "fecha_creacion": {
+            "format": "date-time",
+            "title": "Fecha Creacion",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "nombre": {
+            "title": "Nombre",
+            "type": "string"
+          },
+          "rol": {
+            "title": "Rol",
+            "type": "string"
+          },
+          "ultima_actividad": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ultima Actividad"
+          }
+        },
+        "required": [
+          "id",
+          "nombre",
+          "correo",
+          "rol",
+          "activo",
+          "ultima_actividad",
+          "fecha_creacion"
+        ],
+        "title": "UsuarioItem",
+        "type": "object"
+      },
       "UsuarioYo": {
         "properties": {
           "correo": {
@@ -95,6 +275,22 @@
           "permisos"
         ],
         "title": "UsuarioYo",
+        "type": "object"
+      },
+      "UsuariosSalida": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/UsuarioItem"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "UsuariosSalida",
         "type": "object"
       },
       "ValidationError": {
@@ -145,6 +341,183 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/api/v1/bitacora": {
+      "get": {
+        "operationId": "consultar_api_v1_bitacora_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "desde",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Desde"
+            }
+          },
+          {
+            "in": "query",
+            "name": "hasta",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Hasta"
+            }
+          },
+          {
+            "in": "query",
+            "name": "usuario_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Usuario Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "colaborador_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Colaborador Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "accion",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 40,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Accion"
+            }
+          },
+          {
+            "in": "query",
+            "name": "orden",
+            "required": false,
+            "schema": {
+              "default": "desc",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "title": "Orden",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 400,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limite",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limite",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BitacoraSalida"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Consulta de la bitácora (DSH-05)",
+        "tags": [
+          "bitacora"
+        ]
+      }
+    },
     "/api/v1/sesion/iniciar": {
       "post": {
         "operationId": "iniciar_api_v1_sesion_iniciar_post",
@@ -182,6 +555,55 @@
           }
         },
         "summary": "Registra el inicio de sesión (DSH-06)",
+        "tags": [
+          "usuarios"
+        ]
+      }
+    },
+    "/api/v1/usuarios": {
+      "get": {
+        "operationId": "listar_api_v1_usuarios_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsuariosSalida"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Usuarios de la empresa (DSH-08)",
         "tags": [
           "usuarios"
         ]
@@ -290,6 +712,57 @@
           }
         },
         "summary": "Usuario actual (DSH-07)",
+        "tags": [
+          "usuarios"
+        ]
+      }
+    },
+    "/api/v1/usuarios/{usuario_id}/desactivar": {
+      "post": {
+        "operationId": "desactivar_api_v1_usuarios__usuario_id__desactivar_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "usuario_id",
+            "required": true,
+            "schema": {
+              "title": "Usuario Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Desactiva un usuario y cierra sus sesiones (DSH-09)",
         "tags": [
           "usuarios"
         ]

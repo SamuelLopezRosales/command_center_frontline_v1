@@ -86,3 +86,63 @@ async def login_ya_registrado(conn: AsyncConnection, empresa_id: int, jti: str) 
         {"e": empresa_id, "jti": jti},
     )
     return r.first() is not None
+
+
+@dataclass(frozen=True)
+class FilaUsuarioLista:
+    id: int
+    nombre: str
+    correo: str
+    rol: str
+    activo: bool
+    ultima_actividad: datetime | None
+    fecha_creacion: datetime
+    cognito_sub: str
+
+
+async def listar(conn: AsyncConnection) -> list[FilaUsuarioLista]:
+    """Usuarios de la empresa en curso (la política RLS filtra por empresa)."""
+    filas = (
+        (
+            await conn.execute(
+                text(
+                    "SELECT id, nombre, correo, rol, activo, ultima_actividad, fecha_creacion, "
+                    "cognito_sub FROM identidad.usuario ORDER BY activo DESC, lower(nombre), id"
+                )
+            )
+        )
+        .mappings()
+        .all()
+    )
+    return [FilaUsuarioLista(**f) for f in filas]
+
+
+async def bloquear_activos(conn: AsyncConnection) -> list[int]:
+    """Bloquea las filas de usuarios activos para serializar desactivaciones simultáneas."""
+    r = await conn.execute(
+        text("SELECT id FROM identidad.usuario WHERE activo ORDER BY id FOR UPDATE")
+    )
+    return [int(x[0]) for x in r.all()]
+
+
+async def por_id(conn: AsyncConnection, usuario_id: int) -> FilaUsuarioLista | None:
+    fila = (
+        (
+            await conn.execute(
+                text(
+                    "SELECT id, nombre, correo, rol, activo, ultima_actividad, fecha_creacion, "
+                    "cognito_sub FROM identidad.usuario WHERE id = :id"
+                ),
+                {"id": usuario_id},
+            )
+        )
+        .mappings()
+        .first()
+    )
+    return FilaUsuarioLista(**fila) if fila else None
+
+
+async def marcar_inactivo(conn: AsyncConnection, usuario_id: int) -> None:
+    await conn.execute(
+        text("UPDATE identidad.usuario SET activo = false WHERE id = :id"), {"id": usuario_id}
+    )

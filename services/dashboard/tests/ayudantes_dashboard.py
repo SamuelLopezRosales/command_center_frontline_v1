@@ -32,3 +32,18 @@ def emitir(sub: str, empresa_id: int, rol: str = "RH", jti: str | None = None) -
 
 def cab(token: str, **extra) -> dict[str, str]:
     return {"Authorization": f"Bearer {token}", **extra}
+
+
+class CognitoFalso:
+    """Registra las llamadas de desactivación; ``falla=True`` simula una caída de Cognito."""
+
+    def __init__(self, falla: bool = False):
+        self.llamadas: list[str] = []
+        self.falla = falla
+
+    async def deshabilitar_y_cerrar_sesiones(self, username: str) -> None:
+        if self.falla:
+            from cc_common.errores import ErrorProveedor
+
+            raise ErrorProveedor("COGNITO_NO_DISPONIBLE", "No fue posible desactivar la cuenta.")
+        self.llamadas.append(username)

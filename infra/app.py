@@ -60,14 +60,65 @@ def registrar_nag(app: cdk.App) -> None:
 
 def construir_stacks(app: cdk.App, amb: esquema.Ambiente, destino: Destino) -> dict[str, cdk.Stack]:
     """Define los stacks del ambiente. Solo se llama después de la guardia de cuenta."""
+    from infra.stacks.auth import AuthStack
+    from infra.stacks.compute_base import ComputeBaseStack
+    from infra.stacks.data import DataStack
+    from infra.stacks.messaging import MessagingStack
     from infra.stacks.network import NetworkStack
     from infra.stacks.security import SecurityStack
+    from infra.stacks.storage import StorageStack
 
     env = cdk.Environment(account=destino.cuenta, region=destino.region)
     sufijo = amb.nombre
     security = SecurityStack(app, f"CcSecurity-{sufijo}", ambiente=amb, env=env)
     network = NetworkStack(app, f"CcNetwork-{sufijo}", ambiente=amb, env=env)
-    return {"security": security, "network": network}
+    storage = StorageStack(
+        app, f"CcStorage-{sufijo}", ambiente=amb, llave_infra=security.llave_infra, env=env
+    )
+    data = DataStack(
+        app,
+        f"CcData-{sufijo}",
+        ambiente=amb,
+        llave_infra=security.llave_infra,
+        vpc=network.vpc,
+        sg_rds=network.sg_rds,
+        sg_proxy=network.sg_proxy,
+        env=env,
+    )
+    messaging = MessagingStack(
+        app, f"CcMessaging-{sufijo}", ambiente=amb, llave_infra=security.llave_infra, env=env
+    )
+    auth = AuthStack(
+        app,
+        f"CcAuth-{sufijo}",
+        ambiente=amb,
+        llave_infra=security.llave_infra,
+        vpc=network.vpc,
+        sg_lambda=network.sg_lambda,
+        secreto_bd=data.secretos_roles["svc_dashboard"],
+        host_bd=data.proxy.endpoint if data.proxy is not None else None,
+        env=env,
+    )
+    compute_base = ComputeBaseStack(
+        app,
+        f"CcComputeBase-{sufijo}",
+        ambiente=amb,
+        llave_infra=security.llave_infra,
+        vpc=network.vpc,
+        sg_ecs=network.sg_ecs,
+        secreto_admin=data.secreto_admin,
+        secretos_roles=data.secretos_roles,
+        env=env,
+    )
+    return {
+        "compute_base": compute_base,
+        "auth": auth,
+        "security": security,
+        "network": network,
+        "storage": storage,
+        "data": data,
+        "messaging": messaging,
+    }
 
 
 def main() -> None:
