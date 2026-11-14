@@ -53,108 +53,147 @@ Se actualiza al empezar y al terminar cada tarea. Estados: pendiente, en curso, 
 | T-047 | Ejecutar las migraciones, los roles y las políticas RLS en cc-test | 1 | completada | 2026-11-14 | run-task migrar x2: exit 0 ambas; orden dashboard, campos, colaboradores, whatsapp, constancias, notificaciones, roles.sql, rls.sql, grants.sql; registros sin password ni URL | 3 defectos encontrados y corregidos: NAT sin memoria, falta kms:Decrypt, ALTER ROLE sin superusuario (roles.sql, autorizado). Idempotencia: 2a ejecucion identica y exit 0 (Alembic sin revisiones pendientes) |
 | T-048 | Verificar los recursos de la Fase 1 (lectura) | 1 | completada | 2026-11-14 | scripts/verificar_f1.ps1: exit 0, 0 fallas (7 stacks, RDS, Object Lock, 20 colas, Cognito MFA, 110 recursos etiquetados) | Solo lectura |
 | T-049 | Ejecutar bootstrap_admin en cc-test | 1 | completada | 2026-11-14 | Empresa 1 activa; invitacion 1 vigente, sin usar, 72 h, hash de 32 bytes, sin correo exigido; bitacora INVITACION_CREADA (SISTEMA); 0 usuarios; registro /cc/test/ops de la sesion sin eventos; CloudTrail ExecuteCommand de samuel.lopez.labs-inovacion | Samuel ejecuto ops.sh bootstrap por ECS Exec; el agente no vio el codigo. Razon social quedo "Tu Empresa SA de CV" (ejemplo de la guia). Tarea ops detenida. Plugin session-manager 1.2.896.0 instalado con winget (autorizado) |
-| T-050 | Probar el registro, el MFA y el inicio de sesión con Cognito real | 1 | en_curso | 2026-11-14 |  |  |
-| T-051 | Punto de control de la Fase 1 | 1 | pendiente | | | |
-| T-052 | Crear el esqueleto del servicio `colaboradores` y el cliente de definiciones de campos | 2 | pendiente | | | |
-| T-053 | Implementar los repositorios de colaborador y valor de campo con cifrado | 2 | pendiente | | | |
-| T-054 | Implementar organizaciones, logotipo y plantas (COL-08 a COL-15) | 2 | pendiente | | | |
-| T-055 | Implementar el alta de colaborador (COL-02) | 2 | pendiente | | | |
-| T-056 | Implementar el detalle y la edición (COL-03 y COL-04) | 2 | pendiente | | | |
-| T-057 | Implementar baja, reactivación, consentimiento y elegibilidad (COL-05 a COL-07) | 2 | pendiente | | | |
-| T-058 | Implementar el listado, la búsqueda y los filtros (COL-01) | 2 | pendiente | | | |
-| T-059 | Implementar las interfaces internas de colaboradores (INT-COL-01 a 05, 07 y 08) | 2 | pendiente | | | |
-| T-060 | Generar la plantilla de carga de Excel (COL-16) | 2 | pendiente | | | |
-| T-061 | Implementar el lector y el validador de filas de la carga | 2 | pendiente | | | |
-| T-062 | Implementar el `worker-cargas` (upsert por lotes) | 2 | pendiente | | | |
-| T-063 | Implementar los endpoints de cargas (COL-17 a COL-22) | 2 | pendiente | | | |
-| T-064 | Probar la carga con la plantilla real del cliente y el aislamiento por empresa | 2 | pendiente | | | |
-| T-065 | Punto de control de la Fase 2 | 2 | pendiente | | | |
-| T-066 | Crear el servicio `campos` con listado, creación y detalle (CAM-01 a CAM-03) | 3 | pendiente | | | |
-| T-067 | Implementar la actualización de campos con sus protecciones (CAM-04) | 3 | pendiente | | | |
-| T-068 | Implementar la eliminación y el reordenamiento (CAM-05 y CAM-06) | 3 | pendiente | | | |
-| T-069 | Implementar las opciones de campos de lista (CAM-07 a CAM-09) | 3 | pendiente | | | |
-| T-070 | Implementar el catálogo sembrado y las interfaces internas de campos (INT-CAM-01 y INT-CAM-02) | 3 | pendiente | | | |
-| T-071 | Agregar a `colaboradores` las consultas INT-COL-09 e INT-COL-10 | 3 | pendiente | | | |
-| T-072 | Publicar `campo.actualizado`, consumirlo y reemplazar el stub de `colaboradores` | 3 | pendiente | | | |
-| T-073 | Extender `bootstrap_admin.py` con la siembra de campos | 3 | pendiente | | | |
-| T-074 | Probar la integración de campos dinámicos con colaboradores | 3 | pendiente | | | |
-| T-075 | Punto de control de la Fase 3 | 3 | pendiente | | | |
-| T-076 | Crear el servicio `constancias` con el CRUD de plantillas (CON-01 a CON-06) | 4 | pendiente | | | |
-| T-077 | Definir el esquema JSON del contenido y los borradores (CON-07 y CON-08) | 4 | pendiente | | | |
-| T-078 | Implementar el catálogo de variables y el resolutor (CON-15) | 4 | pendiente | | | |
-| T-079 | Implementar las variables derivadas (sueldo mensual, importe en letra y fechas) | 4 | pendiente | | | |
-| T-080 | Implementar la validación, la publicación y las versiones (CON-09 a CON-12) | 4 | pendiente | | | |
-| T-081 | Implementar la restauración de versiones (CON-13) | 4 | pendiente | | | |
-| T-082 | Implementar el renderizador de HTML, el logotipo y el QR | 4 | pendiente | | | |
-| T-083 | Generar el PDF con WeasyPrint y la vista previa (CON-14) | 4 | pendiente | | | |
-| T-084 | Implementar el folio y las interfaces de solicitudes (INT-CON-01 a 05) | 4 | pendiente | | | |
-| T-085 | Implementar el `worker-pdf` (generación, snapshot y almacenamiento) | 4 | pendiente | | | |
-| T-086 | Implementar los enlaces de un solo uso y la estrategia de entrega (CON-20 y CON-21) | 4 | pendiente | | | |
-| T-087 | Implementar el detalle, la descarga y el reenvío de constancias (CON-16 a CON-18) | 4 | pendiente | | | |
-| T-088 | Implementar la verificación pública (CON-19) | 4 | pendiente | | | |
-| T-089 | Implementar INT-CON-06 y el trabajo de `alerta_plantilla` | 4 | pendiente | | | |
-| T-090 | Probar rendimiento del PDF y concurrencia de folios | 4 | pendiente | | | |
-| T-091 | Probar la seguridad del renderizado y de los enlaces | 4 | pendiente | | | |
-| T-092 | Punto de control de la Fase 4 | 4 | pendiente | | | |
-| T-093 | Crear el servicio `whatsapp` y el simulador de la API de Meta | 5 | pendiente | | | |
-| T-094 | Implementar la Lambda `webhook-meta` | 5 | pendiente | | | |
-| T-095 | Implementar la Lambda `estados-entrega` | 5 | pendiente | | | |
-| T-096 | Implementar la Lambda `enviador` y `VentanaService` | 5 | pendiente | | | |
-| T-097 | Implementar el bot: máquina de estados, mensajes y verificación | 5 | pendiente | | | |
-| T-098 | Implementar el bot: menú y solicitud de constancia | 5 | pendiente | | | |
-| T-099 | Implementar el `worker-whatsapp-entrada`, el antiabuso y el cierre por inactividad | 5 | pendiente | | | |
-| T-100 | Implementar el consumidor de estados en `constancias` y los avisos a RH | 5 | pendiente | | | |
-| T-101 | Implementar los indicadores, solicitudes recientes y alertas del dashboard (DSH-01 a DSH-04) | 5 | pendiente | | | |
-| T-102 | Implementar el historial de constancias (DSH-11) | 5 | pendiente | | | |
-| T-103 | Probar el flujo completo de solicitud de constancia con el simulador | 5 | pendiente | | | |
-| T-104 | Punto de control de la Fase 5 | 5 | pendiente | | | |
-| T-105 | Crear el servicio `notificaciones` y las audiencias (NOT-01 a NOT-05) | 6 | pendiente | | | |
-| T-106 | Implementar `AudienciaQueryService` e INT-COL-06 en `colaboradores` (y NOT-06) | 6 | pendiente | | | |
-| T-107 | Implementar el embudo y la revisión (NOT-18) | 6 | pendiente | | | |
-| T-108 | Implementar las plantillas de mensaje y el cliente de Meta (NOT-07 a NOT-13) | 6 | pendiente | | | |
-| T-109 | Implementar el CRUD de notificaciones, duplicar e indicadores (NOT-14 a NOT-17, NOT-21, NOT-23 y NOT-24) | 6 | pendiente | | | |
-| T-110 | Implementar la confirmación, el horario y la programación (NOT-19) | 6 | pendiente | | | |
-| T-111 | Implementar la Lambda `despachador` | 6 | pendiente | | | |
-| T-112 | Implementar la Lambda `conciliador` | 6 | pendiente | | | |
-| T-113 | Implementar los consumidores de eventos y la máquina de estados de la notificación | 6 | pendiente | | | |
-| T-114 | Implementar la Lambda `respaldo-correo` | 6 | pendiente | | | |
-| T-115 | Implementar reintentar, cancelar y las variables de plantilla (NOT-20, NOT-22 e INT-COL-05 ampliado) | 6 | pendiente | | | |
-| T-116 | Implementar el chat de RH (WAP-01 a WAP-05) | 6 | pendiente | | | |
-| T-117 | Probar el flujo completo de notificaciones con el simulador | 6 | pendiente | | | |
-| T-118 | Punto de control de la Fase 6 | 6 | pendiente | | | |
-| T-119 | Crear el proyecto React, el cliente de API tipado y el manejo de errores | 7 | pendiente | | | |
-| T-120 | Implementar el acceso: inicio de sesión con MFA, registro y recuperación | 7 | pendiente | | | |
-| T-121 | Implementar el diseño base, la navegación, el cierre por inactividad y las cabeceras de desarrollo | 7 | pendiente | | | |
-| T-122 | Implementar el dashboard (`cv1_01`) | 7 | pendiente | | | |
-| T-123 | Implementar el listado y el formulario de colaboradores (`cv1_02` y `cv1_03`) | 7 | pendiente | | | |
-| T-124 | Implementar la configuración de campos (`cv1_04`) | 7 | pendiente | | | |
-| T-125 | Implementar la carga masiva, las organizaciones y las plantas | 7 | pendiente | | | |
-| T-126 | Implementar el listado de plantillas y el editor visual (`cv1_05` y `cv1_06`) | 7 | pendiente | | | |
-| T-127 | Implementar la vista previa, la validación y las versiones del editor | 7 | pendiente | | | |
-| T-128 | Implementar el historial de constancias y la página pública de verificación (`cv1_07`) | 7 | pendiente | | | |
-| T-129 | Implementar el listado de notificaciones y las plantillas de mensaje (`cv1_08`) | 7 | pendiente | | | |
-| T-130 | Implementar la nueva notificación con el embudo y el detalle de envío (`cv1_09` y `cv1_10`) | 7 | pendiente | | | |
-| T-131 | Implementar el chat de RH y la administración de usuarios e invitaciones | 7 | pendiente | | | |
-| T-132 | Probar localización, accesibilidad básica y contratos de la SPA | 7 | pendiente | | | |
-| T-133 | Probar de extremo a extremo la SPA con Playwright contra el stack local | 7 | pendiente | | | |
-| T-134 | Punto de control de la Fase 7 | 7 | pendiente | | | |
-| T-135 | Crear los stacks de cómputo: servicios de ECS, ALB y reglas por ruta | 8 | pendiente | | | |
-| T-136 | Crear los workers y las Lambdas de mensajería en CDK | 8 | pendiente | | | |
-| T-137 | Crear el stack CcApi (API Gateway, VPC Link y autorizador JWT) | 8 | pendiente | | | |
-| T-138 | Crear el stack CcEdge en us-east-1 (CloudFront, WAF y firma de descargas) | 8 | pendiente | | | |
-| T-139 | Crear los stacks CcFrontend y CcObservability | 8 | pendiente | | | |
-| T-140 | Crear los stacks CcBackup y CcPipeline | 8 | pendiente | | | |
-| T-141 | Completar las aserciones de infraestructura y la revisión de IAM | 8 | pendiente | | | |
-| T-142 | Ejecutar pruebas de carga con k6 en local | 8 | pendiente | | | |
-| T-143 | Ejecutar las pruebas de seguridad | 8 | pendiente | | | |
-| T-144 | Escribir los runbooks y documentar la brecha de retención y borrado a solicitud | 8 | pendiente | | | |
-| T-145 | Construir y publicar las imágenes de los servicios y los paquetes de las Lambdas | 8 | pendiente | | | |
-| T-146 | Mostrar el cdk diff completo de la Fase 8 (lectura) | 8 | pendiente | | | |
-| T-147 | Desplegar cómputo, workers, Lambdas y API en cc-test | 8 | pendiente | | | |
-| T-148 | Desplegar el borde, la SPA y la observabilidad en cc-test | 8 | pendiente | | | |
-| T-149 | Ejecutar migraciones y pruebas de humo en cc-test | 8 | pendiente | | | |
-| T-150 | Ejecutar las pruebas de extremo a extremo y de carga en cc-test | 8 | pendiente | | | |
-| T-151 | Probar la restauración de RDS a un punto en el tiempo en cc-test | 8 | pendiente | | | |
-| T-152 | Registrar resultados, ajustes y brechas | 8 | pendiente | | | |
-| T-153 | Preparar la guía de limpieza de cc-test, que ejecuta Samuel a mano | 8 | pendiente | | | |
-| T-154 | Punto de control de la Fase 8 y cierre del plan | 8 | pendiente | | | |
+| T-050 | Probar el registro, el MFA y el inicio de sesión con Cognito real | 1 | reemplazada | 2026-11-14 | | v0.2: pasa a T-229 |
+| T-051 | Punto de control de la Fase 1 | 1 | reemplazada | 2026-11-14 | | v0.2: pasa a T-229 |
+| T-052 | Crear el esqueleto del servicio `colaboradores` y el cliente de definiciones de campos | 2 | reemplazada | 2026-11-14 | | v0.2: pasa a T-201 |
+| T-053 | Implementar los repositorios de colaborador y valor de campo con cifrado | 2 | reemplazada | 2026-11-14 | | v0.2: pasa a T-201 |
+| T-054 | Implementar organizaciones, logotipo y plantas (COL-08 a COL-15) | 2 | reemplazada | 2026-11-14 | | v0.2: pasa a T-201 |
+| T-055 | Implementar el alta de colaborador (COL-02) | 2 | reemplazada | 2026-11-14 | | v0.2: pasa a T-202 |
+| T-056 | Implementar el detalle y la edición (COL-03 y COL-04) | 2 | reemplazada | 2026-11-14 | | v0.2: pasa a T-202 |
+| T-057 | Implementar baja, reactivación, consentimiento y elegibilidad (COL-05 a COL-07) | 2 | reemplazada | 2026-11-14 | | v0.2: pasa a T-202 |
+| T-058 | Implementar el listado, la búsqueda y los filtros (COL-01) | 2 | reemplazada | 2026-11-14 | | v0.2: pasa a T-202 |
+| T-059 | Implementar las interfaces internas de colaboradores (INT-COL-01 a 05, 07 y 08) | 2 | reemplazada | 2026-11-14 | | v0.2: pasa a T-203 |
+| T-060 | Generar la plantilla de carga de Excel (COL-16) | 2 | reemplazada | 2026-11-14 | | v0.2: pasa a T-204 |
+| T-061 | Implementar el lector y el validador de filas de la carga | 2 | reemplazada | 2026-11-14 | | v0.2: pasa a T-204 |
+| T-062 | Implementar el `worker-cargas` (upsert por lotes) | 2 | reemplazada | 2026-11-14 | | v0.2: pasa a T-204 |
+| T-063 | Implementar los endpoints de cargas (COL-17 a COL-22) | 2 | reemplazada | 2026-11-14 | | v0.2: pasa a T-204 |
+| T-064 | Probar la carga con la plantilla real del cliente y el aislamiento por empresa | 2 | reemplazada | 2026-11-14 | | v0.2: pasa a T-204 |
+| T-065 | Punto de control de la Fase 2 | 2 | reemplazada | 2026-11-14 | | v0.2: pasa a T-204 |
+| T-066 | Crear el servicio `campos` con listado, creación y detalle (CAM-01 a CAM-03) | 3 | reemplazada | 2026-11-14 | | v0.2: pasa a T-205 |
+| T-067 | Implementar la actualización de campos con sus protecciones (CAM-04) | 3 | reemplazada | 2026-11-14 | | v0.2: pasa a T-205 |
+| T-068 | Implementar la eliminación y el reordenamiento (CAM-05 y CAM-06) | 3 | reemplazada | 2026-11-14 | | v0.2: pasa a T-205 |
+| T-069 | Implementar las opciones de campos de lista (CAM-07 a CAM-09) | 3 | reemplazada | 2026-11-14 | | v0.2: pasa a T-205 |
+| T-070 | Implementar el catálogo sembrado y las interfaces internas de campos (INT-CAM-01 y INT-CAM-02) | 3 | reemplazada | 2026-11-14 | | v0.2: pasa a T-205 |
+| T-071 | Agregar a `colaboradores` las consultas INT-COL-09 e INT-COL-10 | 3 | reemplazada | 2026-11-14 | | v0.2: pasa a T-206 |
+| T-072 | Publicar `campo.actualizado`, consumirlo y reemplazar el stub de `colaboradores` | 3 | reemplazada | 2026-11-14 | | v0.2: pasa a T-206 |
+| T-073 | Extender `bootstrap_admin.py` con la siembra de campos | 3 | reemplazada | 2026-11-14 | | v0.2: pasa a T-206 |
+| T-074 | Probar la integración de campos dinámicos con colaboradores | 3 | reemplazada | 2026-11-14 | | v0.2: pasa a T-206 |
+| T-075 | Punto de control de la Fase 3 | 3 | reemplazada | 2026-11-14 | | v0.2: pasa a T-206 |
+| T-076 | Crear el servicio `constancias` con el CRUD de plantillas (CON-01 a CON-06) | 4 | reemplazada | 2026-11-14 | | v0.2: pasa a T-207 |
+| T-077 | Definir el esquema JSON del contenido y los borradores (CON-07 y CON-08) | 4 | reemplazada | 2026-11-14 | | v0.2: pasa a T-207 |
+| T-078 | Implementar el catálogo de variables y el resolutor (CON-15) | 4 | reemplazada | 2026-11-14 | | v0.2: pasa a T-207 |
+| T-079 | Implementar las variables derivadas (sueldo mensual, importe en letra y fechas) | 4 | reemplazada | 2026-11-14 | | v0.2: pasa a T-207 |
+| T-080 | Implementar la validación, la publicación y las versiones (CON-09 a CON-12) | 4 | reemplazada | 2026-11-14 | | v0.2: pasa a T-208 |
+| T-081 | Implementar la restauración de versiones (CON-13) | 4 | reemplazada | 2026-11-14 | | v0.2: pasa a T-208 |
+| T-082 | Implementar el renderizador de HTML, el logotipo y el QR | 4 | reemplazada | 2026-11-14 | | v0.2: pasa a T-208 |
+| T-083 | Generar el PDF con WeasyPrint y la vista previa (CON-14) | 4 | reemplazada | 2026-11-14 | | v0.2: pasa a T-208 |
+| T-084 | Implementar el folio y las interfaces de solicitudes (INT-CON-01 a 05) | 4 | reemplazada | 2026-11-14 | | v0.2: pasa a T-209 |
+| T-085 | Implementar el `worker-pdf` (generación, snapshot y almacenamiento) | 4 | reemplazada | 2026-11-14 | | v0.2: pasa a T-209 |
+| T-086 | Implementar los enlaces de un solo uso y la estrategia de entrega (CON-20 y CON-21) | 4 | reemplazada | 2026-11-14 | | v0.2: pasa a T-209 |
+| T-087 | Implementar el detalle, la descarga y el reenvío de constancias (CON-16 a CON-18) | 4 | reemplazada | 2026-11-14 | | v0.2: pasa a T-209 |
+| T-088 | Implementar la verificación pública (CON-19) | 4 | reemplazada | 2026-11-14 | | v0.2: pasa a T-209 |
+| T-089 | Implementar INT-CON-06 y el trabajo de `alerta_plantilla` | 4 | reemplazada | 2026-11-14 | | v0.2: pasa a T-209 |
+| T-090 | Probar rendimiento del PDF y concurrencia de folios | 4 | reemplazada | 2026-11-14 | | v0.2: pasa a T-210 |
+| T-091 | Probar la seguridad del renderizado y de los enlaces | 4 | reemplazada | 2026-11-14 | | v0.2: pasa a T-210 |
+| T-092 | Punto de control de la Fase 4 | 4 | reemplazada | 2026-11-14 | | v0.2: pasa a T-210 |
+| T-093 | Crear el servicio `whatsapp` y el simulador de la API de Meta | 5 | reemplazada | 2026-11-14 | | v0.2: pasa a T-211 |
+| T-094 | Implementar la Lambda `webhook-meta` | 5 | reemplazada | 2026-11-14 | | v0.2: pasa a T-211 |
+| T-095 | Implementar la Lambda `estados-entrega` | 5 | reemplazada | 2026-11-14 | | v0.2: pasa a T-211 |
+| T-096 | Implementar la Lambda `enviador` y `VentanaService` | 5 | reemplazada | 2026-11-14 | | v0.2: pasa a T-211 |
+| T-097 | Implementar el bot: máquina de estados, mensajes y verificación | 5 | reemplazada | 2026-11-14 | | v0.2: pasa a T-212 |
+| T-098 | Implementar el bot: menú y solicitud de constancia | 5 | reemplazada | 2026-11-14 | | v0.2: pasa a T-212 |
+| T-099 | Implementar el `worker-whatsapp-entrada`, el antiabuso y el cierre por inactividad | 5 | reemplazada | 2026-11-14 | | v0.2: pasa a T-212 |
+| T-100 | Implementar el consumidor de estados en `constancias` y los avisos a RH | 5 | reemplazada | 2026-11-14 | | v0.2: pasa a T-213 |
+| T-101 | Implementar los indicadores, solicitudes recientes y alertas del dashboard (DSH-01 a DSH-04) | 5 | reemplazada | 2026-11-14 | | v0.2: pasa a T-213 |
+| T-102 | Implementar el historial de constancias (DSH-11) | 5 | reemplazada | 2026-11-14 | | v0.2: pasa a T-213 |
+| T-103 | Probar el flujo completo de solicitud de constancia con el simulador | 5 | reemplazada | 2026-11-14 | | v0.2: pasa a T-214 |
+| T-104 | Punto de control de la Fase 5 | 5 | reemplazada | 2026-11-14 | | v0.2: pasa a T-214 |
+| T-105 | Crear el servicio `notificaciones` y las audiencias (NOT-01 a NOT-05) | 6 | reemplazada | 2026-11-14 | | v0.2: pasa a T-215 |
+| T-106 | Implementar `AudienciaQueryService` e INT-COL-06 en `colaboradores` (y NOT-06) | 6 | reemplazada | 2026-11-14 | | v0.2: pasa a T-215 |
+| T-107 | Implementar el embudo y la revisión (NOT-18) | 6 | reemplazada | 2026-11-14 | | v0.2: pasa a T-215 |
+| T-108 | Implementar las plantillas de mensaje y el cliente de Meta (NOT-07 a NOT-13) | 6 | reemplazada | 2026-11-14 | | v0.2: pasa a T-216 |
+| T-109 | Implementar el CRUD de notificaciones, duplicar e indicadores (NOT-14 a NOT-17, NOT-21, NOT-23 y NOT-24) | 6 | reemplazada | 2026-11-14 | | v0.2: pasa a T-216 |
+| T-110 | Implementar la confirmación, el horario y la programación (NOT-19) | 6 | reemplazada | 2026-11-14 | | v0.2: pasa a T-216 |
+| T-111 | Implementar la Lambda `despachador` | 6 | reemplazada | 2026-11-14 | | v0.2: pasa a T-217 |
+| T-112 | Implementar la Lambda `conciliador` | 6 | reemplazada | 2026-11-14 | | v0.2: pasa a T-217 |
+| T-113 | Implementar los consumidores de eventos y la máquina de estados de la notificación | 6 | reemplazada | 2026-11-14 | | v0.2: pasa a T-217 |
+| T-114 | Implementar la Lambda `respaldo-correo` | 6 | reemplazada | 2026-11-14 | | v0.2: pasa a T-217 |
+| T-115 | Implementar reintentar, cancelar y las variables de plantilla (NOT-20, NOT-22 e INT-COL-05 ampliado) | 6 | reemplazada | 2026-11-14 | | v0.2: pasa a T-217 |
+| T-116 | Implementar el chat de RH (WAP-01 a WAP-05) | 6 | reemplazada | 2026-11-14 | | v0.2: pasa a T-218 |
+| T-117 | Probar el flujo completo de notificaciones con el simulador | 6 | reemplazada | 2026-11-14 | | v0.2: pasa a T-218 |
+| T-118 | Punto de control de la Fase 6 | 6 | reemplazada | 2026-11-14 | | v0.2: pasa a T-218 |
+| T-119 | Crear el proyecto React, el cliente de API tipado y el manejo de errores | 7 | reemplazada | 2026-11-14 | | v0.2: pasa a T-219 |
+| T-120 | Implementar el acceso: inicio de sesión con MFA, registro y recuperación | 7 | reemplazada | 2026-11-14 | | v0.2: pasa a T-219 |
+| T-121 | Implementar el diseño base, la navegación, el cierre por inactividad y las cabeceras de desarrollo | 7 | reemplazada | 2026-11-14 | | v0.2: pasa a T-219 |
+| T-122 | Implementar el dashboard (`cv1_01`) | 7 | reemplazada | 2026-11-14 | | v0.2: pasa a T-220 |
+| T-123 | Implementar el listado y el formulario de colaboradores (`cv1_02` y `cv1_03`) | 7 | reemplazada | 2026-11-14 | | v0.2: pasa a T-220 |
+| T-124 | Implementar la configuración de campos (`cv1_04`) | 7 | reemplazada | 2026-11-14 | | v0.2: pasa a T-220 |
+| T-125 | Implementar la carga masiva, las organizaciones y las plantas | 7 | reemplazada | 2026-11-14 | | v0.2: pasa a T-220 |
+| T-126 | Implementar el listado de plantillas y el editor visual (`cv1_05` y `cv1_06`) | 7 | reemplazada | 2026-11-14 | | v0.2: pasa a T-221 |
+| T-127 | Implementar la vista previa, la validación y las versiones del editor | 7 | reemplazada | 2026-11-14 | | v0.2: pasa a T-221 |
+| T-128 | Implementar el historial de constancias y la página pública de verificación (`cv1_07`) | 7 | reemplazada | 2026-11-14 | | v0.2: pasa a T-221 |
+| T-129 | Implementar el listado de notificaciones y las plantillas de mensaje (`cv1_08`) | 7 | reemplazada | 2026-11-14 | | v0.2: pasa a T-222 |
+| T-130 | Implementar la nueva notificación con el embudo y el detalle de envío (`cv1_09` y `cv1_10`) | 7 | reemplazada | 2026-11-14 | | v0.2: pasa a T-222 |
+| T-131 | Implementar el chat de RH y la administración de usuarios e invitaciones | 7 | reemplazada | 2026-11-14 | | v0.2: pasa a T-222 |
+| T-132 | Probar localización, accesibilidad básica y contratos de la SPA | 7 | reemplazada | 2026-11-14 | | v0.2: pasa a T-223 |
+| T-133 | Probar de extremo a extremo la SPA con Playwright contra el stack local | 7 | reemplazada | 2026-11-14 | | v0.2: pasa a T-223 |
+| T-134 | Punto de control de la Fase 7 | 7 | reemplazada | 2026-11-14 | | v0.2: pasa a T-223 |
+| T-135 | Crear los stacks de cómputo: servicios de ECS, ALB y reglas por ruta | 8 | reemplazada | 2026-11-14 | | v0.2: pasa a T-224 |
+| T-136 | Crear los workers y las Lambdas de mensajería en CDK | 8 | reemplazada | 2026-11-14 | | v0.2: pasa a T-224 |
+| T-137 | Crear el stack CcApi (API Gateway, VPC Link y autorizador JWT) | 8 | reemplazada | 2026-11-14 | | v0.2: pasa a T-225 |
+| T-138 | Crear el stack CcEdge en us-east-1 (CloudFront, WAF y firma de descargas) | 8 | reemplazada | 2026-11-14 | | v0.2: pasa a T-225 |
+| T-139 | Crear los stacks CcFrontend y CcObservability | 8 | reemplazada | 2026-11-14 | | v0.2: pasa a T-225 |
+| T-140 | Crear los stacks CcBackup y CcPipeline | 8 | reemplazada | 2026-11-14 | | v0.2: pasa a T-226 |
+| T-141 | Completar las aserciones de infraestructura y la revisión de IAM | 8 | reemplazada | 2026-11-14 | | v0.2: pasa a T-226 |
+| T-142 | Ejecutar pruebas de carga con k6 en local | 8 | reemplazada | 2026-11-14 | | v0.2: pasa a T-228 |
+| T-143 | Ejecutar las pruebas de seguridad | 8 | reemplazada | 2026-11-14 | | v0.2: pasa a T-228 |
+| T-144 | Escribir los runbooks y documentar la brecha de retención y borrado a solicitud | 8 | reemplazada | 2026-11-14 | | v0.2: pasa a T-228 |
+| T-145 | Construir y publicar las imágenes de los servicios y los paquetes de las Lambdas | 8 | reemplazada | 2026-11-14 | | v0.2: pasa a T-229 |
+| T-146 | Mostrar el cdk diff completo de la Fase 8 (lectura) | 8 | reemplazada | 2026-11-14 | | v0.2: pasa a T-229 |
+| T-147 | Desplegar cómputo, workers, Lambdas y API en cc-test | 8 | reemplazada | 2026-11-14 | | v0.2: pasa a T-229 |
+| T-148 | Desplegar el borde, la SPA y la observabilidad en cc-test | 8 | reemplazada | 2026-11-14 | | v0.2: pasa a T-229 |
+| T-149 | Ejecutar migraciones y pruebas de humo en cc-test | 8 | reemplazada | 2026-11-14 | | v0.2: pasa a T-229 |
+| T-150 | Ejecutar las pruebas de extremo a extremo y de carga en cc-test | 8 | reemplazada | 2026-11-14 | | v0.2: pasa a T-230 |
+| T-151 | Probar la restauración de RDS a un punto en el tiempo en cc-test | 8 | reemplazada | 2026-11-14 | | v0.2: pasa a T-230 |
+| T-152 | Registrar resultados, ajustes y brechas | 8 | reemplazada | 2026-11-14 | | v0.2: pasa a T-230 |
+| T-153 | Preparar la guía de limpieza de cc-test, que ejecuta Samuel a mano | 8 | reemplazada | 2026-11-14 | | v0.2: pasa a T-230 |
+| T-154 | Punto de control de la Fase 8 y cierre del plan | 8 | reemplazada | 2026-11-14 | | v0.2: pasa a T-230 |
+| T-201 | Servicio `colaboradores`: esqueleto, repositorios con cifrado, organizaciones, logotipo y plantas | 2 | pendiente | | | Agrupa: T-052, T-053, T-054 |
+| T-202 | Colaboradores: alta, detalle, edición, baja, reactivación, consentimiento, elegibilidad y listado (COL-01 a COL-07) | 2 | pendiente | | | Agrupa: T-055, T-056, T-057, T-058 |
+| T-203 | Interfaces internas de colaboradores (INT-COL-01 a 05, 07 y 08) | 2 | pendiente | | | Agrupa: T-059 |
+| T-204 | Carga masiva: plantilla de Excel, validador, `worker-cargas`, endpoints y prueba con la plantilla real | 2 | pendiente | | | Agrupa: T-060, T-061, T-062, T-063, T-064, T-065 |
+| T-205 | Servicio `campos` completo: CRUD, protecciones, opciones de lista, catálogo sembrado e interfaces internas (CAM-01 a CAM-09, INT-CAM-01 y 02) | 3 | pendiente | | | Agrupa: T-066, T-067, T-068, T-069, T-070 |
+| T-206 | Integración de campos con colaboradores: INT-COL-09 y 10, evento `campo.actualizado`, fin del stub y siembra en `bootstrap_admin.py` | 3 | pendiente | | | Agrupa: T-071, T-072, T-073, T-074, T-075 |
+| T-207 | Plantillas de constancia: CRUD, esquema JSON, borradores, catálogo de variables, resolutor y variables derivadas (CON-01 a CON-08 y CON-15) | 4 | pendiente | | | Agrupa: T-076, T-077, T-078, T-079 |
+| T-208 | Publicación, versiones y restauración; renderizador de HTML, logotipo, QR, PDF con WeasyPrint y vista previa (CON-09 a CON-14) | 4 | pendiente | | | Agrupa: T-080, T-081, T-082, T-083 |
+| T-209 | Solicitudes y entrega: folio, INT-CON-01 a 06, `worker-pdf`, enlaces de un solo uso, descarga, reenvío, verificación pública y `alerta_plantilla` | 4 | pendiente | | | Agrupa: T-084, T-085, T-086, T-087, T-088, T-089 |
+| T-210 | Pruebas de rendimiento del PDF, concurrencia de folios y seguridad del renderizado y los enlaces | 4 | pendiente | | | Agrupa: T-090, T-091, T-092 |
+| T-211 | Servicio `whatsapp`, simulador de Meta y Lambdas `webhook-meta`, `estados-entrega` y `enviador` | 5 | pendiente | | | Agrupa: T-093, T-094, T-095, T-096 |
+| T-212 | Bot de WhatsApp completo: máquina de estados, verificación, menú, solicitud de constancia, `worker-whatsapp-entrada`, antiabuso y cierre por inactividad | 5 | pendiente | | | Agrupa: T-097, T-098, T-099 |
+| T-213 | Estados de entrega en `constancias`, avisos a RH, indicadores y alertas del dashboard e historial (DSH-01 a 04 y DSH-11) | 5 | pendiente | | | Agrupa: T-100, T-101, T-102 |
+| T-214 | Prueba completa de solicitud de constancia con el simulador | 5 | pendiente | | | Agrupa: T-103, T-104 |
+| T-215 | Servicio `notificaciones`: audiencias, `AudienciaQueryService`, INT-COL-06, embudo y revisión (NOT-01 a 06 y NOT-18) | 6 | pendiente | | | Agrupa: T-105, T-106, T-107 |
+| T-216 | Plantillas de mensaje, cliente de Meta, CRUD de notificaciones, indicadores, confirmación, horario y programación | 6 | pendiente | | | Agrupa: T-108, T-109, T-110 |
+| T-217 | Lambdas `despachador`, `conciliador` y `respaldo-correo`, consumidores de eventos, máquina de estados, reintentar y cancelar | 6 | pendiente | | | Agrupa: T-111, T-112, T-113, T-114, T-115 |
+| T-218 | Chat de RH (WAP-01 a 05) y prueba completa de notificaciones con el simulador | 6 | pendiente | | | Agrupa: T-116, T-117, T-118 |
+| T-219 | SPA base: proyecto React, cliente tipado, errores, acceso con MFA, registro, recuperación, navegación y cierre por inactividad | 7 | pendiente | | | Agrupa: T-119, T-120, T-121 |
+| T-220 | Pantallas de dashboard, colaboradores, campos, carga masiva, organizaciones y plantas (`cv1_01` a `cv1_04`) | 7 | pendiente | | | Agrupa: T-122, T-123, T-124, T-125 |
+| T-221 | Pantallas de plantillas: listado, editor visual, vista previa, validación, versiones, historial y verificación pública (`cv1_05` a `cv1_07`) | 7 | pendiente | | | Agrupa: T-126, T-127, T-128 |
+| T-222 | Pantallas de notificaciones, plantillas de mensaje, embudo, detalle de envío, chat, usuarios e invitaciones (`cv1_08` a `cv1_10`) | 7 | pendiente | | | Agrupa: T-129, T-130, T-131 |
+| T-223 | Pruebas de la SPA: localización, accesibilidad, contratos y extremo a extremo con Playwright contra el stack local | 7 | pendiente | | | Agrupa: T-132, T-133, T-134 |
+| T-224 | CDK de cómputo: servicios de ECS, ALB con reglas por ruta, workers y Lambdas de mensajería | 8 | pendiente | | | Agrupa: T-135, T-136 |
+| T-225 | CDK de API, borde, SPA y observabilidad: `CcApi`, `CcEdge`, `CcFrontend` y `CcObservability` | 8 | pendiente | | | Agrupa: T-137, T-138, T-139 |
+| T-226 | CDK de respaldo y pipeline, aserciones completas de infraestructura y revisión de IAM | 8 | pendiente | | | Agrupa: T-140, T-141 |
+| T-227 | Despliegue replicable: `scripts/desplegar.ps1 -Ambiente <nombre>` y guía para otra cuenta de AWS | 8 | pendiente | | | Agrupa: tarea nueva |
+| T-228 | Pruebas finales en local: carga con k6, seguridad, runbooks y brecha de retención y borrado | 8 | pendiente | | | Agrupa: T-142, T-143, T-144 |
+| T-229 | Despliegue completo en cc-test con el script replicable, datos iniciales y prueba real de registro y MFA | 8 | pendiente | | | Agrupa: T-145, T-146, T-147, T-148, T-149, T-050, T-051 |
+| T-230 | Pruebas en cc-test, restauración, resultados, guía de limpieza y cierre | 8 | pendiente | | | Agrupa: T-150, T-151, T-152, T-153, T-154 |
+
+## Resumen de la Fase 1 (cierre, 14 de noviembre de 2026)
+
+- Hecho en local: `cc_common`, esquema y migraciones de los seis servicios, RLS y permisos, servicio `dashboard` (sesión, usuarios, invitaciones, bitácora), triggers de Cognito, `bootstrap_admin.py`, `asignar_contrasenas.py` y los stacks de CDK de la Fase 1. Suite local: 193 pruebas.
+- Probado en `cc-test` (T-045 a T-049): siete stacks desplegados, migraciones y contraseñas aplicadas, empresa e invitación creadas, `verificar_f1.ps1` sin fallas.
+- Defectos que solo aparecieron en AWS, corregidos y con prueba: NAT `t4g.nano` sin memoria (ahora `t4g.micro`), falta de `kms:Decrypt` al leer secretos, `ALTER ROLE` sin superusuario en `roles.sql`, tilde en descripciones de EC2 y RDS.
+- No hecho: T-050 (registro y MFA reales) pasa a T-229.
+- AWS: Samuel destruyó todo con `cdk destroy` el 14 de noviembre. Verificado: sin stacks, secretos, logs ni repositorios; las dos llaves de KMS se borran solas el 21 de noviembre.
+- Plan v0.2: tareas pendientes agrupadas en T-201 a T-230; despliegue único al final con `scripts/desplegar.ps1` (T-227 y T-229).
