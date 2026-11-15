@@ -1,0 +1,11 @@
+/* Páginas públicas: prefijo pub-. */
+.pub { min-height: 100vh; display: grid; place-items: center; background: var(--navy); padding: 24px; }
+.pub-tarjeta { background: var(--blanco); border-radius: 10px; padding: 28px 30px; width: 440px; max-width: 100%; }
+.pub-marca { color: var(--navy); font-weight: 700; letter-spacing: 0.35em; font-size: 18px; margin-bottom: 16px; }
+.pub-tarjeta h1 { font-size: 22px; }
+.pub-datos { display: grid; grid-template-columns: max-content 1fr; gap: 10px 18px; margin: 18px 0 0; }
+.pub-datos dt { color: var(--suave); font-size: 13px; }
+.pub-datos dd { margin: 0; font-weight: 600; }
+.pub-aviso { color: var(--rojo); font-weight: 600; }
+.pub-suave { color: var(--suave); font-size: 13px; }
+.pub-boton { width: 100%; padding: 14px; font-size: 16px; }

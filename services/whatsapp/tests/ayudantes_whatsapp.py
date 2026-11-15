@@ -6,6 +6,9 @@ from typing import Any
 
 import psycopg
 
+LLAVE_CODIGOS = b"llave-hmac-de-prueba-0123456789-abcdefghij"
+CELULAR = "5218112345678"
+
 
 class ColaFalsa:
     """Registra ``send_message`` y ``change_message_visibility``."""
@@ -126,3 +129,109 @@ def registro_sqs(cuerpo: dict, n: int = 1, receptor: int = 1, grupo: str | None 
         "body": json.dumps(cuerpo),
         "attributes": atributos,
     }
+
+
+# ------------------------------------------------------------------ bot (T-212)
+
+import hashlib  # noqa: E402
+import re  # noqa: E402
+
+from cc_whatsapp.clientes import Busqueda, RespuestaError  # noqa: E402
+
+
+def huella_de(celular: str) -> str:
+    """Hash de prueba del número (los últimos 10 dígitos)."""
+    return hashlib.sha256(re.sub(r"\D", "", celular)[-10:].encode()).hexdigest()
+
+
+class ColaboradoresFalso:
+    """INT-COL-01 a 03 y 07. ``registrar`` da de alta un número; ``dato`` es el dato correcto."""
+
+    def __init__(self):
+        self.registrados: dict[str, Busqueda] = {}
+        self.datos: dict[int, str] = {}
+        self.desafios: dict[int, str] = {}
+        self.verificaciones = 0
+
+    def registrar(self, celular, colaborador_id, *, elegible=True, motivo=None, dato="1234",
+                  desafio="NSS_ULTIMOS4"):  # fmt: skip
+        self.registrados[huella_de(celular)] = Busqueda(
+            True, huella_de(celular), colaborador_id, elegible, motivo
+        )
+        self.datos[colaborador_id] = dato
+        self.desafios[colaborador_id] = desafio
+
+    async def buscar_por_celular(self, empresa_id, celular):
+        h = huella_de(celular)
+        return self.registrados.get(h, Busqueda(False, h))
+
+    async def desafio(self, empresa_id, colaborador_id):
+        return self.desafios[colaborador_id]
+
+    async def verificar(self, empresa_id, colaborador_id, dato):
+        self.verificaciones += 1
+        return self.datos[colaborador_id] == dato
+
+    async def nombre(self, empresa_id, colaborador_id):
+        return "Ana Pérez Ruiz"
+
+
+class ConstanciasFalso:
+    def __init__(self, plantillas=None):
+        self.lista = plantillas if plantillas is not None else [
+            {"id": 1, "nombre": "Constancia laboral", "descripcion": None, "version": 1}
+        ]  # fmt: skip
+        self._n = 0
+        self.creadas: list[int] = []
+        self.elegidas: list[tuple[int, int]] = []
+        self.generadas: list[int] = []
+        self.canceladas: list[int] = []
+        self.abierta = False  # simula INT-CON-02 con 409 SOLICITUD_ABIERTA
+        self.faltan: list[str] | None = None  # simula INT-CON-04 con 422
+
+    async def plantillas(self, empresa_id):
+        return list(self.lista)
+
+    async def crear_solicitud(self, empresa_id, colaborador_id, conversacion_id, nombre):
+        if self.abierta:
+            raise RespuestaError(409, "SOLICITUD_ABIERTA")
+        self._n += 1
+        self.creadas.append(self._n)
+        return self._n
+
+    async def elegir_plantilla(self, empresa_id, solicitud_id, plantilla_id):
+        self.elegidas.append((solicitud_id, plantilla_id))
+
+    async def generar(self, empresa_id, solicitud_id):
+        if self.faltan:
+            raise RespuestaError(422, "CAMPOS_FALTANTES", {"campos": self.faltan})
+        self.generadas.append(solicitud_id)
+
+    async def cancelar(self, empresa_id, solicitud_id):
+        self.canceladas.append(solicitud_id)
+
+
+class AlertasFalsas:
+    def __init__(self):
+        self.avisos: list[tuple[str, dict]] = []
+
+    async def avisar(self, empresa_id, tipo, datos):
+        self.avisos.append((tipo, datos))
+
+
+def salidas_bot(datos) -> list[dict]:
+    """Mensajes que el bot dejó para ``wa-salida``, en orden."""
+    return eventos(datos, "mensaje_salida")
+
+
+def textos_bot(datos) -> list[str]:
+    return [m["texto"] or "[interactivo]" for m in salidas_bot(datos)]
+
+
+def ultimo_codigo(datos) -> str:
+    """Código de 6 dígitos del último mensaje de verificación enviado."""
+    for m in reversed(salidas_bot(datos)):
+        encontrado = re.search(r"\b(\d{6})\b", m["texto"] or "")
+        if encontrado:
+            return encontrado.group(1)
+    raise AssertionError("el bot no envió ningún código")

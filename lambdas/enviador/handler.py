@@ -174,6 +174,9 @@ def procesar(
     if m.get("adjunto"):
         return _fallido(conn, cfg, fila_id, m, "ADJUNTO_NO_SOPORTADO")
     conversacion_id, ultimo = _ventana(conn, m)
+    if m.get("entrante_at"):  # respuesta del bot: la ventana abrió con el mensaje que contesta
+        entrante = datetime.fromisoformat(m["entrante_at"])
+        ultimo = entrante if ultimo is None else max(ultimo, entrante)
     decision = ventana.decidir(
         origen_tipo=m["origen_tipo"],
         tipo_pedido=m.get("tipo", "TEXTO"),
@@ -189,7 +192,9 @@ def procesar(
         "UPDATE whatsapp.mensaje_whatsapp SET intentos = intentos + 1, tipo = %s, "
         "conversacion_id = COALESCE(conversacion_id, %s) WHERE id = %s",
         (
-            decision.accion if decision.accion in (TEXTO, PLANTILLA) else "TEXTO",
+            PLANTILLA
+            if decision.accion == PLANTILLA
+            else ("INTERACTIVO" if m.get("tipo") == "INTERACTIVO" else TEXTO),
             conversacion_id,
             fila_id,
         ),
@@ -201,6 +206,8 @@ def procesar(
             wamid = meta.enviar_plantilla(
                 destino, m["plantilla"], cfg.plantilla_idioma, m.get("variables")
             )
+        elif m.get("tipo") == "INTERACTIVO":
+            wamid = meta.enviar_interactivo(destino, m["interactivo"])
         else:
             wamid = meta.enviar_texto(destino, m["texto"])
     except ErrorMeta as e:

@@ -749,7 +749,7 @@ Objetivo: WhatsApp con simulador de Meta, bot de verificación y solicitud, dash
     - (T-096, Implementar la Lambda `enviador` y `VentanaService`) pruebas con eventos simulados: un colaborador en BAJA o sin consentimiento no recibe; los mensajes de rechazo del bot (`RECHAZO_BOT`) se envían como respuesta fija dentro de la ventana; un mensaje de notificación siempre es plantilla; texto libre fuera de ventana no sale; constancias reintentan 2 intentos y notificaciones 3, con espera creciente; un error permanente no reintenta; `clave_idempotencia` evita enviar dos veces
   - Requiere aprobación: no
 
-- [ ] T-212. Bot de WhatsApp completo: máquina de estados, verificación, menú, solicitud de constancia, `worker-whatsapp-entrada`, antiabuso y cierre por inactividad
+- [x] T-212. Bot de WhatsApp completo: máquina de estados, verificación, menú, solicitud de constancia, `worker-whatsapp-entrada`, antiabuso y cierre por inactividad
   - Fase: 5
   - Agrupa: T-097, T-098, T-099
   - Requisitos: CC-REQ-071, CC-REQ-072, CC-REQ-073, CC-REQ-074, CC-REQ-075, CC-REQ-076, CC-REQ-086, CC-REQ-091, CC-REQ-159
@@ -851,7 +851,7 @@ Objetivo: Notificaciones masivas con embudo, programación, respaldo por correo 
 
 Objetivo: SPA de React con todas las pantallas de los diseños. Todo en local (Docker, PostgreSQL y LocalStack); no toca AWS.
 
-- [ ] T-219. SPA base: proyecto React, cliente tipado, errores, acceso con MFA, registro, recuperación, navegación y cierre por inactividad
+- [x] T-219. SPA base: proyecto React, cliente tipado, errores, acceso con MFA, registro, recuperación, navegación y cierre por inactividad
   - Fase: 7
   - Agrupa: T-119, T-120, T-121
   - Requisitos: CC-REQ-001, CC-REQ-002, CC-REQ-004, CC-REQ-006, CC-REQ-007, CC-NFR-012, CC-NFR-014
@@ -864,7 +864,7 @@ Objetivo: SPA de React con todas las pantallas de los diseños. Todo en local (D
     - (T-121, Implementar el diseño base, la navegación, el cierre por inactividad y las cabeceras de desarrollo) pruebas de componente: menú de Dashboard, Colaboradores, Constancias y Notificaciones; la sesión se cierra tras 30 minutos sin actividad; la CSP de desarrollo no permite recursos externos
   - Requiere aprobación: no
 
-- [ ] T-220. Pantallas de dashboard, colaboradores, campos, carga masiva, organizaciones y plantas (`cv1_01` a `cv1_04`)
+- [x] T-220. Pantallas de dashboard, colaboradores, campos, carga masiva, organizaciones y plantas (`cv1_01` a `cv1_04`)
   - Fase: 7
   - Agrupa: T-122, T-123, T-124, T-125
   - Requisitos: CC-REQ-011, CC-REQ-012, CC-REQ-013, CC-REQ-014, CC-REQ-020, CC-REQ-022, CC-REQ-031, CC-REQ-032, CC-REQ-033, CC-REQ-034, CC-REQ-035, CC-REQ-040, CC-REQ-043, CC-REQ-044, CC-REQ-045, CC-REQ-051, CC-REQ-052
@@ -878,7 +878,7 @@ Objetivo: SPA de React con todas las pantallas de los diseños. Todo en local (D
     - (T-125, Implementar la carga masiva, las organizaciones y las plantas) pruebas de componente: descarga de la plantilla, subida con URL firmada, seguimiento del estado, resumen y descarga del reporte de errores; catálogos de organizaciones (con logotipo) y plantas con desactivación
   - Requiere aprobación: no
 
-- [ ] T-221. Pantallas de plantillas: listado, editor visual, vista previa, validación, versiones, historial y verificación pública (`cv1_05` a `cv1_07`)
+- [x] T-221. Pantallas de plantillas: listado, editor visual, vista previa, validación, versiones, historial y verificación pública (`cv1_05` a `cv1_07`)
   - Fase: 7
   - Agrupa: T-126, T-127, T-128
   - Requisitos: CC-REQ-060, CC-REQ-061, CC-REQ-062, CC-REQ-063, CC-REQ-064, CC-REQ-065, CC-REQ-066, CC-REQ-067, CC-REQ-068, CC-REQ-069, CC-REQ-070, CC-REQ-087, CC-REQ-088, CC-REQ-089, CC-REQ-090

@@ -1,0 +1,14 @@
+.car-pasos { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+.car-pasos p { color: var(--suave); font-size: 13px; }
+.car-tabla { padding: 0; overflow: hidden; margin-bottom: 24px; }
+.car-tabla h2 { padding: 20px 24px 0; }
+.car-pie { display: flex; justify-content: flex-end; gap: 12px; padding: 14px 24px; border-top: 1px solid var(--borde); align-items: center; font-size: 13px; color: var(--suave); }
+.car-resumen { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 16px 0; }
+.car-resumen div { background: #f9fafb; border: 1px solid var(--borde); border-radius: 8px; padding: 14px 16px; }
+.car-resumen dt { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--suave); font-weight: 700; }
+.car-resumen dd { margin: 4px 0 0; font-size: 24px; font-weight: 700; color: var(--navy); }
+.car-barra { height: 10px; border-radius: 999px; background: #e5e7eb; overflow: hidden; margin: 10px 0; }
+.car-barra span { display: block; height: 100%; background: var(--naranja); }
+.car-acciones { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 12px; align-items: center; }
+.car-filtro select { border: 1px solid var(--borde); border-radius: 6px; padding: 8px 10px; background: #fff; }
+.car-errores { margin: 0; padding-left: 16px; color: var(--rojo); }

@@ -29,6 +29,20 @@ class ConfigWhatsapp(Configuracion):
     eventos_activos: bool = False  # inicia el relay del outbox con la API
     colaboradores_url: str | None = None
     ventana_horas: int = 24
+    # Bot (design.md §7). Una cuenta de WhatsApp atiende a una empresa: el worker de entrada usa la
+    # empresa configurada (la asociación número-empresa llega con la vinculación, PQ-07).
+    empresa_id: int | None = None
+    constancias_url: str | None = None
+    codigo_hmac_secreto_id: str | None = None  # cc/{env}/whatsapp-hmac
+    alertas_topic_arn: str | None = None  # SNS alertas-rh
+    aviso_privacidad_url: str | None = None  # texto y enlace por confirmar (PQ-12)
+    inactividad_minutos: int = 30  # DS-14, PQ-20
+    bloqueo_horas: int = 24  # PQ-23
+    intentos_verificacion: int = 3
+    codigo_minutos: int = 10
+    limite_mensajes_minuto: int = 20  # DS-17
+    limite_solicitudes_dia: int = 5  # PQ-20
+    plantillas_por_pagina: int = 9  # una lista interactiva admite 10 filas: 9 más "Ver más"
 
 
 @lru_cache(maxsize=1)

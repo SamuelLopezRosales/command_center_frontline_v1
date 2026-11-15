@@ -97,6 +97,7 @@ def test_todas_las_tablas(bd):
             "conversacion_whatsapp",
             "mensaje_whatsapp",
             "codigo_verificacion",
+            "uso_numero",
             "clave_datos",
             "outbox",
         },

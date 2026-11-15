@@ -225,3 +225,38 @@ def test_en_fifo_un_fallo_detiene_los_siguientes_del_mismo_grupo(mundo):
     r = mundo["enviar"](a, b, grupo=str(d["colaborador"]))
     assert [f["itemIdentifier"] for f in r["batchItemFailures"]] == ["m1", "m2"]
     assert mundo["sim"].enviados == []  # el segundo no se adelantó
+
+
+def test_el_bot_responde_a_un_numero_sin_conversacion_con_la_ventana_del_mensaje_que_contesta(
+    mundo,
+):
+    from datetime import UTC, datetime
+
+    d = mundo["d"]  # sin conversación ni colaborador: solo cuenta `entrante_at`
+    ahora = datetime.now(UTC).isoformat()
+    m = salida(d, origen_tipo="BOT", proposito="RECHAZO_BOT", wa_id="5219999999999",
+               texto="Este número no tiene acceso al servicio.", entrante_at=ahora)  # fmt: skip
+    m["colaborador_id"] = None
+    mundo["enviar"](m)
+    assert mundo["sim"].enviados[0]["to"] == "529999999999"
+    sin = salida(d, origen_tipo="BOT", proposito="RECHAZO_BOT", wa_id="5219999999999")
+    sin["colaborador_id"] = None
+    mundo["enviar"](sin)  # sin `entrante_at` ni conversación la ventana está cerrada
+    assert mensaje(d, sin["mensaje_uuid"])[:2] == ("FALLIDO", "VENTANA_CERRADA")
+
+
+def test_la_lista_interactiva_del_menu_se_envia_dentro_de_la_ventana(mundo):
+    from datetime import UTC, datetime
+
+    d = mundo["d"]
+    lista = {"type": "list", "body": {"text": "Elige"},
+             "action": {"button": "Ver", "sections": [{"rows": [{"id": "plantilla:1", "title": "A"}]}]}}  # fmt: skip
+    m = salida(d, origen_tipo="BOT", proposito="BOT", wa_id="5218112345678", tipo="INTERACTIVO",
+               interactivo=lista, texto=None, entrante_at=datetime.now(UTC).isoformat())  # fmt: skip
+    mundo["enviar"](m)
+    [e] = mundo["sim"].enviados
+    assert e["type"] == "interactive" and e["interactive"]["action"]["button"] == "Ver"
+    assert (
+        mensaje(d, m["mensaje_uuid"])[0] == "ENVIADO"
+        and mensaje(d, m["mensaje_uuid"])[4] == "INTERACTIVO"
+    )

@@ -89,6 +89,10 @@ class ClienteMeta:
             {"to": destino, "type": "text", "text": {"body": texto, "preview_url": False}}
         )
 
+    def enviar_interactivo(self, destino: str, interactivo: dict[str, Any]) -> str:
+        """Lista o botones (``interactive``); solo dentro de la ventana de 24 horas."""
+        return self._enviar({"to": destino, "type": "interactive", "interactive": interactivo})
+
     def enviar_plantilla(
         self, destino: str, nombre: str, idioma: str, variables: list[str] | None = None
     ) -> str:

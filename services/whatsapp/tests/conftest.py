@@ -42,3 +42,39 @@ def datos(bd_migrada):
     url = bd_migrada.url_rol("svc_whatsapp", asincrona=False)
     d["abrir"] = lambda: psycopg.connect(url)
     return d
+
+
+# ------------------------------------------------------------------ bot (T-212)
+
+
+@pytest.fixture
+async def bot(datos, bd_migrada):
+    """Contexto del bot con colaboradores y constancias de mentira y la base real (RLS vigente)."""
+    from ayudantes_whatsapp import (
+        CELULAR,
+        LLAVE_CODIGOS,
+        AlertasFalsas,
+        ColaboradoresFalso,
+        ConstanciasFalso,
+    )
+    from cc_common.db import crear_motor
+    from cc_whatsapp.bot.contexto import Contexto
+
+    motor = crear_motor(bd_migrada.url_rol("svc_whatsapp"))
+    cfg = ConfigWhatsapp(
+        empresa_id=datos["empresa"],
+        cola_salida_url="wa-salida.fifo",
+        aviso_privacidad_url="https://cc.test/privacidad",
+    )
+    colaboradores = ColaboradoresFalso()
+    colaboradores.registrar(CELULAR, datos["colaborador"])
+    ctx = Contexto(
+        cfg=cfg,
+        motor=motor,
+        colaboradores=colaboradores,
+        constancias=ConstanciasFalso(),
+        alertas=AlertasFalsas(),
+        llave_codigos=LLAVE_CODIGOS,
+    )
+    yield ctx
+    await motor.dispose()
