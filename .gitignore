@@ -43,3 +43,6 @@ Thumbs.db
 
 # Paquete de las Lambdas (scripts/empaquetar_lambdas.py)
 build/
+
+# Stack local de desarrollo (scripts/local.ps1): PIDs, registros, llaves y secretos de prueba
+.local/

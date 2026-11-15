@@ -50,6 +50,7 @@ def crear_app(
         if cfg.eventos_activos:
             from cc_colaboradores import consumidores
 
+            tareas.append(asyncio.create_task(_relay(app, parar)))
             tareas.append(asyncio.create_task(consumidores.ejecutar(app, parar)))
         yield
         parar.set()
@@ -106,3 +107,22 @@ def _secreto_interno_de(cfg: ConfigColaboradores) -> Callable[[], str]:
         return estado["valor"]
 
     return leer
+
+
+async def _relay(app: FastAPI, parar: asyncio.Event) -> None:
+    """relay-outbox: publica ``carga.confirmada`` en ``cola-cargas`` (design.md §4.7).
+
+    Sin este relay la carga masiva queda confirmada pero nadie la procesa.
+    """
+    import boto3
+    from cc_common.outbox import publicador_aws
+    from cc_common.tareas import relay_outbox
+
+    cfg = app.state.config
+    opciones = {"region_name": cfg.region, "endpoint_url": cfg.sqs_endpoint or None}
+    publicador = publicador_aws(
+        boto3.client("sqs", **opciones),
+        boto3.client("events", **opciones),
+        fuente="cc.colaboradores",
+    )
+    await relay_outbox(app.state.motor, "colaboradores", publicador, parar)
