@@ -64,6 +64,18 @@ class KmsFalso:
         return {"Plaintext": bytes(a ^ b for a, b in zip(blob[:32], self._mascara, strict=True))}
 
 
+SECRETO_INTERNO = "secreto-interno-de-prueba-0123456789-abcdef"
+
+
+def interno(servicio: str, empresa_id: int | None) -> dict[str, str]:
+    from cc_common.internal_client import emitir_token_interno
+
+    h = {"Authorization": f"Bearer {emitir_token_interno(SECRETO_INTERNO, servicio)}"}
+    if empresa_id is not None:
+        h["X-Empresa-Id"] = str(empresa_id)
+    return h
+
+
 def construir_app(motor, cifrador, almacen=None, campos=None, **cfg):
     from cc_colaboradores.campos_cliente import CacheCampos, StubCampos
     from cc_colaboradores.config import ConfigColaboradores
@@ -77,4 +89,5 @@ def construir_app(motor, cifrador, almacen=None, campos=None, **cfg):
         cifrador=cifrador,
         almacen=almacen,
         campos=campos or CacheCampos(StubCampos()),
+        secreto_interno=lambda: SECRETO_INTERNO,
     )

@@ -16,6 +16,95 @@
         "title": "Baja",
         "type": "object"
       },
+      "BuscarCelular": {
+        "additionalProperties": false,
+        "properties": {
+          "celular": {
+            "maxLength": 30,
+            "minLength": 1,
+            "title": "Celular",
+            "type": "string"
+          }
+        },
+        "required": [
+          "celular"
+        ],
+        "title": "BuscarCelular",
+        "type": "object"
+      },
+      "Busqueda": {
+        "properties": {
+          "celular_hash": {
+            "title": "Celular Hash",
+            "type": "string"
+          },
+          "colaborador_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Colaborador Id"
+          },
+          "consentimiento_vigente": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Consentimiento Vigente"
+          },
+          "elegible": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Elegible"
+          },
+          "encontrado": {
+            "title": "Encontrado",
+            "type": "boolean"
+          },
+          "estatus": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estatus"
+          },
+          "motivo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motivo"
+          }
+        },
+        "required": [
+          "encontrado",
+          "celular_hash"
+        ],
+        "title": "Busqueda",
+        "type": "object"
+      },
       "ColaboradorActualizar": {
         "additionalProperties": false,
         "description": "Parcial. ``numero_empleado`` y ``estatus`` no están: no cambian aquí (COL-04).",
@@ -447,6 +536,141 @@
           "otorgado"
         ],
         "title": "Consentimiento",
+        "type": "object"
+      },
+      "Contacto": {
+        "properties": {
+          "celular": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Celular"
+          },
+          "correo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Correo"
+          },
+          "elegible": {
+            "title": "Elegible",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "motivo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motivo"
+          },
+          "valores": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Valores",
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "elegible"
+        ],
+        "title": "Contacto",
+        "type": "object"
+      },
+      "Contactos": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/Contacto"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "Contactos",
+        "type": "object"
+      },
+      "Datos": {
+        "properties": {
+          "faltantes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Faltantes",
+            "type": "array"
+          },
+          "valores": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Valores",
+            "type": "object"
+          }
+        },
+        "required": [
+          "valores",
+          "faltantes"
+        ],
+        "title": "Datos",
+        "type": "object"
+      },
+      "DatosConstancia": {
+        "additionalProperties": false,
+        "properties": {
+          "variables": {
+            "items": {
+              "maxLength": 80,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 100,
+            "title": "Variables",
+            "type": "array"
+          }
+        },
+        "required": [
+          "variables"
+        ],
+        "title": "DatosConstancia",
+        "type": "object"
+      },
+      "Desafio": {
+        "properties": {
+          "tipo": {
+            "enum": [
+              "NSS_ULTIMOS4",
+              "FECHA_INGRESO_DDMM"
+            ],
+            "title": "Tipo",
+            "type": "string"
+          }
+        },
+        "required": [
+          "tipo"
+        ],
+        "title": "Desafio",
         "type": "object"
       },
       "EstadoConsentimiento": {
@@ -1044,6 +1268,54 @@
         "title": "Referencia",
         "type": "object"
       },
+      "ResolverContactos": {
+        "additionalProperties": false,
+        "properties": {
+          "ids": {
+            "items": {
+              "type": "integer"
+            },
+            "maxItems": 500,
+            "minItems": 1,
+            "title": "Ids",
+            "type": "array"
+          },
+          "proposito": {
+            "enum": [
+              "NOTIFICACION",
+              "CONSTANCIA",
+              "VERIFICACION",
+              "CHAT",
+              "CORREO"
+            ],
+            "title": "Proposito",
+            "type": "string"
+          },
+          "variables": {
+            "anyOf": [
+              {
+                "items": {
+                  "maxLength": 80,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "maxItems": 100,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Variables"
+          }
+        },
+        "required": [
+          "ids",
+          "proposito"
+        ],
+        "title": "ResolverContactos",
+        "type": "object"
+      },
       "UrlSubida": {
         "properties": {
           "expira": {
@@ -1106,6 +1378,35 @@
           "type"
         ],
         "title": "ValidationError",
+        "type": "object"
+      },
+      "Verificacion": {
+        "properties": {
+          "valido": {
+            "title": "Valido",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "valido"
+        ],
+        "title": "Verificacion",
+        "type": "object"
+      },
+      "Verificar": {
+        "additionalProperties": false,
+        "properties": {
+          "dato": {
+            "maxLength": 20,
+            "minLength": 1,
+            "title": "Dato",
+            "type": "string"
+          }
+        },
+        "required": [
+          "dato"
+        ],
+        "title": "Verificar",
         "type": "object"
       }
     }
@@ -2205,6 +2506,550 @@
         "summary": "Actualiza o desactiva una planta (COL-15)",
         "tags": [
           "plantas"
+        ]
+      }
+    },
+    "/internal/colaboradores/buscar-por-celular": {
+      "post": {
+        "operationId": "buscar_por_celular_internal_colaboradores_buscar_por_celular_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-empresa-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Empresa-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BuscarCelular"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Busqueda"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "INT-COL-01",
+        "tags": [
+          "internas"
+        ]
+      }
+    },
+    "/internal/colaboradores/contactos:resolver": {
+      "post": {
+        "operationId": "resolver_contactos_internal_colaboradores_contactos_resolver_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-empresa-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Empresa-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResolverContactos"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Contactos"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "INT-COL-05",
+        "tags": [
+          "internas"
+        ]
+      }
+    },
+    "/internal/colaboradores/{colaborador_id}/datos-constancia": {
+      "post": {
+        "operationId": "datos_constancia_internal_colaboradores__colaborador_id__datos_constancia_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "colaborador_id",
+            "required": true,
+            "schema": {
+              "title": "Colaborador Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-empresa-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Empresa-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DatosConstancia"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Datos"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "INT-COL-04",
+        "tags": [
+          "internas"
+        ]
+      }
+    },
+    "/internal/colaboradores/{colaborador_id}/desafio": {
+      "post": {
+        "operationId": "desafio_internal_colaboradores__colaborador_id__desafio_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "colaborador_id",
+            "required": true,
+            "schema": {
+              "title": "Colaborador Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-empresa-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Empresa-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Desafio"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "INT-COL-02",
+        "tags": [
+          "internas"
+        ]
+      }
+    },
+    "/internal/colaboradores/{colaborador_id}/resumen": {
+      "get": {
+        "operationId": "resumen_internal_colaboradores__colaborador_id__resumen_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "colaborador_id",
+            "required": true,
+            "schema": {
+              "title": "Colaborador Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-empresa-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Empresa-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Resumen Internal Colaboradores  Colaborador Id  Resumen Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "INT-COL-07",
+        "tags": [
+          "internas"
+        ]
+      }
+    },
+    "/internal/colaboradores/{colaborador_id}/verificar": {
+      "post": {
+        "operationId": "verificar_internal_colaboradores__colaborador_id__verificar_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "colaborador_id",
+            "required": true,
+            "schema": {
+              "title": "Colaborador Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-empresa-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Empresa-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Verificar"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Verificacion"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "INT-COL-03",
+        "tags": [
+          "internas"
+        ]
+      }
+    },
+    "/internal/organizaciones/{organizacion_id}": {
+      "get": {
+        "operationId": "organizacion_internal_organizaciones__organizacion_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "organizacion_id",
+            "required": true,
+            "schema": {
+              "title": "Organizacion Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-empresa-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Empresa-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Organizacion Internal Organizaciones  Organizacion Id  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "INT-COL-08",
+        "tags": [
+          "internas"
         ]
       }
     }

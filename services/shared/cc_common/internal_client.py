@@ -123,3 +123,62 @@ class ClienteInterno:
                 await asyncio.sleep(self._espera * intento)
         self._registrar(False)
         raise ErrorProveedor() from ultimo
+
+
+# ------------------------------------------------------------------ lado del servidor (T-203)
+
+
+class LlamadaInterna:
+    """Quién llama (servicio del token) y para qué empresa (``X-Empresa-Id``)."""
+
+    __slots__ = ("empresa_id", "servicio")
+
+    def __init__(self, servicio: str, empresa_id: int) -> None:
+        self.servicio = servicio
+        self.empresa_id = empresa_id
+
+
+def requiere_servicio(*permitidos: str):
+    """Dependencia de FastAPI para rutas ``/internal``: token interno de un servicio permitido y
+    encabezado ``X-Empresa-Id`` (la empresa fija ``app.empresa_id`` y con ello la RLS).
+
+    La app debe exponer ``app.state.secreto_interno``: una función sin argumentos que devuelve el
+    secreto ``cc/{env}/internal-auth``. Se marca como ruta con permiso para ``rutas_sin_permiso``.
+    """
+    from fastapi import Depends, Header, Request
+
+    from cc_common.auth import extraer_bearer
+    from cc_common.errores import ErrorCampo, ErrorValidacion
+
+    servicios = frozenset(permitidos)
+
+    def _dependencia(
+        request: Request,
+        authorization: str | None = Header(default=None),
+        x_empresa_id: str | None = Header(default=None),
+    ) -> LlamadaInterna:
+        servicio = verificar_token_interno(
+            extraer_bearer(authorization), request.app.state.secreto_interno(), servicios
+        )
+        try:
+            empresa_id = int(x_empresa_id or "")
+        except ValueError:
+            empresa_id = 0
+        if empresa_id <= 0:
+            raise ErrorValidacion(
+                "EMPRESA_REQUERIDA",
+                "Falta el encabezado X-Empresa-Id.",
+                errores=[ErrorCampo("X-Empresa-Id", "REQUERIDO", "Falta la empresa.")],
+            )
+        return LlamadaInterna(servicio, empresa_id)
+
+    # Con ``from __future__ import annotations`` FastAPI no resolvería ``Request`` (importado
+    # aquí dentro): se le dan las anotaciones ya evaluadas.
+    _dependencia.__annotations__ = {
+        "request": Request,
+        "authorization": str | None,
+        "x_empresa_id": str | None,
+        "return": LlamadaInterna,
+    }
+    _dependencia._permiso = f"interno:{','.join(sorted(servicios))}"  # type: ignore[attr-defined]
+    return Depends(_dependencia)

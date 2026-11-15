@@ -7,7 +7,8 @@ OpenAPI y se prueba sin infraestructura.
 
 from __future__ import annotations
 
-from collections.abc import AsyncIterator
+import time
+from collections.abc import AsyncIterator, Callable
 from contextlib import asynccontextmanager
 from typing import Any
 
@@ -31,6 +32,7 @@ def crear_app(
     cifrador: Any | None = None,
     almacen: Any | None = None,
     campos: Any | None = None,
+    secreto_interno: Callable[[], str] | None = None,
 ) -> FastAPI:
     cfg = config or ConfigColaboradores()
 
@@ -62,6 +64,7 @@ def crear_app(
     app.state.almacen = almacen
     # Temporal: StubCampos se reemplaza por el cliente de INT-CAM-01 en T-206.
     app.state.campos = campos or CacheCampos(StubCampos())
+    app.state.secreto_interno = secreto_interno or _secreto_interno_de(cfg)
     instalar_manejadores(app)
 
     @app.get("/salud", include_in_schema=False)
@@ -72,3 +75,22 @@ def crear_app(
 
     registrar_rutas(app)
     return app
+
+
+def _secreto_interno_de(cfg: ConfigColaboradores) -> Callable[[], str]:
+    """Lee ``cc/{env}/internal-auth`` al primer uso y lo guarda 5 minutos (tolera la rotación)."""
+    estado: dict[str, Any] = {"valor": None, "hasta": 0.0}
+
+    def leer() -> str:
+        if estado["valor"] is None or time.monotonic() > estado["hasta"]:
+            if not cfg.internal_auth_secreto_id:
+                from cc_common.errores import ErrorInterno
+
+                raise ErrorInterno("SECRETO_INTERNO_NO_CONFIGURADO", "Servicio no configurado.")
+            from cc_common.recursos import leer_secreto
+
+            estado["valor"] = leer_secreto(cfg.internal_auth_secreto_id, cfg.region)
+            estado["hasta"] = time.monotonic() + 300
+        return estado["valor"]
+
+    return leer

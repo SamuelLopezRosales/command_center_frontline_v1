@@ -606,7 +606,7 @@ Objetivo: CRUD de colaboradores, organizaciones y plantas con cifrado, elegibili
     - (T-058, Implementar el listado, la búsqueda y los filtros (COL-01)) pruebas de integración con 10,000 filas: búsqueda por nombre con acentos y parcial usa el índice trigrama; filtros por organización, planta, estatus, tipo y campo dinámico no sensible; columnas elegidas por el cliente; los campos sensibles no se filtran ni se devuelven; paginación con total
   - Requiere aprobación: no
 
-- [ ] T-203. Interfaces internas de colaboradores (INT-COL-01 a 05, 07 y 08)
+- [x] T-203. Interfaces internas de colaboradores (INT-COL-01 a 05, 07 y 08)
   - Fase: 2
   - Agrupa: T-059
   - Requisitos: CC-REQ-071, CC-REQ-072, CC-REQ-073, CC-REQ-076, CC-REQ-115, CC-REQ-157

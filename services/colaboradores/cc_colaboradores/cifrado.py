@@ -24,7 +24,7 @@ from contextvars import ContextVar
 from dataclasses import dataclass, field
 from typing import Any
 
-from cc_common.crypto import DekCifrada, EnvelopeCrypto, aad, hmac_celular
+from cc_common.crypto import DekCifrada, EnvelopeCrypto, aad, hmac_celular, hmac_texto
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncConnection
 
@@ -129,6 +129,10 @@ class Cifrador:
 
     def hash_celular(self, celular_10: str) -> bytes:
         return hmac_celular(self._llave_hmac, celular_10)
+
+    def hash_numero_invalido(self, digitos: str) -> bytes:
+        """Huella de un número que no es de 10 dígitos, para registrar el intento sin guardarlo."""
+        return hmac_texto(self._llave_hmac, f"invalido:{digitos}")
 
 
 def cifrador_desde_config(cfg: Any) -> Cifrador:

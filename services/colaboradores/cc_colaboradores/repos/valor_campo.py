@@ -122,9 +122,11 @@ async def leer(
     colaborador_id: int,
     definiciones: list[DefinicionCampo],
     incluir_sensibles: bool = False,
+    solo: set[str] | None = None,
 ) -> tuple[dict[str, Any], list[str]]:
     """``{codigo_interno: valor}``. Los sensibles salen como ``{"presente": true}`` salvo con
-    ``incluir_sensibles``. Devuelve también los códigos sensibles descifrados (bitácora)."""
+    ``incluir_sensibles``; con ``solo`` se limita a esos códigos (descifra solo lo pedido).
+    Devuelve también los códigos sensibles descifrados (bitácora)."""
     por_id = {d.id: d for d in definiciones}
     filas = await conn.execute(
         text(
@@ -137,8 +139,8 @@ async def leer(
     descifrados: list[str] = []
     for campo_id, t, n, f, o, x in filas.all():
         d = por_id.get(campo_id)
-        if d is None:
-            continue  # campo eliminado o de otra configuración: no se expone
+        if d is None or (solo is not None and d.codigo_interno not in solo):
+            continue  # campo eliminado, de otra configuración o no pedido: no se expone
         if x is not None:
             if not incluir_sensibles:
                 salida[d.codigo_interno] = dict(ENMASCARADO)
