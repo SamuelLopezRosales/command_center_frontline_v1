@@ -673,7 +673,7 @@ Objetivo: Campos dinámicos con su catálogo e integración con colaboradores. T
 
 Objetivo: Plantillas de constancia, versiones, PDF, folio, entrega por enlace y verificación pública. Todo en local (Docker, PostgreSQL y LocalStack); no toca AWS.
 
-- [ ] T-207. Plantillas de constancia: CRUD, esquema JSON, borradores, catálogo de variables, resolutor y variables derivadas (CON-01 a CON-08 y CON-15)
+- [x] T-207. Plantillas de constancia: CRUD, esquema JSON, borradores, catálogo de variables, resolutor y variables derivadas (CON-01 a CON-08 y CON-15)
   - Fase: 4
   - Agrupa: T-076, T-077, T-078, T-079
   - Requisitos: CC-REQ-060, CC-REQ-061, CC-REQ-062, CC-REQ-064, CC-REQ-069, CC-REQ-070, CC-REQ-078, CC-REQ-161

@@ -1,0 +1,347 @@
+{
+  "$defs": {
+    "BloqueLogotipo": {
+      "additionalProperties": false,
+      "properties": {
+        "alineacion": {
+          "default": "izquierda",
+          "enum": [
+            "izquierda",
+            "centro",
+            "derecha",
+            "justificado"
+          ],
+          "title": "Alineacion",
+          "type": "string"
+        },
+        "ancho_cm": {
+          "default": 5.0,
+          "maximum": 15.0,
+          "minimum": 1.0,
+          "title": "Ancho Cm",
+          "type": "number"
+        },
+        "tipo": {
+          "const": "logotipo",
+          "title": "Tipo",
+          "type": "string"
+        }
+      },
+      "required": [
+        "tipo"
+      ],
+      "title": "BloqueLogotipo",
+      "type": "object"
+    },
+    "BloqueParrafo": {
+      "additionalProperties": false,
+      "properties": {
+        "alineacion": {
+          "default": "izquierda",
+          "enum": [
+            "izquierda",
+            "centro",
+            "derecha",
+            "justificado"
+          ],
+          "title": "Alineacion",
+          "type": "string"
+        },
+        "contenido": {
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/NodoTexto"
+              },
+              {
+                "$ref": "#/$defs/NodoVariable"
+              },
+              {
+                "$ref": "#/$defs/NodoSalto"
+              }
+            ]
+          },
+          "maxItems": 500,
+          "title": "Contenido",
+          "type": "array"
+        },
+        "tipo": {
+          "const": "parrafo",
+          "title": "Tipo",
+          "type": "string"
+        }
+      },
+      "required": [
+        "tipo"
+      ],
+      "title": "BloqueParrafo",
+      "type": "object"
+    },
+    "Margenes": {
+      "additionalProperties": false,
+      "properties": {
+        "der": {
+          "default": 2.5,
+          "maximum": 5.0,
+          "minimum": 1.0,
+          "title": "Der",
+          "type": "number"
+        },
+        "inf": {
+          "default": 2.5,
+          "maximum": 5.0,
+          "minimum": 1.0,
+          "title": "Inf",
+          "type": "number"
+        },
+        "izq": {
+          "default": 2.5,
+          "maximum": 5.0,
+          "minimum": 1.0,
+          "title": "Izq",
+          "type": "number"
+        },
+        "sup": {
+          "default": 2.5,
+          "maximum": 5.0,
+          "minimum": 1.0,
+          "title": "Sup",
+          "type": "number"
+        }
+      },
+      "title": "Margenes",
+      "type": "object"
+    },
+    "NodoSalto": {
+      "additionalProperties": false,
+      "properties": {
+        "salto": {
+          "const": true,
+          "title": "Salto",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "salto"
+      ],
+      "title": "NodoSalto",
+      "type": "object"
+    },
+    "NodoTexto": {
+      "additionalProperties": false,
+      "properties": {
+        "color": {
+          "anyOf": [
+            {
+              "pattern": "^#[0-9A-Fa-f]{6}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Color"
+        },
+        "cursiva": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cursiva"
+        },
+        "negrita": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Negrita"
+        },
+        "subrayado": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Subrayado"
+        },
+        "tamano_pt": {
+          "anyOf": [
+            {
+              "maximum": 48,
+              "minimum": 8,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tamano Pt"
+        },
+        "texto": {
+          "maxLength": 5000,
+          "minLength": 1,
+          "title": "Texto",
+          "type": "string"
+        }
+      },
+      "required": [
+        "texto"
+      ],
+      "title": "NodoTexto",
+      "type": "object"
+    },
+    "NodoVariable": {
+      "additionalProperties": false,
+      "properties": {
+        "color": {
+          "anyOf": [
+            {
+              "pattern": "^#[0-9A-Fa-f]{6}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Color"
+        },
+        "cursiva": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cursiva"
+        },
+        "negrita": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Negrita"
+        },
+        "subrayado": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Subrayado"
+        },
+        "tamano_pt": {
+          "anyOf": [
+            {
+              "maximum": 48,
+              "minimum": 8,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tamano Pt"
+        },
+        "var": {
+          "pattern": "^[a-z][a-z0-9_]{0,40}(\\.[a-z][a-z0-9_]{0,40})?$",
+          "title": "Var",
+          "type": "string"
+        }
+      },
+      "required": [
+        "var"
+      ],
+      "title": "NodoVariable",
+      "type": "object"
+    },
+    "Pagina": {
+      "additionalProperties": false,
+      "properties": {
+        "margenes_cm": {
+          "$ref": "#/$defs/Margenes"
+        },
+        "tamano": {
+          "default": "CARTA",
+          "enum": [
+            "CARTA",
+            "A4"
+          ],
+          "title": "Tamano",
+          "type": "string"
+        }
+      },
+      "title": "Pagina",
+      "type": "object"
+    }
+  },
+  "$id": "contenido_plantilla.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "bloques": {
+      "items": {
+        "discriminator": {
+          "mapping": {
+            "logotipo": "#/$defs/BloqueLogotipo",
+            "parrafo": "#/$defs/BloqueParrafo"
+          },
+          "propertyName": "tipo"
+        },
+        "oneOf": [
+          {
+            "$ref": "#/$defs/BloqueLogotipo"
+          },
+          {
+            "$ref": "#/$defs/BloqueParrafo"
+          }
+        ]
+      },
+      "maxItems": 200,
+      "title": "Bloques",
+      "type": "array"
+    },
+    "esquema": {
+      "const": 1,
+      "title": "Esquema",
+      "type": "integer"
+    },
+    "pagina": {
+      "$ref": "#/$defs/Pagina"
+    }
+  },
+  "required": [
+    "esquema"
+  ],
+  "title": "Contenido de plantilla de constancia (esquema 1)",
+  "type": "object"
+}

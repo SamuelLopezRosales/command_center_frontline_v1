@@ -142,3 +142,36 @@ def test_detecta_ruta_sin_permiso():
         return {}
 
     assert rutas_sin_permiso(app) == ["GET /olvidada"]
+
+
+def test_detecta_rutas_sin_permiso_dentro_de_routers_incluidos():
+    """Con FastAPI reciente las rutas de ``include_router`` no están en ``app.routes``: el
+    recorrido debe entrar en ellas, con su prefijo (regresión de T-207)."""
+    from fastapi import APIRouter
+
+    def usuario(authorization: str | None = Header(default=None)) -> UsuarioActual:
+        raise NotImplementedError  # nunca se invoca: solo se inspeccionan las rutas
+
+    app = _app()
+    router = APIRouter()
+
+    @router.get("/olvidada")
+    def olvidada():
+        return {}
+
+    @router.get("/protegida")
+    def protegida(u=requiere_permiso(Permiso.COLABORADORES_VER, usuario)):  # noqa: B008
+        return {}
+
+    interno = APIRouter()
+
+    @interno.delete("/profunda")
+    def profunda():
+        return {}
+
+    router.include_router(interno, prefix="/anidado")
+    app.include_router(router, prefix="/api/v1")
+    assert sorted(rutas_sin_permiso(app)) == [
+        "DELETE /api/v1/anidado/profunda",
+        "GET /api/v1/olvidada",
+    ]

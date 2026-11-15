@@ -10,7 +10,7 @@ con ``ruta_publica``; ``rutas_sin_permiso`` permite probar que ninguna ruta qued
 
 from __future__ import annotations
 
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Iterable, Iterator
 from dataclasses import dataclass
 from typing import Any
 
@@ -140,11 +140,27 @@ def _marcas(dependencias: Iterable[Any]) -> bool:
     return False
 
 
+def _aplanar(rutas: Iterable[Any], prefijo: str = "") -> Iterator[tuple[str, Any]]:
+    """Recorre las rutas incluso dentro de routers incluidos.
+
+    FastAPI reciente (0.16x) no copia las rutas de ``include_router`` a ``app.routes``: las deja
+    agrupadas en un objeto con ``original_router`` y el prefijo en ``include_context``. Sin este
+    recorrido, ``rutas_sin_permiso`` no vería ninguna ruta de los servicios.
+    """
+    for ruta in rutas:
+        original = getattr(ruta, "original_router", None)
+        if original is not None:
+            contexto = getattr(ruta, "include_context", None)
+            hijo = prefijo + (getattr(contexto, "prefix", "") or "")
+            yield from _aplanar(original.routes, hijo)
+        else:
+            yield prefijo + getattr(ruta, "path", ""), ruta
+
+
 def rutas_sin_permiso(app: Any) -> list[str]:
     """Rutas de la app que no declaran permiso ni se marcan como públicas."""
     faltantes = []
-    for ruta in app.routes:
-        camino = getattr(ruta, "path", "")
+    for camino, ruta in _aplanar(app.routes):
         dependiente = getattr(ruta, "dependant", None)
         if dependiente is None or camino in RUTAS_EXENTAS:
             continue
