@@ -717,7 +717,7 @@ Objetivo: Plantillas de constancia, versiones, PDF, folio, entrega por enlace y 
     - (T-089, Implementar INT-CON-06 y el trabajo de `alerta_plantilla`) pruebas de integración: el uso de una variable devuelve las plantillas (versión vigente y borrador) que la usan; el trabajo recalcula `alerta_plantilla` al publicar y por evento `campo.actualizado`, con conteos desde INT-COL-09
   - Requiere aprobación: no
 
-- [ ] T-210. Pruebas de rendimiento del PDF, concurrencia de folios y seguridad del renderizado y los enlaces
+- [x] T-210. Pruebas de rendimiento del PDF, concurrencia de folios y seguridad del renderizado y los enlaces
   - Fase: 4
   - Agrupa: T-090, T-091, T-092
   - Requisitos: CC-REQ-063, CC-REQ-079, CC-NFR-001, CC-NFR-008

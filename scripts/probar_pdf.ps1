@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
   Corre las pruebas de PDF (WeasyPrint) en un contenedor Linux.
 
@@ -11,7 +11,7 @@
   .\scripts\probar_pdf.ps1              # usa la imagen si ya existe
   .\scripts\probar_pdf.ps1 -Reconstruir # la vuelve a construir (cambio de dependencias)
 #>
-param([switch]$Reconstruir, [string[]]$Pytest = @())
+param([switch]$Reconstruir, [switch]$Recursos, [string[]]$Pytest = @())
 
 $ErrorActionPreference = 'Stop'
 $raiz = Split-Path -Parent $PSScriptRoot
@@ -23,6 +23,9 @@ if ($Reconstruir -or -not (docker image ls -q $imagen)) {
     if ($LASTEXITCODE -ne 0) { throw 'No se pudo construir la imagen.' }
 }
 
-docker run --rm -v "${raiz}:/app" -w /app $imagen `
-    python -m pytest -q -p no:cacheprovider -m pdf services/constancias/tests/test_pdf.py @Pytest
+# -Recursos limita el contenedor a 1 vCPU y 2 GB (el worker-pdf de produccion) y muestra la salida
+[string[]]$limites = if ($Recursos) { @('--cpus=1', '--memory=2g') } else { @() }
+[string[]]$extra = if ($Recursos) { @('-s') } else { @() }
+docker run --rm @limites -v "${raiz}:/app" -w /app $imagen `
+    python -m pytest -q -p no:cacheprovider -m pdf services/constancias/tests/test_pdf.py services/constancias/tests/test_pdf_rendimiento.py @extra @Pytest
 exit $LASTEXITCODE

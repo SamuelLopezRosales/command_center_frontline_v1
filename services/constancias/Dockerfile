@@ -19,4 +19,4 @@ RUN useradd --uid 10001 --no-create-home app
 USER 10001
 EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=3s CMD python -c "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/salud', timeout=2).status == 200 else 1)"
-CMD ["uvicorn", "cc_constancias.main:crear_app", "--factory", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers", "--no-server-header"]
+CMD ["uvicorn", "cc_constancias.main:crear_app", "--factory", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers", "--no-server-header", "--no-access-log"]
