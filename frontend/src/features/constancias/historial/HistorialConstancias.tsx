@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { mensajeDeError } from "@/shared/errores";
 import { fechaHora } from "@/shared/fechas";
 import { listarHistorial, listarPlantillas, reenviarConstancia, urlDeDescarga } from "../api";
@@ -86,12 +87,18 @@ function Fila({ item, alAviso }: { item: ItemHistorial; alAviso: (a: { tipo: "ok
 
 /** Historial de constancias generadas (cv1_07). El endpoint DSH-11 llega con T-213. */
 export function HistorialConstancias() {
-  const [busqueda, setBusqueda] = useState("");
+  // Los enlaces del dashboard llegan con `?estado=` o `?q=`.
+  const [params] = useSearchParams();
+  const estadoInicial = ["PENDIENTE", "ENTREGADA", "FALLIDA"].includes(params.get("estado") ?? "")
+    ? (params.get("estado") as EstadoEntrega)
+    : "";
+  const [busqueda, setBusqueda] = useState(params.get("q") ?? "");
   const [desde, setDesde] = useState("");
   const [hasta, setHasta] = useState("");
   const [plantillaId, setPlantillaId] = useState("");
-  const [estado, setEstado] = useState<"" | EstadoEntrega>("");
-  const [pagina, setPagina] = useState(1);
+  const [estado, setEstado] = useState<"" | EstadoEntrega>(estadoInicial);
+  // Pila de cursores: el último es el de la página actual; `undefined` es la primera (DSH-11).
+  const [cursores, setCursores] = useState<(string | undefined)[]>([undefined]);
   const [q, setQ] = useState("");
   const [aviso, setAviso] = useState<{ tipo: "ok" | "error"; texto: string } | null>(null);
 
@@ -99,7 +106,7 @@ export function HistorialConstancias() {
   useEffect(() => {
     const espera = setTimeout(() => {
       setQ(busqueda.trim());
-      setPagina(1);
+      setCursores([undefined]);
     }, 300);
     return () => clearTimeout(espera);
   }, [busqueda]);
@@ -110,7 +117,7 @@ export function HistorialConstancias() {
     hasta: hasta || undefined,
     plantilla_id: plantillaId ? Number(plantillaId) : undefined,
     estado: estado || undefined,
-    pagina,
+    cursor: cursores.at(-1),
     limite: LIMITE,
   };
 
@@ -123,11 +130,9 @@ export function HistorialConstancias() {
 
   const cambiar = (fn: () => void) => {
     fn();
-    setPagina(1);
+    setCursores([undefined]);
   };
   const datos = historial.data;
-  const primero = datos && datos.total > 0 ? (datos.pagina - 1) * datos.limite + 1 : 0;
-  const ultimo = datos ? Math.min(datos.total, (datos.pagina - 1) * datos.limite + datos.items.length) : 0;
 
   return (
     <div className="cons">
@@ -198,12 +203,12 @@ export function HistorialConstancias() {
             </table>
           )}
           <div className="cons-pie">
-            <span className="cons-suave">{datos.total > 0 ? t.historial.mostrando(primero, ultimo, datos.total) : t.historial.sinConstancias}</span>
+            <span className="cons-suave">{datos.items.length > 0 ? t.historial.mostrando(datos.items.length) : t.historial.sinConstancias}</span>
             <span>
-              <button type="button" className="btn btn-contorno" disabled={pagina <= 1} onClick={() => setPagina((p) => p - 1)}>
+              <button type="button" className="btn btn-contorno" disabled={cursores.length <= 1} onClick={() => setCursores((c) => c.slice(0, -1))}>
                 {t.historial.anterior}
               </button>{" "}
-              <button type="button" className="btn btn-contorno" disabled={ultimo >= datos.total} onClick={() => setPagina((p) => p + 1)}>
+              <button type="button" className="btn btn-contorno" disabled={!datos.siguiente} onClick={() => setCursores((c) => [...c, datos.siguiente ?? undefined])}>
                 {t.historial.siguiente}
               </button>
             </span>

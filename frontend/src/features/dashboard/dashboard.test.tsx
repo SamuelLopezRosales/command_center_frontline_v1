@@ -14,6 +14,7 @@ const solicitudes: ItemSolicitud[] = [
 ];
 const constancias: ItemConstancia[] = [
   {
+    id: 142,
     folio: "CG-2026-0142",
     colaborador_nombre: "Samuel López Rosales",
     plantilla_nombre: "Constancia laboral",
@@ -22,6 +23,7 @@ const constancias: ItemConstancia[] = [
     estado_entrega: "ENTREGADA",
   },
   {
+    id: 140,
     folio: "CG-2026-0140",
     colaborador_nombre: "Miguel Ángel Herrera Cruz",
     plantilla_nombre: "Constancia consulado",

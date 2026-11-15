@@ -3,7 +3,8 @@
 - ``campo.actualizado``: recalcula las alertas de campos vacíos de las plantillas de la empresa.
   Recalcular es idempotente, así que repetir el evento solo repite el cálculo.
 
-``wa.mensaje_estado`` (confirmación de entrega) lo agrega la tarea del conector de WhatsApp.
+- ``wa.mensaje_estado``: confirma o falla la entrega de la constancia (T-213). Los mensajes de
+  otro origen (bot, notificaciones) se ignoran.
 """
 
 from __future__ import annotations
@@ -15,15 +16,21 @@ from typing import Any
 
 from cc_common.tareas import consumidor_sqs
 
+from cc_constancias.servicios import estados_entrega
 from cc_constancias.workers.alertas_plantilla import recalcular
 
 log = logging.getLogger("cc.consumidores")
 
 CAMPO_ACTUALIZADO = "campo.actualizado"
+MENSAJE_ESTADO = "wa.mensaje_estado"
 
 
-async def manejar_evento(motor, almacen, campos, colaboradores, evento: dict[str, Any]) -> bool:
+async def manejar_evento(
+    motor, almacen, campos, colaboradores, evento: dict[str, Any], cfg: Any = None
+) -> bool:
     """Devuelve ``True`` si el evento tuvo efecto (no era de otro tipo)."""
+    if evento.get("tipo") == MENSAJE_ESTADO:
+        return await estados_entrega.aplicar(motor, cfg, evento)
     if evento.get("tipo") != CAMPO_ACTUALIZADO:
         log.info("evento ignorado")
         return False
@@ -48,6 +55,7 @@ async def ejecutar(app: Any, parar: asyncio.Event) -> None:
             dep.campos(peticion),
             dep.colaboradores(peticion),
             evento,
+            cfg,
         )
 
     await consumidor_sqs(sqs, cfg.cola_eventos_url, manejador, parar)

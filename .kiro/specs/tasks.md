@@ -762,7 +762,7 @@ Objetivo: WhatsApp con simulador de Meta, bot de verificación y solicitud, dash
     - (T-099, Implementar el `worker-whatsapp-entrada`, el antiabuso y el cierre por inactividad) pruebas de integración con LocalStack: consume `wa-entrada.fifo` en orden por número; una repetición no duplica efectos; 20 mensajes por minuto y 5 solicitudes por día por número se limitan; 30 minutos de inactividad cierran la conversación y dejan `CANCELADA` la solicitud sin confirmar
   - Requiere aprobación: no
 
-- [ ] T-213. Estados de entrega en `constancias`, avisos a RH, indicadores y alertas del dashboard e historial (DSH-01 a 04 y DSH-11)
+- [x] T-213. Estados de entrega en `constancias`, avisos a RH, indicadores y alertas del dashboard e historial (DSH-01 a 04 y DSH-11)
   - Fase: 5
   - Agrupa: T-100, T-101, T-102
   - Requisitos: CC-REQ-011, CC-REQ-012, CC-REQ-013, CC-REQ-014, CC-REQ-084, CC-REQ-085, CC-REQ-087, CC-REQ-164

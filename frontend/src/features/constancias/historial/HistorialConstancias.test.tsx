@@ -28,7 +28,7 @@ const ITEMS = [
   item({ id: 136, folio: "CG-2026-0136", colaborador_nombre: "Ricardo Salinas", estado_entrega: "PENDIENTE", version: 2 }),
 ];
 
-const pagina = (items: ItemHistorial[], total = items.length, pag = 1) => ({ items, total, pagina: pag, limite: 20 });
+const pagina = (items: ItemHistorial[], siguiente: string | null = null) => ({ items, siguiente });
 
 const montar = () =>
   renderizar(
@@ -40,7 +40,7 @@ const montar = () =>
 
 const baseApi = (extra: Record<string, unknown> = {}) => ({
   "GET /api/v1/plantillas": { items: [plantilla(), plantilla({ id: 8, nombre: "Constancia guardería" })] },
-  "GET /api/v1/constancias/historial": pagina(ITEMS, 142),
+  "GET /api/v1/constancias/historial": pagina(ITEMS),
   ...extra,
 });
 
@@ -60,7 +60,7 @@ describe("historial de constancias (cv1_07)", () => {
     expect(fallida.getByText("Fallida")).toBeInTheDocument();
     // 15:42 UTC es 09:42 en la Ciudad de México.
     expect(fila("CG-2026-0142").getByText("13 nov, 09:42")).toBeInTheDocument();
-    expect(screen.getByText("Mostrando 1–3 de 142 constancias")).toBeInTheDocument();
+    expect(screen.getByText("Mostrando 3 constancias")).toBeInTheDocument();
   });
 
   it("descarga solo con ENTREGADA o FALLIDA y reenvío solo con FALLIDA; PENDIENTE no ofrece descarga", async () => {
@@ -135,7 +135,7 @@ describe("historial de constancias (cv1_07)", () => {
     // Todos los filtros siguen aplicados juntos.
     expect(ultima().get("estado")).toBe("FALLIDA");
     expect(ultima().get("plantilla_id")).toBe("8");
-    expect(ultima().get("pagina")).toBe("1");
+    expect(ultima().get("cursor")).toBeNull();
   });
 
   it("pagina con Anterior y Siguiente", async () => {
@@ -143,8 +143,8 @@ describe("historial de constancias (cv1_07)", () => {
     const llamadas = simulador(
       baseApi({
         "GET /api/v1/constancias/historial": (l: { url: string }) => {
-          const p = Number(new URL(l.url, "http://x").searchParams.get("pagina") ?? "1");
-          return json(p === 1 ? pagina(ITEMS, 45, 1) : pagina([item({ id: 9, folio: "CG-2026-0009" })], 45, 2));
+          const c = new URL(l.url, "http://x").searchParams.get("cursor");
+          return json(c === null ? pagina(ITEMS, "cursor-2") : pagina([item({ id: 9, folio: "CG-2026-0009" })]));
         },
       }),
     );
@@ -153,12 +153,29 @@ describe("historial de constancias (cv1_07)", () => {
     expect(screen.getByRole("button", { name: "Anterior" })).toBeDisabled();
     await usuario.click(screen.getByRole("button", { name: "Siguiente" }));
     expect(await screen.findByText("CG-2026-0009")).toBeInTheDocument();
-    expect(screen.getByText("Mostrando 21–21 de 45 constancias")).toBeInTheDocument();
-    expect(new URL(llamadas.filter((l) => l.ruta.endsWith("/historial")).at(-1)!.url, "http://x").searchParams.get("pagina")).toBe("2");
+    expect(screen.getByText("Mostrando 1 constancia")).toBeInTheDocument();
+    expect(new URL(llamadas.filter((l) => l.ruta.endsWith("/historial")).at(-1)!.url, "http://x").searchParams.get("cursor")).toBe("cursor-2");
+    expect(screen.getByRole("button", { name: "Siguiente" })).toBeDisabled();
+    await usuario.click(screen.getByRole("button", { name: "Anterior" }));
+    expect(await screen.findByText("CG-2026-0142")).toBeInTheDocument();
+  });
+
+  it("aplica los filtros que llegan en la URL (enlaces del dashboard)", async () => {
+    const llamadas = simulador(baseApi());
+    renderizar(
+      <Routes>
+        <Route path="constancias/*" element={<RutasConstancias />} />
+      </Routes>,
+      { ruta: "/constancias/historial?estado=FALLIDA&q=CG-2026-0140" },
+    );
+    await screen.findByText("CG-2026-0142");
+    const url = new URL(llamadas.filter((l) => l.ruta.endsWith("/historial")).at(-1)!.url, "http://x");
+    expect(url.searchParams.get("estado")).toBe("FALLIDA");
+    await waitFor(() => expect(screen.getByRole("searchbox", { name: "Buscar colaborador o folio" })).toHaveValue("CG-2026-0140"));
   });
 
   it("sin resultados muestra el mensaje vacío", async () => {
-    simulador(baseApi({ "GET /api/v1/constancias/historial": pagina([], 0) }));
+    simulador(baseApi({ "GET /api/v1/constancias/historial": pagina([]) }));
     montar();
     expect(await screen.findByText("No hay constancias con esos filtros.")).toBeInTheDocument();
     expect(screen.getByText("Mostrando 0 constancias")).toBeInTheDocument();

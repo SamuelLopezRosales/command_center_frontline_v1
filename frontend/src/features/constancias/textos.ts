@@ -141,7 +141,7 @@ export const t = {
     errorReenvio: "No se pudo reenviar la constancia.",
     anterior: "Anterior",
     siguiente: "Siguiente",
-    mostrando: (a: number, b: number, total: number) => `Mostrando ${a}–${b} de ${total} constancias`,
+    mostrando: (n: number) => `Mostrando ${n} ${n === 1 ? "constancia" : "constancias"}`,
     sinConstancias: "Mostrando 0 constancias",
   },
 } as const;

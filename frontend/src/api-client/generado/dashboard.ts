@@ -17,6 +17,91 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/constancias/historial": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Historial de constancias (DSH-11) */
+        get: operations["historial_api_v1_constancias_historial_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/dashboard/alertas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Alertas (DSH-04) */
+        get: operations["alertas_api_v1_dashboard_alertas_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/dashboard/constancias-recientes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Constancias recientes (DSH-03) */
+        get: operations["constancias_recientes_api_v1_dashboard_constancias_recientes_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/dashboard/resumen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Indicadores (DSH-01) */
+        get: operations["resumen_api_v1_dashboard_resumen_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/dashboard/solicitudes-recientes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Solicitudes recientes (DSH-02) */
+        get: operations["solicitudes_recientes_api_v1_dashboard_solicitudes_recientes_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/sesion/iniciar": {
         parameters: {
             query?: never;
@@ -106,6 +191,22 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** Alerta */
+        Alerta: {
+            /** Detalle */
+            detalle: string;
+            /** Enlace */
+            enlace: string;
+            /**
+             * Tipo
+             * @enum {string}
+             */
+            tipo: "SIN_CONSENTIMIENTO" | "CONSTANCIA_FALLIDA" | "CONSTANCIA_PENDIENTE" | "CAMPO_VACIO_EN_PLANTILLA";
+            /** Titulo */
+            titulo: string;
+            /** Total */
+            total: number;
+        };
         /** BitacoraSalida */
         BitacoraSalida: {
             /** Items */
@@ -117,6 +218,13 @@ export interface components {
         HTTPValidationError: {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
+        };
+        /** HistorialSalida */
+        HistorialSalida: {
+            /** Items */
+            items: components["schemas"]["ItemHistorial"][];
+            /** Siguiente */
+            siguiente: string | null;
         };
         /** InvitacionEntrada */
         InvitacionEntrada: {
@@ -134,6 +242,61 @@ export interface components {
             fecha_expira: string;
             /** Id */
             id: number;
+        };
+        /** ItemConstancia */
+        ItemConstancia: {
+            /** Colaborador Nombre */
+            colaborador_nombre: string;
+            /** Estado Entrega */
+            estado_entrega: string;
+            /**
+             * Fecha
+             * Format: date-time
+             */
+            fecha: string;
+            /** Folio */
+            folio: string;
+            /** Id */
+            id: number;
+            /** Plantilla Nombre */
+            plantilla_nombre: string;
+            /** Version */
+            version: number;
+        };
+        /** ItemHistorial */
+        ItemHistorial: {
+            /** Canal */
+            canal: string;
+            /** Colaborador Nombre */
+            colaborador_nombre: string;
+            /** Estado Entrega */
+            estado_entrega: string;
+            /**
+             * Fecha
+             * Format: date-time
+             */
+            fecha: string;
+            /** Folio */
+            folio: string;
+            /** Id */
+            id: number;
+            /** Plantilla Nombre */
+            plantilla_nombre: string;
+            /** Version */
+            version: number;
+        };
+        /** ItemSolicitud */
+        ItemSolicitud: {
+            /** Colaborador Nombre */
+            colaborador_nombre: string;
+            /** Estado */
+            estado: string;
+            /** Id */
+            id: number;
+            /** Plantilla Nombre */
+            plantilla_nombre: string | null;
+            /** Version */
+            version: number | null;
         };
         /** RegistroBitacora */
         RegistroBitacora: {
@@ -164,6 +327,19 @@ export interface components {
             usuario_id: number | null;
             /** Usuario Nombre */
             usuario_nombre: string | null;
+        };
+        /** ResumenDashboard */
+        ResumenDashboard: {
+            /** Colaboradores Activos */
+            colaboradores_activos: number;
+            /** Constancias Mes */
+            constancias_mes: number;
+            /** Plantillas Activas */
+            plantillas_activas: number;
+            /** Solicitudes En Proceso */
+            solicitudes_en_proceso: number;
+            /** Vacio */
+            vacio: boolean;
         };
         /** UsuarioItem */
         UsuarioItem: {
@@ -254,6 +430,174 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["BitacoraSalida"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    historial_api_v1_constancias_historial_get: {
+        parameters: {
+            query?: {
+                desde?: string | null;
+                hasta?: string | null;
+                plantilla_id?: number | null;
+                colaborador_id?: number | null;
+                estado?: ("PENDIENTE" | "ENTREGADA" | "FALLIDA") | null;
+                q?: string | null;
+                cursor?: string | null;
+                limite?: number;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HistorialSalida"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    alertas_api_v1_dashboard_alertas_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Alerta"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    constancias_recientes_api_v1_dashboard_constancias_recientes_get: {
+        parameters: {
+            query?: {
+                limite?: number;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ItemConstancia"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    resumen_api_v1_dashboard_resumen_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResumenDashboard"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    solicitudes_recientes_api_v1_dashboard_solicitudes_recientes_get: {
+        parameters: {
+            query?: {
+                limite?: number;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ItemSolicitud"][];
                 };
             };
             /** @description Validation Error */

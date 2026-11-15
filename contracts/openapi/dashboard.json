@@ -1,6 +1,45 @@
 {
   "components": {
     "schemas": {
+      "Alerta": {
+        "properties": {
+          "detalle": {
+            "title": "Detalle",
+            "type": "string"
+          },
+          "enlace": {
+            "title": "Enlace",
+            "type": "string"
+          },
+          "tipo": {
+            "enum": [
+              "SIN_CONSENTIMIENTO",
+              "CONSTANCIA_FALLIDA",
+              "CONSTANCIA_PENDIENTE",
+              "CAMPO_VACIO_EN_PLANTILLA"
+            ],
+            "title": "Tipo",
+            "type": "string"
+          },
+          "titulo": {
+            "title": "Titulo",
+            "type": "string"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "tipo",
+          "titulo",
+          "detalle",
+          "total",
+          "enlace"
+        ],
+        "title": "Alerta",
+        "type": "object"
+      },
       "BitacoraSalida": {
         "properties": {
           "items": {
@@ -40,6 +79,34 @@
           }
         },
         "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "HistorialSalida": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ItemHistorial"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "siguiente": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Siguiente"
+          }
+        },
+        "required": [
+          "items",
+          "siguiente"
+        ],
+        "title": "HistorialSalida",
         "type": "object"
       },
       "InvitacionEntrada": {
@@ -82,6 +149,146 @@
           "fecha_expira"
         ],
         "title": "InvitacionSalida",
+        "type": "object"
+      },
+      "ItemConstancia": {
+        "properties": {
+          "colaborador_nombre": {
+            "title": "Colaborador Nombre",
+            "type": "string"
+          },
+          "estado_entrega": {
+            "title": "Estado Entrega",
+            "type": "string"
+          },
+          "fecha": {
+            "format": "date-time",
+            "title": "Fecha",
+            "type": "string"
+          },
+          "folio": {
+            "title": "Folio",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "plantilla_nombre": {
+            "title": "Plantilla Nombre",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "folio",
+          "colaborador_nombre",
+          "plantilla_nombre",
+          "version",
+          "fecha",
+          "estado_entrega"
+        ],
+        "title": "ItemConstancia",
+        "type": "object"
+      },
+      "ItemHistorial": {
+        "properties": {
+          "canal": {
+            "title": "Canal",
+            "type": "string"
+          },
+          "colaborador_nombre": {
+            "title": "Colaborador Nombre",
+            "type": "string"
+          },
+          "estado_entrega": {
+            "title": "Estado Entrega",
+            "type": "string"
+          },
+          "fecha": {
+            "format": "date-time",
+            "title": "Fecha",
+            "type": "string"
+          },
+          "folio": {
+            "title": "Folio",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "plantilla_nombre": {
+            "title": "Plantilla Nombre",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "folio",
+          "colaborador_nombre",
+          "plantilla_nombre",
+          "version",
+          "fecha",
+          "estado_entrega",
+          "canal"
+        ],
+        "title": "ItemHistorial",
+        "type": "object"
+      },
+      "ItemSolicitud": {
+        "properties": {
+          "colaborador_nombre": {
+            "title": "Colaborador Nombre",
+            "type": "string"
+          },
+          "estado": {
+            "title": "Estado",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "plantilla_nombre": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Plantilla Nombre"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          }
+        },
+        "required": [
+          "id",
+          "colaborador_nombre",
+          "plantilla_nombre",
+          "version",
+          "estado"
+        ],
+        "title": "ItemSolicitud",
         "type": "object"
       },
       "RegistroBitacora": {
@@ -182,6 +389,39 @@
           "detalle"
         ],
         "title": "RegistroBitacora",
+        "type": "object"
+      },
+      "ResumenDashboard": {
+        "properties": {
+          "colaboradores_activos": {
+            "title": "Colaboradores Activos",
+            "type": "integer"
+          },
+          "constancias_mes": {
+            "title": "Constancias Mes",
+            "type": "integer"
+          },
+          "plantillas_activas": {
+            "title": "Plantillas Activas",
+            "type": "integer"
+          },
+          "solicitudes_en_proceso": {
+            "title": "Solicitudes En Proceso",
+            "type": "integer"
+          },
+          "vacio": {
+            "title": "Vacio",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "colaboradores_activos",
+          "constancias_mes",
+          "solicitudes_en_proceso",
+          "plantillas_activas",
+          "vacio"
+        ],
+        "title": "ResumenDashboard",
         "type": "object"
       },
       "UsuarioItem": {
@@ -515,6 +755,422 @@
         "summary": "Consulta de la bitácora (DSH-05)",
         "tags": [
           "bitacora"
+        ]
+      }
+    },
+    "/api/v1/constancias/historial": {
+      "get": {
+        "operationId": "historial_api_v1_constancias_historial_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "desde",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Desde"
+            }
+          },
+          {
+            "in": "query",
+            "name": "hasta",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Hasta"
+            }
+          },
+          {
+            "in": "query",
+            "name": "plantilla_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Plantilla Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "colaborador_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Colaborador Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "estado",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "PENDIENTE",
+                    "ENTREGADA",
+                    "FALLIDA"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Estado"
+            }
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 100,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 400,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limite",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limite",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistorialSalida"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Historial de constancias (DSH-11)",
+        "tags": [
+          "dashboard"
+        ]
+      }
+    },
+    "/api/v1/dashboard/alertas": {
+      "get": {
+        "operationId": "alertas_api_v1_dashboard_alertas_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Alerta"
+                  },
+                  "title": "Response Alertas Api V1 Dashboard Alertas Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Alertas (DSH-04)",
+        "tags": [
+          "dashboard"
+        ]
+      }
+    },
+    "/api/v1/dashboard/constancias-recientes": {
+      "get": {
+        "operationId": "constancias_recientes_api_v1_dashboard_constancias_recientes_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limite",
+            "required": false,
+            "schema": {
+              "default": 10,
+              "maximum": 20,
+              "minimum": 1,
+              "title": "Limite",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ItemConstancia"
+                  },
+                  "title": "Response Constancias Recientes Api V1 Dashboard Constancias Recientes Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Constancias recientes (DSH-03)",
+        "tags": [
+          "dashboard"
+        ]
+      }
+    },
+    "/api/v1/dashboard/resumen": {
+      "get": {
+        "operationId": "resumen_api_v1_dashboard_resumen_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResumenDashboard"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Indicadores (DSH-01)",
+        "tags": [
+          "dashboard"
+        ]
+      }
+    },
+    "/api/v1/dashboard/solicitudes-recientes": {
+      "get": {
+        "operationId": "solicitudes_recientes_api_v1_dashboard_solicitudes_recientes_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limite",
+            "required": false,
+            "schema": {
+              "default": 10,
+              "maximum": 20,
+              "minimum": 1,
+              "title": "Limite",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ItemSolicitud"
+                  },
+                  "title": "Response Solicitudes Recientes Api V1 Dashboard Solicitudes Recientes Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Solicitudes recientes (DSH-02)",
+        "tags": [
+          "dashboard"
         ]
       }
     },

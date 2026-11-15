@@ -307,3 +307,34 @@ async def detalle_constancia(conn: AsyncConnection, constancia_id: int) -> dict[
     )
     f = r.mappings().first()
     return dict(f) if f else None
+
+
+async def marcar_entregada(conn: AsyncConnection, constancia_id: int) -> dict[str, Any] | None:
+    """Pasa la constancia a ``ENTREGADA`` (también desde ``FALLIDA``: si Meta confirma la entrega,
+    el fallo previo ya no es cierto). ``None`` si ya estaba entregada o no existe."""
+    r = await conn.execute(
+        text(
+            "UPDATE constancias.constancia_generada SET estado_entrega = 'ENTREGADA', "
+            "fecha_entrega = now() WHERE id = :id AND estado_entrega <> 'ENTREGADA' "
+            "RETURNING solicitud_id, colaborador_id"
+        ),
+        {"id": constancia_id},
+    )
+    f = r.mappings().first()
+    return dict(f) if f else None
+
+
+async def marcar_entrega_fallida(
+    conn: AsyncConnection, constancia_id: int
+) -> dict[str, Any] | None:
+    """Pasa la constancia de ``PENDIENTE`` a ``FALLIDA``. Una ya entregada no retrocede."""
+    r = await conn.execute(
+        text(
+            "UPDATE constancias.constancia_generada SET estado_entrega = 'FALLIDA' "
+            "WHERE id = :id AND estado_entrega = 'PENDIENTE' "
+            "RETURNING solicitud_id, colaborador_id"
+        ),
+        {"id": constancia_id},
+    )
+    f = r.mappings().first()
+    return dict(f) if f else None
