@@ -638,7 +638,7 @@ Objetivo: CRUD de colaboradores, organizaciones y plantas con cifrado, elegibili
 
 Objetivo: Campos dinámicos con su catálogo e integración con colaboradores. Todo en local (Docker, PostgreSQL y LocalStack); no toca AWS.
 
-- [ ] T-205. Servicio `campos` completo: CRUD, protecciones, opciones de lista, catálogo sembrado e interfaces internas (CAM-01 a CAM-09, INT-CAM-01 y 02)
+- [x] T-205. Servicio `campos` completo: CRUD, protecciones, opciones de lista, catálogo sembrado e interfaces internas (CAM-01 a CAM-09, INT-CAM-01 y 02)
   - Fase: 3
   - Agrupa: T-066, T-067, T-068, T-069, T-070
   - Requisitos: CC-REQ-021, CC-REQ-045, CC-REQ-046, CC-REQ-047, CC-REQ-048, CC-REQ-049, CC-REQ-050, CC-REQ-051, CC-REQ-052
