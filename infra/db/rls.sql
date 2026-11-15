@@ -93,3 +93,12 @@ CREATE OR REPLACE FUNCTION constancias.verificar_constancia(p_codigo text)
 REVOKE ALL ON FUNCTION constancias.estado_token(bytea) FROM PUBLIC;
 REVOKE ALL ON FUNCTION constancias.consumir_token(bytea) FROM PUBLIC;
 REVOKE ALL ON FUNCTION constancias.verificar_constancia(text) FROM PUBLIC;
+
+-- `estados-entrega` recibe estados de Meta que identifican el mensaje por su id de proveedor y no
+-- conoce la empresa: esta función devuelve solo lo necesario para fijarla (design.md §4.4).
+CREATE OR REPLACE FUNCTION whatsapp.mensaje_por_proveedor(p_id text)
+  RETURNS TABLE (id bigint, empresa_id bigint)
+  LANGUAGE sql STABLE SECURITY DEFINER SET search_path = pg_catalog, whatsapp AS $$
+    SELECT m.id, m.empresa_id FROM whatsapp.mensaje_whatsapp m WHERE m.id_mensaje_proveedor = p_id
+  $$;
+REVOKE ALL ON FUNCTION whatsapp.mensaje_por_proveedor(text) FROM PUBLIC;

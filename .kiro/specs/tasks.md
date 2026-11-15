@@ -735,7 +735,7 @@ Objetivo: Plantillas de constancia, versiones, PDF, folio, entrega por enlace y 
 
 Objetivo: WhatsApp con simulador de Meta, bot de verificación y solicitud, dashboard e historial. Todo en local (Docker, PostgreSQL y LocalStack); no toca AWS.
 
-- [ ] T-211. Servicio `whatsapp`, simulador de Meta y Lambdas `webhook-meta`, `estados-entrega` y `enviador`
+- [x] T-211. Servicio `whatsapp`, simulador de Meta y Lambdas `webhook-meta`, `estados-entrega` y `enviador`
   - Fase: 5
   - Agrupa: T-093, T-094, T-095, T-096
   - Requisitos: CC-REQ-085, CC-REQ-086, CC-REQ-104, CC-REQ-114, CC-REQ-116, CC-REQ-157, CC-REQ-158, CC-NFR-012
