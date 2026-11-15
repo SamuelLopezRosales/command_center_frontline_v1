@@ -75,6 +75,28 @@ async def motor(datos):
 
 
 @pytest.fixture
+def s3_cargas(localstack):
+    """Bucket de cargas en LocalStack: ``(AlmacenS3, cliente boto3, nombre del bucket)``."""
+    import uuid
+
+    import boto3
+    from botocore.config import Config
+    from cc_colaboradores.almacenamiento import AlmacenS3
+
+    cliente = boto3.client(
+        "s3",
+        endpoint_url=localstack,
+        region_name="us-east-1",
+        aws_access_key_id="test",
+        aws_secret_access_key="test",
+        config=Config(signature_version="s3v4", s3={"addressing_style": "path"}),
+    )
+    bucket = f"cc-cargas-{uuid.uuid4().hex[:10]}"
+    cliente.create_bucket(Bucket=bucket)
+    return AlmacenS3(bucket, cliente), cliente, bucket
+
+
+@pytest.fixture
 async def cliente(motor, cifrador):
     app = construir_app(motor, cifrador)
     async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://t") as c:

@@ -32,6 +32,15 @@ def almacen(request: Request) -> Any:
     return estado.almacen
 
 
+def almacen_cargas(request: Request) -> Any:
+    estado = request.app.state
+    if estado.almacen_cargas is None:
+        from cc_colaboradores.almacenamiento import almacen_cargas_desde_config
+
+        estado.almacen_cargas = almacen_cargas_desde_config(estado.config)
+    return estado.almacen_cargas
+
+
 def cifrador(request: Request) -> Any:
     estado = request.app.state
     if estado.cifrador is None:

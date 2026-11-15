@@ -76,7 +76,7 @@ def interno(servicio: str, empresa_id: int | None) -> dict[str, str]:
     return h
 
 
-def construir_app(motor, cifrador, almacen=None, campos=None, **cfg):
+def construir_app(motor, cifrador, almacen=None, campos=None, almacen_cargas=None, **cfg):
     from cc_colaboradores.campos_cliente import CacheCampos, StubCampos
     from cc_colaboradores.config import ConfigColaboradores
     from cc_colaboradores.main import crear_app
@@ -88,6 +88,7 @@ def construir_app(motor, cifrador, almacen=None, campos=None, **cfg):
         verificador=VerificadorToken(EMISOR, CLIENTE, resolver_llave=lambda _t: LLAVE.public_key()),
         cifrador=cifrador,
         almacen=almacen,
+        almacen_cargas=almacen_cargas,
         campos=campos or CacheCampos(StubCampos()),
         secreto_interno=lambda: SECRETO_INTERNO,
     )

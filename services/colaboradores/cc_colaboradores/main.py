@@ -31,6 +31,7 @@ def crear_app(
     verificador: Any | None = None,
     cifrador: Any | None = None,
     almacen: Any | None = None,
+    almacen_cargas: Any | None = None,
     campos: Any | None = None,
     secreto_interno: Callable[[], str] | None = None,
 ) -> FastAPI:
@@ -62,6 +63,7 @@ def crear_app(
     )
     app.state.cifrador = cifrador
     app.state.almacen = almacen
+    app.state.almacen_cargas = almacen_cargas
     # Temporal: StubCampos se reemplaza por el cliente de INT-CAM-01 en T-206.
     app.state.campos = campos or CacheCampos(StubCampos())
     app.state.secreto_interno = secreto_interno or _secreto_interno_de(cfg)

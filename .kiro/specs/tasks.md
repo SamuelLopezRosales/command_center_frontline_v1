@@ -617,7 +617,7 @@ Objetivo: CRUD de colaboradores, organizaciones y plantas con cifrado, elegibili
     - (T-059, Implementar las interfaces internas de colaboradores (INT-COL-01 a 05, 07 y 08)) pruebas de integración: buscar por celular devuelve el hash aun si no existe; el desafío elige NSS o fecha de ingreso; verificar compara en tiempo constante sin devolver el dato; `datos-constancia` devuelve valores y faltantes y registra `CONSULTA_SENSIBLE` con origen `SISTEMA`; `contactos:resolver` aplica elegibilidad y devuelve correo solo con propósito `CORREO`; sin token interno, 401
   - Requiere aprobación: no
 
-- [ ] T-204. Carga masiva: plantilla de Excel, validador, `worker-cargas`, endpoints y prueba con la plantilla real
+- [x] T-204. Carga masiva: plantilla de Excel, validador, `worker-cargas`, endpoints y prueba con la plantilla real
   - Fase: 2
   - Agrupa: T-060, T-061, T-062, T-063, T-064, T-065
   - Requisitos: CC-REQ-025, CC-REQ-034, CC-REQ-035, CC-REQ-036, CC-REQ-037, CC-REQ-038, CC-REQ-039, CC-REQ-040, CC-REQ-041, CC-REQ-042, CC-REQ-150, CC-REQ-153, CC-REQ-162, CC-NFR-003, CC-NFR-004

@@ -105,6 +105,169 @@
         "title": "Busqueda",
         "type": "object"
       },
+      "Carga": {
+        "properties": {
+          "confirmada": {
+            "title": "Confirmada",
+            "type": "boolean"
+          },
+          "estado": {
+            "enum": [
+              "EN_PROCESO",
+              "TERMINADA",
+              "CANCELADA"
+            ],
+            "title": "Estado",
+            "type": "string"
+          },
+          "fecha_carga": {
+            "format": "date-time",
+            "title": "Fecha Carga",
+            "type": "string"
+          },
+          "fecha_fin": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fecha Fin"
+          },
+          "filas_error": {
+            "title": "Filas Error",
+            "type": "integer"
+          },
+          "filas_ok": {
+            "title": "Filas Ok",
+            "type": "integer"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "motivo_cierre": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motivo Cierre"
+          },
+          "nombre_archivo": {
+            "title": "Nombre Archivo",
+            "type": "string"
+          },
+          "total_filas": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Filas"
+          },
+          "version_plantilla": {
+            "title": "Version Plantilla",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "nombre_archivo",
+          "version_plantilla",
+          "total_filas",
+          "filas_ok",
+          "filas_error",
+          "estado",
+          "confirmada",
+          "fecha_carga",
+          "fecha_fin",
+          "motivo_cierre"
+        ],
+        "title": "Carga",
+        "type": "object"
+      },
+      "CargaDetalle": {
+        "properties": {
+          "carga": {
+            "$ref": "#/components/schemas/Carga"
+          },
+          "filas": {
+            "$ref": "#/components/schemas/PaginaFilas"
+          }
+        },
+        "required": [
+          "carga",
+          "filas"
+        ],
+        "title": "CargaDetalle",
+        "type": "object"
+      },
+      "CargaIniciada": {
+        "properties": {
+          "carga_id": {
+            "title": "Carga Id",
+            "type": "integer"
+          },
+          "content_type": {
+            "default": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "title": "Content Type",
+            "type": "string"
+          },
+          "expira": {
+            "format": "date-time",
+            "title": "Expira",
+            "type": "string"
+          },
+          "s3_key": {
+            "title": "S3 Key",
+            "type": "string"
+          },
+          "url_subida": {
+            "title": "Url Subida",
+            "type": "string"
+          }
+        },
+        "required": [
+          "carga_id",
+          "url_subida",
+          "s3_key",
+          "expira"
+        ],
+        "title": "CargaIniciada",
+        "type": "object"
+      },
+      "CargaIniciar": {
+        "additionalProperties": false,
+        "properties": {
+          "nombre_archivo": {
+            "maxLength": 300,
+            "minLength": 1,
+            "title": "Nombre Archivo",
+            "type": "string"
+          },
+          "tamano": {
+            "minimum": 1.0,
+            "title": "Tamano",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "nombre_archivo",
+          "tamano"
+        ],
+        "title": "CargaIniciar",
+        "type": "object"
+      },
       "ColaboradorActualizar": {
         "additionalProperties": false,
         "description": "Parcial. ``numero_empleado`` y ``estatus`` no están: no cambian aquí (COL-04).",
@@ -673,6 +836,24 @@
         "title": "Desafio",
         "type": "object"
       },
+      "ErrorDeFila": {
+        "properties": {
+          "codigo": {
+            "title": "Codigo",
+            "type": "string"
+          },
+          "mensaje": {
+            "title": "Mensaje",
+            "type": "string"
+          }
+        },
+        "required": [
+          "codigo",
+          "mensaje"
+        ],
+        "title": "ErrorDeFila",
+        "type": "object"
+      },
       "EstadoConsentimiento": {
         "properties": {
           "fecha": {
@@ -715,6 +896,38 @@
           "vigente_hasta"
         ],
         "title": "EstadoConsentimiento",
+        "type": "object"
+      },
+      "FilaCarga": {
+        "properties": {
+          "errores": {
+            "items": {
+              "$ref": "#/components/schemas/ErrorDeFila"
+            },
+            "title": "Errores",
+            "type": "array"
+          },
+          "numero_fila": {
+            "title": "Numero Fila",
+            "type": "integer"
+          },
+          "resultado": {
+            "enum": [
+              "NUEVO",
+              "ACTUALIZADO",
+              "ERROR",
+              "OMITIDO"
+            ],
+            "title": "Resultado",
+            "type": "string"
+          }
+        },
+        "required": [
+          "numero_fila",
+          "resultado",
+          "errores"
+        ],
+        "title": "FilaCarga",
         "type": "object"
       },
       "HTTPValidationError": {
@@ -1121,6 +1334,37 @@
         "title": "OrganizacionesSalida",
         "type": "object"
       },
+      "PaginaCargas": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/Carga"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "limite": {
+            "title": "Limite",
+            "type": "integer"
+          },
+          "pagina": {
+            "title": "Pagina",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "pagina",
+          "limite",
+          "total"
+        ],
+        "title": "PaginaCargas",
+        "type": "object"
+      },
       "PaginaColaboradores": {
         "properties": {
           "items": {
@@ -1150,6 +1394,37 @@
           "total"
         ],
         "title": "PaginaColaboradores",
+        "type": "object"
+      },
+      "PaginaFilas": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/FilaCarga"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "limite": {
+            "title": "Limite",
+            "type": "integer"
+          },
+          "pagina": {
+            "title": "Pagina",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "pagina",
+          "limite",
+          "total"
+        ],
+        "title": "PaginaFilas",
         "type": "object"
       },
       "Planta": {
@@ -1417,6 +1692,453 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/api/v1/cargas": {
+      "get": {
+        "operationId": "listar_api_v1_cargas_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "pagina",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Pagina",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limite",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limite",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaCargas"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Historial de cargas (COL-19)",
+        "tags": [
+          "cargas"
+        ]
+      },
+      "post": {
+        "operationId": "iniciar_api_v1_cargas_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CargaIniciar"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CargaIniciada"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Inicia una carga (COL-17)",
+        "tags": [
+          "cargas"
+        ]
+      }
+    },
+    "/api/v1/cargas/plantilla": {
+      "get": {
+        "operationId": "plantilla_api_v1_cargas_plantilla_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {}
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Plantilla de Excel con los campos activos (COL-16)",
+        "tags": [
+          "cargas"
+        ]
+      }
+    },
+    "/api/v1/cargas/{carga_id}": {
+      "get": {
+        "operationId": "detalle_api_v1_cargas__carga_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "carga_id",
+            "required": true,
+            "schema": {
+              "title": "Carga Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "resultado",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "NUEVO",
+                    "ACTUALIZADO",
+                    "ERROR",
+                    "OMITIDO"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Resultado"
+            }
+          },
+          {
+            "in": "query",
+            "name": "pagina",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Pagina",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limite",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limite",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CargaDetalle"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Resumen y filas de una carga (COL-20)",
+        "tags": [
+          "cargas"
+        ]
+      }
+    },
+    "/api/v1/cargas/{carga_id}/cancelar": {
+      "post": {
+        "operationId": "cancelar_api_v1_cargas__carga_id__cancelar_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "carga_id",
+            "required": true,
+            "schema": {
+              "title": "Carga Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Carga"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Cancela una carga (COL-22)",
+        "tags": [
+          "cargas"
+        ]
+      }
+    },
+    "/api/v1/cargas/{carga_id}/confirmar": {
+      "post": {
+        "operationId": "confirmar_api_v1_cargas__carga_id__confirmar_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "carga_id",
+            "required": true,
+            "schema": {
+              "title": "Carga Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Carga"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Confirma el archivo subido y lo encola (COL-18)",
+        "tags": [
+          "cargas"
+        ]
+      }
+    },
+    "/api/v1/cargas/{carga_id}/errores": {
+      "get": {
+        "operationId": "errores_api_v1_cargas__carga_id__errores_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "carga_id",
+            "required": true,
+            "schema": {
+              "title": "Carga Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/csv": {}
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Reporte de errores en CSV (COL-21)",
+        "tags": [
+          "cargas"
+        ]
+      }
+    },
     "/api/v1/colaboradores": {
       "get": {
         "operationId": "listar_api_v1_colaboradores_get",

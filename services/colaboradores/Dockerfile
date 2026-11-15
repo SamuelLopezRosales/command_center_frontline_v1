@@ -9,7 +9,7 @@ WORKDIR /app
 RUN pip install --no-cache-dir "fastapi>=0.115" "uvicorn[standard]>=0.32" "pydantic>=2.9" \
       "pydantic-settings>=2.5" "structlog>=24.4" "sqlalchemy[asyncio]>=2.0.35" "asyncpg>=0.30" \
       "httpx>=0.27" "cryptography>=43" "boto3>=1.35" "pyjwt[crypto]>=2.9" "tenacity>=9.0" \
-      "google-re2>=1.1"
+      "google-re2>=1.1" "openpyxl>=3.1"
 
 COPY services/shared/cc_common ./services/shared/cc_common
 COPY services/colaboradores/cc_colaboradores ./services/colaboradores/cc_colaboradores
