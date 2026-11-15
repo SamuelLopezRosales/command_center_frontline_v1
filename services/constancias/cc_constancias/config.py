@@ -15,6 +15,10 @@ class ConfigConstancias(Configuracion):
     bucket_plantillas: str = "cc-local-plantillas"
     s3_endpoint: str | None = None  # LocalStack en local; vacío en AWS
     contenido_max_bytes: int = 512 * 1024  # CC-REQ-060: máximo del JSON de una plantilla
+    # Dominio público: el QR de una constancia apunta a https://{dominio}/v/{código} (CC-REQ-080).
+    dominio: str = "localhost"
+    logotipo_cache_segundos: int = 600
+    logotipo_max_bytes: int = 1_048_576
     # Servicios a los que `constancias` consulta (INT-CAM-01 e INT-COL-04). Sin URL, solo en
     # local se usan sustitutos vacíos.
     campos_url: str | None = None

@@ -432,6 +432,16 @@ async def test_resumen_sin_datos_sensibles(entorno):
     assert CELULAR not in r.text and "12345678901" not in r.text
 
 
+async def test_resumen_tambien_lo_lee_constancias_y_nadie_mas(entorno):
+    """`constancias` necesita la organización del colaborador para el logotipo (T-208)."""
+    h, a, cid = entorno["h"], entorno["a"], entorno["con_nss"]
+    ruta = f"/internal/colaboradores/{cid}/resumen"
+    r = await h.get(ruta, headers=interno("constancias", a))
+    assert r.status_code == 200 and r.json()["organizacion"]["id"] == entorno["org"]
+    for servicio in ("notificaciones", "campos", "dashboard"):
+        assert (await h.get(ruta, headers=interno(servicio, a))).status_code == 401, servicio
+
+
 async def test_organizacion_para_constancias(entorno):
     h, a = entorno["h"], entorno["a"]
     r = await h.get(f"/internal/organizaciones/{entorno['org']}", headers=interno("constancias", a))

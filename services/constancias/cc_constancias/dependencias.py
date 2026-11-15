@@ -75,6 +75,20 @@ def colaboradores(request: Request) -> Any:
     return estado.colaboradores
 
 
+def cargador_logotipo(request: Request) -> Any:
+    estado = request.app.state
+    if estado.logotipos is None:
+        from cc_constancias.render.logotipo import CargadorLogotipo
+
+        cfg = estado.config
+        estado.logotipos = CargadorLogotipo(
+            almacen(request),
+            ttl_s=cfg.logotipo_cache_segundos,
+            maximo=cfg.logotipo_max_bytes,
+        )
+    return estado.logotipos
+
+
 def ip_cliente(request: Request) -> str | None:
     """IP real del visitante: CloudFront la envía en ``CloudFront-Viewer-Address`` (ip:puerto)."""
     visor = request.headers.get("cloudfront-viewer-address")

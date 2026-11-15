@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'unsafe-inline'">
+<title>Constancia {{ folio }}</title>
+<style>
+{{ css | safe }}
+</style>
+</head>
+<body>
+{{ cuerpo }}
+<div class="pie-pantalla">
+<span>Folio {{ folio }}</span>
+<span>Verifique en {{ url }}</span>
+<img class="qr-pie" alt="Código QR de verificación" src="{{ qr_uri }}" style="width: 1.8cm">
+</div>
+</body>
+</html>

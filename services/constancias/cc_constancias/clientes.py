@@ -12,7 +12,7 @@ y corte de circuito). Los sustitutos (``Stub*``) sirven en local y en las prueba
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Protocol
+from typing import Any, Protocol
 
 from cc_common.errores import ErrorProveedor
 from cc_common.internal_client import ClienteInterno
@@ -50,6 +50,12 @@ class ClienteColaboradores(Protocol):
         self, empresa_id: int, colaborador_id: int, variables: list[str]
     ) -> tuple[dict[str, str], list[str]]: ...
 
+    async def faltantes_contar(self, empresa_id: int, codigos: list[str]) -> dict[str, int]: ...
+
+    async def resumen(self, empresa_id: int, colaborador_id: int) -> dict[str, Any]: ...
+
+    async def organizacion(self, empresa_id: int, organizacion_id: int) -> dict[str, Any]: ...
+
 
 class StubCampos:
     def __init__(self, por_empresa: dict[int, list[DefinicionCampo]] | None = None) -> None:
@@ -62,16 +68,53 @@ class StubCampos:
 
 
 class StubColaboradores:
-    """Devuelve ``valores[colaborador_id]`` filtrado a las variables pedidas."""
+    """Devuelve ``valores[colaborador_id]`` filtrado a las variables pedidas.
 
-    def __init__(self, valores: dict[int, dict[str, str]] | None = None) -> None:
+    ``vacios`` es lo que responde INT-COL-09 por código interno; ``organizaciones`` y
+    ``resumenes`` lo que responden INT-COL-08 e INT-COL-07.
+    """
+
+    def __init__(
+        self,
+        valores: dict[int, dict[str, str]] | None = None,
+        *,
+        vacios: dict[str, int] | None = None,
+        resumenes: dict[int, dict[str, Any]] | None = None,
+        organizaciones: dict[int, dict[str, Any]] | None = None,
+    ) -> None:
         self.valores = valores or {}
+        self.vacios = vacios or {}
+        self.resumenes = resumenes or {}
+        self.organizaciones = organizaciones or {}
         self.llamadas: list[tuple[int, int, list[str]]] = []
+        self.llamadas_faltantes: list[list[str]] = []
+
+    async def faltantes_contar(self, empresa_id: int, codigos: list[str]) -> dict[str, int]:
+        self.llamadas_faltantes.append(list(codigos))
+        return {c: self.vacios.get(c, 0) for c in codigos}
+
+    async def resumen(self, empresa_id: int, colaborador_id: int) -> dict[str, Any]:
+        from cc_common.errores import ErrorNoEncontrado
+
+        if colaborador_id not in self.resumenes and colaborador_id not in self.valores:
+            raise ErrorNoEncontrado()
+        return self.resumenes.get(colaborador_id, {"organizacion": {"id": 0}})
+
+    async def organizacion(self, empresa_id: int, organizacion_id: int) -> dict[str, Any]:
+        from cc_common.errores import ErrorNoEncontrado
+
+        if organizacion_id not in self.organizaciones:
+            raise ErrorNoEncontrado()
+        return self.organizaciones[organizacion_id]
 
     async def datos_constancia(
         self, empresa_id: int, colaborador_id: int, variables: list[str]
     ) -> tuple[dict[str, str], list[str]]:
         self.llamadas.append((empresa_id, colaborador_id, list(variables)))
+        if variables and colaborador_id not in self.valores:
+            from cc_common.errores import ErrorNoEncontrado
+
+            raise ErrorNoEncontrado()  # como INT-COL-04: el colaborador no existe
         propios = self.valores.get(colaborador_id, {})
         dados = {v: propios[v] for v in variables if v in propios}
         return dados, [v for v in variables if v not in dados]
@@ -139,3 +182,32 @@ class ColaboradoresHttp:
             raise ErrorProveedor()
         cuerpo = r.json()
         return dict(cuerpo["valores"]), list(cuerpo["faltantes"])
+
+    async def faltantes_contar(self, empresa_id: int, codigos: list[str]) -> dict[str, int]:
+        if not codigos:
+            return {}
+        r = await self._c.solicitar(
+            "POST",
+            "/internal/colaboradores/faltantes:contar",
+            json={"codigos_internos": codigos},
+            headers={"X-Empresa-Id": str(empresa_id)},
+        )
+        if r.status_code != 200:
+            raise ErrorProveedor()
+        return {str(k): int(v) for k, v in r.json().items()}
+
+    async def resumen(self, empresa_id: int, colaborador_id: int) -> dict[str, Any]:
+        return await self._obtener(empresa_id, f"/internal/colaboradores/{colaborador_id}/resumen")
+
+    async def organizacion(self, empresa_id: int, organizacion_id: int) -> dict[str, Any]:
+        return await self._obtener(empresa_id, f"/internal/organizaciones/{organizacion_id}")
+
+    async def _obtener(self, empresa_id: int, ruta: str) -> dict[str, Any]:
+        r = await self._c.solicitar("GET", ruta, headers={"X-Empresa-Id": str(empresa_id)})
+        if r.status_code == 404:
+            from cc_common.errores import ErrorNoEncontrado
+
+            raise ErrorNoEncontrado()
+        if r.status_code != 200:
+            raise ErrorProveedor()
+        return dict(r.json())

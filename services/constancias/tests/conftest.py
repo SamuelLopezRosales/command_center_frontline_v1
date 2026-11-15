@@ -67,8 +67,15 @@ def campos():
 
 
 @pytest.fixture
-async def http(motor, s3_plantillas, campos):
-    app = construir_app(motor, almacen=s3_plantillas[0], campos=campos)
+def colaboradores():
+    from cc_constancias.clientes import StubColaboradores
+
+    return StubColaboradores()
+
+
+@pytest.fixture
+async def http(motor, s3_plantillas, campos, colaboradores):
+    app = construir_app(motor, almacen=s3_plantillas[0], campos=campos, colaboradores=colaboradores)
     async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://t") as c:
         yield c
 

@@ -31,6 +31,7 @@ def crear_app(
     almacen: Any | None = None,
     campos: Any | None = None,
     colaboradores: Any | None = None,
+    logotipos: Any | None = None,
     secreto_interno: Callable[[], str] | None = None,
 ) -> FastAPI:
     cfg = config or ConfigConstancias()
@@ -62,6 +63,7 @@ def crear_app(
     app.state.almacen = almacen
     app.state.campos = campos
     app.state.colaboradores = colaboradores
+    app.state.logotipos = logotipos
     app.state.secreto_interno = secreto_interno or _secreto_interno_de(cfg)
     instalar_manejadores(app)
 

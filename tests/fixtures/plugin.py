@@ -46,6 +46,7 @@ def docker_disponible() -> bool:
 
 def pytest_configure(config):
     config.addinivalue_line("markers", "docker: necesita Docker (PostgreSQL o LocalStack)")
+    config.addinivalue_line("markers", "pdf: necesita WeasyPrint; corre con scripts/probar_pdf.ps1")
 
 
 def pytest_collection_modifyitems(config, items):

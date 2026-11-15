@@ -173,6 +173,43 @@
         "title": "HTTPValidationError",
         "type": "object"
       },
+      "Hallazgo": {
+        "properties": {
+          "codigo": {
+            "title": "Codigo",
+            "type": "string"
+          },
+          "mensaje": {
+            "title": "Mensaje",
+            "type": "string"
+          },
+          "total": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total"
+          },
+          "variables": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Variables",
+            "type": "array"
+          }
+        },
+        "required": [
+          "codigo",
+          "mensaje",
+          "variables"
+        ],
+        "title": "Hallazgo",
+        "type": "object"
+      },
       "Margenes": {
         "additionalProperties": false,
         "properties": {
@@ -555,6 +592,42 @@
         "title": "PlantillasSalida",
         "type": "object"
       },
+      "PublicarEntrada": {
+        "additionalProperties": false,
+        "properties": {
+          "confirmar_sensibles": {
+            "default": false,
+            "title": "Confirmar Sensibles",
+            "type": "boolean"
+          }
+        },
+        "title": "PublicarEntrada",
+        "type": "object"
+      },
+      "ResultadoValidacion": {
+        "properties": {
+          "advertencias": {
+            "items": {
+              "$ref": "#/components/schemas/Hallazgo"
+            },
+            "title": "Advertencias",
+            "type": "array"
+          },
+          "errores": {
+            "items": {
+              "$ref": "#/components/schemas/Hallazgo"
+            },
+            "title": "Errores",
+            "type": "array"
+          }
+        },
+        "required": [
+          "errores",
+          "advertencias"
+        ],
+        "title": "ResultadoValidacion",
+        "type": "object"
+      },
       "ValidationError": {
         "properties": {
           "ctx": {
@@ -643,6 +716,146 @@
           "items"
         ],
         "title": "VariablesSalida",
+        "type": "object"
+      },
+      "Version": {
+        "properties": {
+          "fecha_creacion": {
+            "format": "date-time",
+            "title": "Fecha Creacion",
+            "type": "string"
+          },
+          "hash": {
+            "title": "Hash",
+            "type": "string"
+          },
+          "numero": {
+            "title": "Numero",
+            "type": "integer"
+          },
+          "vigente": {
+            "title": "Vigente",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "numero",
+          "hash",
+          "fecha_creacion",
+          "vigente"
+        ],
+        "title": "Version",
+        "type": "object"
+      },
+      "VersionDetalle": {
+        "properties": {
+          "contenido": {
+            "$ref": "#/components/schemas/ContenidoPlantilla"
+          },
+          "fecha_creacion": {
+            "format": "date-time",
+            "title": "Fecha Creacion",
+            "type": "string"
+          },
+          "hash": {
+            "title": "Hash",
+            "type": "string"
+          },
+          "numero": {
+            "title": "Numero",
+            "type": "integer"
+          },
+          "vigente": {
+            "title": "Vigente",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "numero",
+          "hash",
+          "fecha_creacion",
+          "vigente",
+          "contenido"
+        ],
+        "title": "VersionDetalle",
+        "type": "object"
+      },
+      "VersionesSalida": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/Version"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "VersionesSalida",
+        "type": "object"
+      },
+      "VistaPreviaEntrada": {
+        "additionalProperties": false,
+        "description": "Una de las dos fuentes: una ``version`` publicada o el borrador (``usar_borrador``).",
+        "properties": {
+          "colaborador_id": {
+            "minimum": 1.0,
+            "title": "Colaborador Id",
+            "type": "integer"
+          },
+          "usar_borrador": {
+            "default": false,
+            "title": "Usar Borrador",
+            "type": "boolean"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          }
+        },
+        "required": [
+          "colaborador_id"
+        ],
+        "title": "VistaPreviaEntrada",
+        "type": "object"
+      },
+      "VistaPreviaSalida": {
+        "properties": {
+          "desconocidas": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Desconocidas",
+            "type": "array"
+          },
+          "faltantes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Faltantes",
+            "type": "array"
+          },
+          "html": {
+            "title": "Html",
+            "type": "string"
+          }
+        },
+        "required": [
+          "html",
+          "faltantes",
+          "desconocidas"
+        ],
+        "title": "VistaPreviaSalida",
         "type": "object"
       }
     }
@@ -1121,6 +1334,64 @@
         ]
       }
     },
+    "/api/v1/plantillas/{plantilla_id}/borrador/validar": {
+      "post": {
+        "operationId": "validar_api_v1_plantillas__plantilla_id__borrador_validar_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "plantilla_id",
+            "required": true,
+            "schema": {
+              "title": "Plantilla Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultadoValidacion"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Valida el borrador (CON-09)",
+        "tags": [
+          "versiones"
+        ]
+      }
+    },
     "/api/v1/plantillas/{plantilla_id}/duplicar": {
       "post": {
         "operationId": "duplicar_api_v1_plantillas__plantilla_id__duplicar_post",
@@ -1176,6 +1447,341 @@
         "summary": "Duplicado (CON-05)",
         "tags": [
           "plantillas"
+        ]
+      }
+    },
+    "/api/v1/plantillas/{plantilla_id}/publicar": {
+      "post": {
+        "operationId": "publicar_api_v1_plantillas__plantilla_id__publicar_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "plantilla_id",
+            "required": true,
+            "schema": {
+              "title": "Plantilla Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/PublicarEntrada"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Entrada"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Version"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Publica el borrador como una versión nueva (CON-10)",
+        "tags": [
+          "versiones"
+        ]
+      }
+    },
+    "/api/v1/plantillas/{plantilla_id}/versiones": {
+      "get": {
+        "operationId": "listar_api_v1_plantillas__plantilla_id__versiones_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "plantilla_id",
+            "required": true,
+            "schema": {
+              "title": "Plantilla Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionesSalida"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Versiones publicadas (CON-11)",
+        "tags": [
+          "versiones"
+        ]
+      }
+    },
+    "/api/v1/plantillas/{plantilla_id}/versiones/{numero}": {
+      "get": {
+        "operationId": "detalle_api_v1_plantillas__plantilla_id__versiones__numero__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "plantilla_id",
+            "required": true,
+            "schema": {
+              "title": "Plantilla Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "numero",
+            "required": true,
+            "schema": {
+              "title": "Numero",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionDetalle"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Una versión con su contenido (CON-12)",
+        "tags": [
+          "versiones"
+        ]
+      }
+    },
+    "/api/v1/plantillas/{plantilla_id}/versiones/{numero}/restaurar": {
+      "post": {
+        "operationId": "restaurar_api_v1_plantillas__plantilla_id__versiones__numero__restaurar_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "plantilla_id",
+            "required": true,
+            "schema": {
+              "title": "Plantilla Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "numero",
+            "required": true,
+            "schema": {
+              "title": "Numero",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Version"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Restaura una versión como una versión nueva (CON-13)",
+        "tags": [
+          "versiones"
+        ]
+      }
+    },
+    "/api/v1/plantillas/{plantilla_id}/vista-previa": {
+      "post": {
+        "operationId": "vista_previa_api_v1_plantillas__plantilla_id__vista_previa_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "plantilla_id",
+            "required": true,
+            "schema": {
+              "title": "Plantilla Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VistaPreviaEntrada"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VistaPreviaSalida"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Vista previa con los datos de un colaborador (CON-14)",
+        "tags": [
+          "vista-previa"
         ]
       }
     }

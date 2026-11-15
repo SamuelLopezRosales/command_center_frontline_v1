@@ -84,6 +84,8 @@ class Contactos(BaseModel):
 WHATSAPP = requiere_servicio("whatsapp")
 CONSTANCIAS = requiere_servicio("constancias")
 EMISORES = requiere_servicio("whatsapp", "notificaciones", "constancias")
+# `constancias` lee el resumen para saber la organización (y su logotipo) de un colaborador.
+RESUMEN = requiere_servicio("whatsapp", "constancias")
 
 
 @router.post("/colaboradores/buscar-por-celular", response_model=Busqueda, summary="INT-COL-01")
@@ -150,7 +152,7 @@ async def resolver_contactos(
 
 @router.get("/colaboradores/{colaborador_id}/resumen", summary="INT-COL-07")
 async def resumen(
-    colaborador_id: int, ll: LlamadaInterna = WHATSAPP, m=Depends(motor)
+    colaborador_id: int, ll: LlamadaInterna = RESUMEN, m=Depends(motor)
 ) -> dict[str, Any]:
     return await servicio.resumen(m, ll.empresa_id, colaborador_id)
 

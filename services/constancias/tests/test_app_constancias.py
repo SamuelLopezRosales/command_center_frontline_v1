@@ -36,6 +36,12 @@ def test_openapi_determinista_y_contrato_al_dia():
         "/api/v1/plantillas/{plantilla_id}",
         "/api/v1/plantillas/{plantilla_id}/duplicar",
         "/api/v1/plantillas/{plantilla_id}/borrador",
+        "/api/v1/plantillas/{plantilla_id}/borrador/validar",
+        "/api/v1/plantillas/{plantilla_id}/publicar",
+        "/api/v1/plantillas/{plantilla_id}/versiones",
+        "/api/v1/plantillas/{plantilla_id}/versiones/{numero}",
+        "/api/v1/plantillas/{plantilla_id}/versiones/{numero}/restaurar",
+        "/api/v1/plantillas/{plantilla_id}/vista-previa",
         "/api/v1/constancias/variables",
     } <= set(doc["paths"])
     assert "ContenidoPlantilla" in doc["components"]["schemas"]  # el cuerpo de CON-08
@@ -148,4 +154,6 @@ async def test_cliente_de_campos_lee_las_definiciones_con_inactivas():
 async def test_stub_de_colaboradores_filtra_a_lo_pedido():
     s = StubColaboradores({1: {"a": "1", "b": "2"}})
     assert await s.datos_constancia(9, 1, ["a", "c"]) == ({"a": "1"}, ["c"])
-    assert await s.datos_constancia(9, 2, ["a"]) == ({}, ["a"])
+    assert await s.datos_constancia(9, 1, []) == ({}, [])
+    with pytest.raises(ErrorNoEncontrado):  # colaborador inexistente, como INT-COL-04
+        await s.datos_constancia(9, 2, ["a"])

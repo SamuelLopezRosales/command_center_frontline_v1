@@ -93,8 +93,8 @@ def publicar_version(datos, almacen, plantilla_id: int, numero: int = 1, conteni
     return clave
 
 
-def emitir_constancia(datos, plantilla_id: int, numero_version: int = 1, n: int = 1) -> int:
-    """Inserta una constancia ya emitida con la versión indicada. Devuelve su id."""
+def crear_colaborador(datos) -> int:
+    """Inserta un colaborador de la empresa A (con su organización y planta). Devuelve su id."""
     e = datos["a"]
     org = sql(
         datos,
@@ -109,7 +109,7 @@ def emitir_constancia(datos, plantilla_id: int, numero_version: int = 1, n: int 
         "ON CONFLICT (empresa_id, lower(nombre)) DO UPDATE SET nombre = 'Norte' RETURNING id",
         (e,),
     )[0][0]
-    colaborador = sql(
+    return sql(
         datos,
         "INSERT INTO colaboradores.colaborador (empresa_id, organizacion_id, planta_id, "
         "numero_empleado, nombres, apellido_paterno, apellido_materno, celular_cifrado, "
@@ -118,6 +118,12 @@ def emitir_constancia(datos, plantilla_id: int, numero_version: int = 1, n: int 
         "decode(md5(%s) || md5(%s), 'hex'), '0000', '2020-01-01', 'Op', 'OPERATIVO') RETURNING id",
         (e, org, planta, f"E-{uuid.uuid4().hex[:8]}".upper(), uuid.uuid4().hex, uuid.uuid4().hex),
     )[0][0]
+
+
+def emitir_constancia(datos, plantilla_id: int, numero_version: int = 1, n: int = 1) -> int:
+    """Inserta una constancia ya emitida con la versión indicada. Devuelve su id."""
+    e = datos["a"]
+    colaborador = crear_colaborador(datos)
     version = sql(
         datos,
         "SELECT id FROM constancias.version_plantilla WHERE plantilla_id = %s AND numero = %s",

@@ -687,7 +687,7 @@ Objetivo: Plantillas de constancia, versiones, PDF, folio, entrega por enlace y 
     - (T-079, Implementar las variables derivadas (sueldo mensual, importe en letra y fechas)) pruebas unitarias: factores semanal 52/12, catorcenal 26/12, quincenal 2 y mensual 1 con `Decimal` y redondeo a dos decimales; importe en letra en mayúsculas con `00/100 MN` (por ejemplo 9,500 da "NUEVE MIL QUINIENTOS PESOS 00/100 MN"); fechas en texto con meses propios en español; `factores_version` queda en el resultado
   - Requiere aprobación: no
 
-- [ ] T-208. Publicación, versiones y restauración; renderizador de HTML, logotipo, QR, PDF con WeasyPrint y vista previa (CON-09 a CON-14)
+- [x] T-208. Publicación, versiones y restauración; renderizador de HTML, logotipo, QR, PDF con WeasyPrint y vista previa (CON-09 a CON-14)
   - Fase: 4
   - Agrupa: T-080, T-081, T-082, T-083
   - Requisitos: CC-REQ-062, CC-REQ-063, CC-REQ-065, CC-REQ-066, CC-REQ-067, CC-REQ-068, CC-REQ-080, CC-NFR-001

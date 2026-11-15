@@ -48,6 +48,7 @@ async def _cuerpo(request: Request, maximo: int) -> bytes:
 @router.get(
     "/plantillas/{plantilla_id}/borrador",
     response_model=BorradorLeido,
+    response_model_exclude_none=True,  # el contenido se entrega en su forma canónica
     summary="Borrador (CON-07)",
 )
 async def obtener(
