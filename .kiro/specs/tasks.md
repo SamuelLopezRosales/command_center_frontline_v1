@@ -579,7 +579,7 @@ Objetivo: biblioteca común, esquema completo de PostgreSQL, servicio `dashboard
 
 Objetivo: CRUD de colaboradores, organizaciones y plantas con cifrado, elegibilidad, interfaces internas y carga masiva de Excel. Todo en local (Docker, PostgreSQL y LocalStack); no toca AWS.
 
-- [ ] T-201. Servicio `colaboradores`: esqueleto, repositorios con cifrado, organizaciones, logotipo y plantas
+- [x] T-201. Servicio `colaboradores`: esqueleto, repositorios con cifrado, organizaciones, logotipo y plantas
   - Fase: 2
   - Agrupa: T-052, T-053, T-054
   - Requisitos: CC-REQ-021, CC-REQ-024, CC-REQ-043, CC-REQ-044, CC-REQ-062, CC-REQ-151, CC-REQ-152, CC-REQ-161, CC-NFR-012
@@ -930,7 +930,7 @@ Objetivo: Infraestructura completa en CDK, despliegue replicable con un solo scr
   - Archivos: `infra/stacks/compute.py`, `infra/tests/test_compute.py`, `infra/stacks/workers_lambdas.py`, `infra/tests/test_workers_lambdas.py`, `infra/stacks/compute.py`, `infra/stacks/workers_lambdas.py`
   - Depende de: T-223, T-043
   - Verificación:
-    - Las imágenes de los servicios, workers y tareas se declaran como activos de CDK (`ecs.ContainerImage.from_asset`, `linux/arm64`): `cdk deploy` las construye y publica, sin etiquetas manuales (decisión D-11, propuesta en la v0.2 del plan)
+    - Las imágenes de los servicios, workers y tareas se declaran como activos de CDK (`ecs.ContainerImage.from_asset`, `linux/arm64`): `cdk deploy` las construye y publica, sin etiquetas manuales (decisión D-11, aprobada por Samuel el 14 de noviembre de 2026)
     - (T-135, Crear los stacks de cómputo: servicios de ECS, ALB y reglas por ruta) aserciones de CDK: seis servicios de Fargate ARM64 con tamaño y escalado (1 tarea en `test`, 2 en `prod`), verificación de salud `/salud`, corte de circuito con reversión, ALB interno HTTPS con las reglas de §13.7 (incluida la prioridad de `/api/v1/constancias/historial` y la separación de `/plantillas` y `/plantillas-mensaje`), grupos de seguridad y roles de IAM de §12
     - (T-136, Crear los workers y las Lambdas de mensajería en CDK) aserciones de CDK: `worker-pdf`, `worker-cargas` y `worker-whatsapp-entrada` con su escalado por cola (mínimo 0 tareas en `test` y 1 en `prod`); Lambdas `webhook-meta` (fuera de la VPC), `enviador`, `estados-entrega`, `despachador`, `conciliador` y `respaldo-correo` con memoria, tiempo, concurrencia reservada, DLQ, alias `live` y políticas de mínimo privilegio; concurrencia aprovisionada en 0 en `test`
   - Requiere aprobación: no

@@ -1,0 +1,1071 @@
+{
+  "components": {
+    "schemas": {
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "LogotipoConfirmar": {
+        "additionalProperties": false,
+        "properties": {
+          "s3_key": {
+            "maxLength": 300,
+            "minLength": 1,
+            "title": "S3 Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "s3_key"
+        ],
+        "title": "LogotipoConfirmar",
+        "type": "object"
+      },
+      "LogotipoSolicitud": {
+        "additionalProperties": false,
+        "properties": {
+          "content_type": {
+            "maxLength": 40,
+            "title": "Content Type",
+            "type": "string"
+          },
+          "tamano": {
+            "minimum": 1.0,
+            "title": "Tamano",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "content_type",
+          "tamano"
+        ],
+        "title": "LogotipoSolicitud",
+        "type": "object"
+      },
+      "Organizacion": {
+        "properties": {
+          "activa": {
+            "title": "Activa",
+            "type": "boolean"
+          },
+          "cargo_firmante": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cargo Firmante"
+          },
+          "ciudad": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ciudad"
+          },
+          "clave": {
+            "title": "Clave",
+            "type": "string"
+          },
+          "correo_firmante": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Correo Firmante"
+          },
+          "domicilio_fiscal": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Domicilio Fiscal"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "nombre_firmante": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nombre Firmante"
+          },
+          "razon_social": {
+            "title": "Razon Social",
+            "type": "string"
+          },
+          "registro_patronal": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Registro Patronal"
+          },
+          "rfc": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rfc"
+          },
+          "tiene_logotipo": {
+            "title": "Tiene Logotipo",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "clave",
+          "razon_social",
+          "rfc",
+          "registro_patronal",
+          "domicilio_fiscal",
+          "ciudad",
+          "nombre_firmante",
+          "cargo_firmante",
+          "correo_firmante",
+          "activa",
+          "tiene_logotipo"
+        ],
+        "title": "Organizacion",
+        "type": "object"
+      },
+      "OrganizacionActualizar": {
+        "additionalProperties": false,
+        "description": "La clave no está: es inmutable (DS-04); enviarla da 422 ``CAMPO_NO_PERMITIDO``.",
+        "properties": {
+          "activa": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Activa"
+          },
+          "cargo_firmante": {
+            "anyOf": [
+              {
+                "maxLength": 150,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cargo Firmante"
+          },
+          "ciudad": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ciudad"
+          },
+          "correo_firmante": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Correo Firmante"
+          },
+          "domicilio_fiscal": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Domicilio Fiscal"
+          },
+          "nombre_firmante": {
+            "anyOf": [
+              {
+                "maxLength": 150,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nombre Firmante"
+          },
+          "razon_social": {
+            "anyOf": [
+              {
+                "maxLength": 250,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Razon Social"
+          },
+          "registro_patronal": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Registro Patronal"
+          },
+          "rfc": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rfc"
+          }
+        },
+        "title": "OrganizacionActualizar",
+        "type": "object"
+      },
+      "OrganizacionCrear": {
+        "additionalProperties": false,
+        "properties": {
+          "cargo_firmante": {
+            "anyOf": [
+              {
+                "maxLength": 150,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cargo Firmante"
+          },
+          "ciudad": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ciudad"
+          },
+          "clave": {
+            "maxLength": 30,
+            "minLength": 1,
+            "title": "Clave",
+            "type": "string"
+          },
+          "correo_firmante": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Correo Firmante"
+          },
+          "domicilio_fiscal": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Domicilio Fiscal"
+          },
+          "nombre_firmante": {
+            "anyOf": [
+              {
+                "maxLength": 150,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nombre Firmante"
+          },
+          "razon_social": {
+            "maxLength": 250,
+            "minLength": 1,
+            "title": "Razon Social",
+            "type": "string"
+          },
+          "registro_patronal": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Registro Patronal"
+          },
+          "rfc": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rfc"
+          }
+        },
+        "required": [
+          "clave",
+          "razon_social"
+        ],
+        "title": "OrganizacionCrear",
+        "type": "object"
+      },
+      "OrganizacionesSalida": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/Organizacion"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "OrganizacionesSalida",
+        "type": "object"
+      },
+      "Planta": {
+        "properties": {
+          "activa": {
+            "title": "Activa",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "nombre": {
+            "title": "Nombre",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "nombre",
+          "activa"
+        ],
+        "title": "Planta",
+        "type": "object"
+      },
+      "PlantaActualizar": {
+        "additionalProperties": false,
+        "properties": {
+          "activa": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Activa"
+          },
+          "nombre": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nombre"
+          }
+        },
+        "title": "PlantaActualizar",
+        "type": "object"
+      },
+      "PlantaCrear": {
+        "additionalProperties": false,
+        "properties": {
+          "nombre": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Nombre",
+            "type": "string"
+          }
+        },
+        "required": [
+          "nombre"
+        ],
+        "title": "PlantaCrear",
+        "type": "object"
+      },
+      "PlantasSalida": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/Planta"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "PlantasSalida",
+        "type": "object"
+      },
+      "UrlSubida": {
+        "properties": {
+          "expira": {
+            "format": "date-time",
+            "title": "Expira",
+            "type": "string"
+          },
+          "s3_key": {
+            "title": "S3 Key",
+            "type": "string"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url",
+          "s3_key",
+          "expira"
+        ],
+        "title": "UrlSubida",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "title": "Command Center - colaboradores",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/v1/organizaciones": {
+      "get": {
+        "operationId": "listar_api_v1_organizaciones_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "solo_activas",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Solo Activas",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizacionesSalida"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Organizaciones (COL-08)",
+        "tags": [
+          "organizaciones"
+        ]
+      },
+      "post": {
+        "operationId": "crear_api_v1_organizaciones_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrganizacionCrear"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Organizacion"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Crea una organización (COL-09)",
+        "tags": [
+          "organizaciones"
+        ]
+      }
+    },
+    "/api/v1/organizaciones/{organizacion_id}": {
+      "patch": {
+        "operationId": "actualizar_api_v1_organizaciones__organizacion_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "organizacion_id",
+            "required": true,
+            "schema": {
+              "title": "Organizacion Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrganizacionActualizar"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Organizacion"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Actualiza o desactiva una organización (COL-10)",
+        "tags": [
+          "organizaciones"
+        ]
+      }
+    },
+    "/api/v1/organizaciones/{organizacion_id}/logotipo": {
+      "post": {
+        "operationId": "solicitar_logotipo_api_v1_organizaciones__organizacion_id__logotipo_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "organizacion_id",
+            "required": true,
+            "schema": {
+              "title": "Organizacion Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LogotipoSolicitud"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UrlSubida"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "URL firmada para subir el logotipo (COL-11)",
+        "tags": [
+          "organizaciones"
+        ]
+      }
+    },
+    "/api/v1/organizaciones/{organizacion_id}/logotipo/confirmar": {
+      "post": {
+        "operationId": "confirmar_logotipo_api_v1_organizaciones__organizacion_id__logotipo_confirmar_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "organizacion_id",
+            "required": true,
+            "schema": {
+              "title": "Organizacion Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LogotipoConfirmar"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Organizacion"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Verifica el logotipo subido y lo asigna (COL-12)",
+        "tags": [
+          "organizaciones"
+        ]
+      }
+    },
+    "/api/v1/plantas": {
+      "get": {
+        "operationId": "listar_api_v1_plantas_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "solo_activas",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Solo Activas",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlantasSalida"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Plantas (COL-13)",
+        "tags": [
+          "plantas"
+        ]
+      },
+      "post": {
+        "operationId": "crear_api_v1_plantas_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlantaCrear"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Planta"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Crea una planta (COL-14)",
+        "tags": [
+          "plantas"
+        ]
+      }
+    },
+    "/api/v1/plantas/{planta_id}": {
+      "patch": {
+        "operationId": "actualizar_api_v1_plantas__planta_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "planta_id",
+            "required": true,
+            "schema": {
+              "title": "Planta Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlantaActualizar"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Planta"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Actualiza o desactiva una planta (COL-15)",
+        "tags": [
+          "plantas"
+        ]
+      }
+    }
+  }
+}

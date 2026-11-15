@@ -1442,7 +1442,7 @@ El servidor repite todas las reglas de la plantilla de Excel (RN y `02_modelo_da
 | `/webhook/meta` | `GET`: token de verificación; `POST`: firma HMAC (CC-REQ-158) |
 | `/internal/*` | Solo desde las tareas de ECS y las Lambdas (grupos de seguridad), con un token interno de corta vida firmado con un secreto de Secrets Manager (`cc/{env}/internal-auth`, rotación 90 días). Sin rutas en API Gateway |
 
-El token de acceso lleva `sub`, `empresa_id` y `rol`, agregados por `cognito-pre-token` (V2; requiere el plan de funciones Essentials de Cognito, supuesto DS-20). El aislamiento por empresa sale de `empresa_id`, nunca de un parámetro de la petición.
+El token de acceso lleva `sub`, `empresa_id`, `rol` y `usuario_id` (este último agregado el 14 de noviembre de 2026 para que cada servicio registre en la bitácora y en sus llaves foráneas al usuario RH sin leer `identidad.usuario`, D-03), agregados por `cognito-pre-token` (V2; requiere el plan de funciones Essentials de Cognito, supuesto DS-20). El aislamiento por empresa sale de `empresa_id`, nunca de un parámetro de la petición.
 
 ### 11.2 Inicio de sesión, MFA, registro y recuperación
 

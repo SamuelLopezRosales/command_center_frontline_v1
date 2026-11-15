@@ -28,6 +28,7 @@ class UsuarioActual:
     empresa_id: int
     rol: str
     jti: str | None = None
+    usuario_id: int | None = None  # claim de cognito-pre-token (design.md §11.1)
 
 
 class VerificadorToken:
@@ -72,9 +73,31 @@ class VerificadorToken:
             rol = str(claims["rol"])
         except (KeyError, TypeError, ValueError) as exc:
             raise ErrorNoAutenticado() from exc
+        crudo_usuario = claims.get("usuario_id")
+        try:
+            usuario_id = int(crudo_usuario) if crudo_usuario is not None else None
+        except (TypeError, ValueError) as exc:
+            raise ErrorNoAutenticado() from exc
+        if usuario_id is not None and usuario_id <= 0:
+            raise ErrorNoAutenticado()
         return UsuarioActual(
-            sub=str(claims["sub"]), empresa_id=empresa_id, rol=rol, jti=claims.get("jti")
+            sub=str(claims["sub"]),
+            empresa_id=empresa_id,
+            rol=rol,
+            jti=claims.get("jti"),
+            usuario_id=usuario_id,
         )
+
+
+def requerir_usuario_id(usuario: UsuarioActual) -> int:
+    """El id numérico del usuario RH, para la bitácora y llaves foráneas (claim ``usuario_id``).
+
+    Lo agrega ``cognito-pre-token``. Un token sin el claim (emitido antes del cambio) obliga a
+    iniciar sesión de nuevo.
+    """
+    if usuario.usuario_id is None:
+        raise ErrorNoAutenticado()
+    return usuario.usuario_id
 
 
 def extraer_bearer(autorizacion: str | None) -> str:

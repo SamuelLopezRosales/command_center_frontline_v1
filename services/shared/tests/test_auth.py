@@ -46,6 +46,19 @@ VERIFICADOR = VerificadorToken(EMISOR, CLIENTE, resolver_llave=lambda _t: LLAVE.
 def test_token_valido():
     u = VERIFICADOR.verificar(token())
     assert u == UsuarioActual(sub="u-1", empresa_id=7, rol="RH", jti="j-1")
+    assert u.usuario_id is None
+
+
+def test_claim_usuario_id():
+    from cc_common.auth import requerir_usuario_id
+
+    u = VERIFICADOR.verificar(token(usuario_id="42"))
+    assert u.usuario_id == 42 and requerir_usuario_id(u) == 42
+    with pytest.raises(ErrorNoAutenticado):
+        requerir_usuario_id(VERIFICADOR.verificar(token()))  # token anterior al claim
+    for malo in ("x", "0", "-3"):
+        with pytest.raises(ErrorNoAutenticado):
+            VERIFICADOR.verificar(token(usuario_id=malo))
 
 
 @pytest.mark.parametrize(

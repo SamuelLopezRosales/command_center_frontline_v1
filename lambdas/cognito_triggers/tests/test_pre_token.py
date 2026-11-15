@@ -29,7 +29,11 @@ def _claims(r):
 
 def test_agrega_empresa_id_y_rol_al_token_de_acceso(bd):
     r = pre_token.handler(evento())
-    assert _claims(r) == {"empresa_id": str(bd["empresa"]), "rol": "RH"}
+    assert _claims(r) == {
+        "empresa_id": str(bd["empresa"]),
+        "rol": "RH",
+        "usuario_id": str(bd["usuario"]),
+    }
 
 
 def test_conserva_otras_modificaciones_de_la_respuesta(bd):

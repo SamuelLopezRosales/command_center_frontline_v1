@@ -36,7 +36,7 @@ async def motor(base_datos):
 
 async def test_registrar_bitacora(motor):
     async with transaccion(motor, 1) as conn:
-        rid = await bitacora.registrar(
+        resultado = await bitacora.registrar(
             conn,
             empresa_id=1,
             accion="MODIFICACION",
@@ -46,10 +46,12 @@ async def test_registrar_bitacora(motor):
             ip="10.0.0.1",
             detalle={"campos": ["puesto", "planta"]},
         )
+        assert resultado is None  # sin RETURNING: los servicios solo insertan (hallazgo de T-201)
         fila = (
             await conn.execute(
-                text("SELECT accion, detalle, ip::text FROM auditoria.bitacora WHERE id = :i"),
-                {"i": rid},
+                text(
+                    "SELECT accion, detalle, ip::text FROM auditoria.bitacora WHERE entidad_id = 9"
+                )
             )
         ).one()
     assert fila[0] == "MODIFICACION"

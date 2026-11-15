@@ -1,4 +1,4 @@
-"""``cognito-pre-token`` (LAM-09, versión 2 del evento): agrega ``empresa_id`` y ``rol``.
+"""``cognito-pre-token`` (LAM-09, evento V2): agrega ``empresa_id``, ``rol`` y ``usuario_id``.
 
 - Usuario no registrado en la base: no agrega nada. La API lo rechaza (USUARIO_NO_REGISTRADO).
 - Usuario inactivo: no se emiten tokens, en ningún tipo de inicio (CC-REQ-010).
@@ -6,7 +6,7 @@
   de 30 minutos. En un inicio de sesión interactivo no se aplica: la persona volvió a
   autenticarse con contraseña y MFA, y ``POST /sesion/iniciar`` (DSH-06) actualiza la actividad.
   Aplicarla también ahí dejaría fuera para siempre a quien no entra por más de 30 minutos.
-- ``empresa_id`` y ``rol`` salen siempre de la base, nunca del cliente (design.md §11.1).
+- ``empresa_id``, ``rol`` y ``usuario_id`` salen de la base, nunca del cliente (design.md §11.1).
 """
 
 from __future__ import annotations
@@ -42,7 +42,7 @@ def handler(event: dict[str, Any], context: Any = None) -> dict[str, Any]:
     if fila is None:
         return event
 
-    _, empresa_id, rol, activo, ultima = fila
+    usuario_id, empresa_id, rol, activo, ultima = fila
     if not activo:
         log.warning("token rechazado", extra={"motivo": "usuario_inactivo"})
         raise SesionNoPermitida(MENSAJE)
@@ -58,7 +58,9 @@ def handler(event: dict[str, Any], context: Any = None) -> dict[str, Any]:
     event["response"] = respuesta
     detalles = respuesta.setdefault("claimsAndScopeOverrideDetails", {})
     acceso = detalles.setdefault("accessTokenGeneration", {})
+    # usuario_id: los servicios lo necesitan para la bitácora y sus llaves foráneas sin leer
+    # identidad.usuario (D-03); decisión de Samuel del 14 de noviembre de 2026.
     acceso.setdefault("claimsToAddOrOverride", {}).update(
-        {"empresa_id": str(empresa_id), "rol": rol}
+        {"empresa_id": str(empresa_id), "rol": rol, "usuario_id": str(usuario_id)}
     )
     return event

@@ -78,9 +78,10 @@ SQL_INSERTAR = text(
     VALUES
       (:empresa_id, :usuario_id, :colaborador_id, :accion, :entidad, :entidad_id,
        CAST(:ip AS inet), :origen, CAST(:detalle AS jsonb))
-    RETURNING id
     """
 )
+# Sin RETURNING: RETURNING exige SELECT sobre la tabla y los roles de servicio solo tienen INSERT
+# en la bitácora (solo dashboard la lee; design.md §2.6). Hallazgo de T-201.
 
 
 class DetalleNoPermitido(ValueError):
@@ -106,12 +107,12 @@ async def registrar(
     ip: str | None = None,
     origen: Literal["USUARIO", "SISTEMA"] = "USUARIO",
     detalle: Mapping[str, Any] | None = None,
-) -> int:
+) -> None:
     """Inserta un registro en la misma transacción que la operación de negocio."""
     if accion not in ACCIONES:
         raise ValueError(f"acción de bitácora desconocida: {accion}")
     datos = validar_detalle(detalle or {})
-    r = await conn.execute(
+    await conn.execute(
         SQL_INSERTAR,
         {
             "empresa_id": empresa_id,
@@ -125,4 +126,3 @@ async def registrar(
             "detalle": json.dumps(datos, ensure_ascii=False, default=str),
         },
     )
-    return int(r.scalar_one())
