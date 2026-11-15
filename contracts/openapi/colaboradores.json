@@ -1,6 +1,498 @@
 {
   "components": {
     "schemas": {
+      "Baja": {
+        "additionalProperties": false,
+        "properties": {
+          "fecha_baja": {
+            "format": "date",
+            "title": "Fecha Baja",
+            "type": "string"
+          }
+        },
+        "required": [
+          "fecha_baja"
+        ],
+        "title": "Baja",
+        "type": "object"
+      },
+      "ColaboradorActualizar": {
+        "additionalProperties": false,
+        "description": "Parcial. ``numero_empleado`` y ``estatus`` no están: no cambian aquí (COL-04).",
+        "properties": {
+          "apellido_materno": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Apellido Materno"
+          },
+          "apellido_paterno": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Apellido Paterno"
+          },
+          "campos": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "maxProperties": 200,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Campos"
+          },
+          "celular": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Celular"
+          },
+          "fecha_ingreso": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fecha Ingreso"
+          },
+          "nombres": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nombres"
+          },
+          "organizacion_id": {
+            "anyOf": [
+              {
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Organizacion Id"
+          },
+          "planta_id": {
+            "anyOf": [
+              {
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planta Id"
+          },
+          "puesto": {
+            "anyOf": [
+              {
+                "maxLength": 150,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Puesto"
+          },
+          "tipo_empleado": {
+            "anyOf": [
+              {
+                "enum": [
+                  "ADMINISTRATIVO",
+                  "OPERATIVO"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tipo Empleado"
+          }
+        },
+        "title": "ColaboradorActualizar",
+        "type": "object"
+      },
+      "ColaboradorCrear": {
+        "additionalProperties": false,
+        "description": "Los once campos fijos son obligatorios (CC-REQ-020); ``estatus`` nace ``ACTIVO``.",
+        "properties": {
+          "apellido_materno": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Apellido Materno",
+            "type": "string"
+          },
+          "apellido_paterno": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Apellido Paterno",
+            "type": "string"
+          },
+          "campos": {
+            "additionalProperties": true,
+            "maxProperties": 200,
+            "title": "Campos",
+            "type": "object"
+          },
+          "celular": {
+            "title": "Celular",
+            "type": "string"
+          },
+          "consentimiento": {
+            "default": false,
+            "title": "Consentimiento",
+            "type": "boolean"
+          },
+          "fecha_ingreso": {
+            "format": "date",
+            "title": "Fecha Ingreso",
+            "type": "string"
+          },
+          "nombres": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Nombres",
+            "type": "string"
+          },
+          "numero_empleado": {
+            "title": "Numero Empleado",
+            "type": "string"
+          },
+          "organizacion_id": {
+            "minimum": 1.0,
+            "title": "Organizacion Id",
+            "type": "integer"
+          },
+          "planta_id": {
+            "minimum": 1.0,
+            "title": "Planta Id",
+            "type": "integer"
+          },
+          "puesto": {
+            "maxLength": 150,
+            "minLength": 1,
+            "title": "Puesto",
+            "type": "string"
+          },
+          "tipo_empleado": {
+            "enum": [
+              "ADMINISTRATIVO",
+              "OPERATIVO"
+            ],
+            "title": "Tipo Empleado",
+            "type": "string"
+          }
+        },
+        "required": [
+          "numero_empleado",
+          "nombres",
+          "apellido_paterno",
+          "apellido_materno",
+          "celular",
+          "organizacion_id",
+          "planta_id",
+          "fecha_ingreso",
+          "puesto",
+          "tipo_empleado"
+        ],
+        "title": "ColaboradorCrear",
+        "type": "object"
+      },
+      "ColaboradorDetalle": {
+        "properties": {
+          "apellido_materno": {
+            "title": "Apellido Materno",
+            "type": "string"
+          },
+          "apellido_paterno": {
+            "title": "Apellido Paterno",
+            "type": "string"
+          },
+          "campos": {
+            "additionalProperties": true,
+            "title": "Campos",
+            "type": "object"
+          },
+          "celular": {
+            "title": "Celular",
+            "type": "string"
+          },
+          "celular_invalido": {
+            "title": "Celular Invalido",
+            "type": "boolean"
+          },
+          "consentimiento": {
+            "$ref": "#/components/schemas/EstadoConsentimiento"
+          },
+          "elegible": {
+            "title": "Elegible",
+            "type": "boolean"
+          },
+          "estatus": {
+            "title": "Estatus",
+            "type": "string"
+          },
+          "fecha_baja": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fecha Baja"
+          },
+          "fecha_ingreso": {
+            "format": "date",
+            "title": "Fecha Ingreso",
+            "type": "string"
+          },
+          "fecha_modificacion": {
+            "format": "date-time",
+            "title": "Fecha Modificacion",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "motivo_no_elegible": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motivo No Elegible"
+          },
+          "nombres": {
+            "title": "Nombres",
+            "type": "string"
+          },
+          "numero_empleado": {
+            "title": "Numero Empleado",
+            "type": "string"
+          },
+          "organizacion": {
+            "$ref": "#/components/schemas/Referencia"
+          },
+          "planta": {
+            "$ref": "#/components/schemas/Referencia"
+          },
+          "puesto": {
+            "title": "Puesto",
+            "type": "string"
+          },
+          "tipo_empleado": {
+            "title": "Tipo Empleado",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "numero_empleado",
+          "nombres",
+          "apellido_paterno",
+          "apellido_materno",
+          "celular",
+          "celular_invalido",
+          "organizacion",
+          "planta",
+          "fecha_ingreso",
+          "puesto",
+          "tipo_empleado",
+          "estatus",
+          "fecha_baja",
+          "consentimiento",
+          "elegible",
+          "motivo_no_elegible",
+          "campos",
+          "fecha_modificacion"
+        ],
+        "title": "ColaboradorDetalle",
+        "type": "object"
+      },
+      "ColaboradorFila": {
+        "properties": {
+          "campos": {
+            "additionalProperties": true,
+            "title": "Campos",
+            "type": "object"
+          },
+          "celular": {
+            "title": "Celular",
+            "type": "string"
+          },
+          "consentimiento_vigente": {
+            "title": "Consentimiento Vigente",
+            "type": "boolean"
+          },
+          "estatus": {
+            "title": "Estatus",
+            "type": "string"
+          },
+          "fecha_ingreso": {
+            "format": "date",
+            "title": "Fecha Ingreso",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "nombre_completo": {
+            "title": "Nombre Completo",
+            "type": "string"
+          },
+          "numero_empleado": {
+            "title": "Numero Empleado",
+            "type": "string"
+          },
+          "organizacion": {
+            "$ref": "#/components/schemas/Referencia"
+          },
+          "planta": {
+            "$ref": "#/components/schemas/Referencia"
+          },
+          "puesto": {
+            "title": "Puesto",
+            "type": "string"
+          },
+          "tipo_empleado": {
+            "title": "Tipo Empleado",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "numero_empleado",
+          "nombre_completo",
+          "celular",
+          "puesto",
+          "tipo_empleado",
+          "estatus",
+          "fecha_ingreso",
+          "organizacion",
+          "planta",
+          "consentimiento_vigente",
+          "campos"
+        ],
+        "title": "ColaboradorFila",
+        "type": "object"
+      },
+      "Consentimiento": {
+        "additionalProperties": false,
+        "properties": {
+          "otorgado": {
+            "title": "Otorgado",
+            "type": "boolean"
+          },
+          "vigente_hasta": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vigente Hasta"
+          }
+        },
+        "required": [
+          "otorgado"
+        ],
+        "title": "Consentimiento",
+        "type": "object"
+      },
+      "EstadoConsentimiento": {
+        "properties": {
+          "fecha": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fecha"
+          },
+          "otorgado": {
+            "title": "Otorgado",
+            "type": "boolean"
+          },
+          "vigente": {
+            "title": "Vigente",
+            "type": "boolean"
+          },
+          "vigente_hasta": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vigente Hasta"
+          }
+        },
+        "required": [
+          "otorgado",
+          "vigente",
+          "fecha",
+          "vigente_hasta"
+        ],
+        "title": "EstadoConsentimiento",
+        "type": "object"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -405,6 +897,37 @@
         "title": "OrganizacionesSalida",
         "type": "object"
       },
+      "PaginaColaboradores": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ColaboradorFila"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "limite": {
+            "title": "Limite",
+            "type": "integer"
+          },
+          "pagina": {
+            "title": "Pagina",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "pagina",
+          "limite",
+          "total"
+        ],
+        "title": "PaginaColaboradores",
+        "type": "object"
+      },
       "Planta": {
         "properties": {
           "activa": {
@@ -491,6 +1014,36 @@
         "title": "PlantasSalida",
         "type": "object"
       },
+      "Reactivar": {
+        "additionalProperties": false,
+        "properties": {
+          "consentimiento": {
+            "default": false,
+            "title": "Consentimiento",
+            "type": "boolean"
+          }
+        },
+        "title": "Reactivar",
+        "type": "object"
+      },
+      "Referencia": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "nombre": {
+            "title": "Nombre",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "nombre"
+        ],
+        "title": "Referencia",
+        "type": "object"
+      },
       "UrlSubida": {
         "properties": {
           "expira": {
@@ -563,6 +1116,594 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/api/v1/colaboradores": {
+      "get": {
+        "operationId": "listar_api_v1_colaboradores_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 100,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q"
+            }
+          },
+          {
+            "in": "query",
+            "name": "organizacion_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Organizacion Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "planta_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Planta Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "estatus",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "ACTIVO",
+                    "BAJA"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Estatus"
+            }
+          },
+          {
+            "in": "query",
+            "name": "tipo_empleado",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "ADMINISTRATIVO",
+                    "OPERATIVO"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Tipo Empleado"
+            }
+          },
+          {
+            "in": "query",
+            "name": "columnas",
+            "required": false,
+            "schema": {
+              "default": [],
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 20,
+              "title": "Columnas",
+              "type": "array"
+            }
+          },
+          {
+            "in": "query",
+            "name": "pagina",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Pagina",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limite",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limite",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaColaboradores"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Listado (COL-01)",
+        "tags": [
+          "colaboradores"
+        ]
+      },
+      "post": {
+        "operationId": "crear_api_v1_colaboradores_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ColaboradorCrear"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ColaboradorDetalle"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Alta (COL-02)",
+        "tags": [
+          "colaboradores"
+        ]
+      }
+    },
+    "/api/v1/colaboradores/{colaborador_id}": {
+      "get": {
+        "operationId": "detalle_api_v1_colaboradores__colaborador_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "colaborador_id",
+            "required": true,
+            "schema": {
+              "title": "Colaborador Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "incluir_sensibles",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Incluir Sensibles",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ColaboradorDetalle"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Detalle (COL-03)",
+        "tags": [
+          "colaboradores"
+        ]
+      },
+      "patch": {
+        "operationId": "actualizar_api_v1_colaboradores__colaborador_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "colaborador_id",
+            "required": true,
+            "schema": {
+              "title": "Colaborador Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "if-match",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "If-Match"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ColaboradorActualizar"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ColaboradorDetalle"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Edición con If-Match (COL-04)",
+        "tags": [
+          "colaboradores"
+        ]
+      }
+    },
+    "/api/v1/colaboradores/{colaborador_id}/baja": {
+      "post": {
+        "operationId": "baja_api_v1_colaboradores__colaborador_id__baja_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "colaborador_id",
+            "required": true,
+            "schema": {
+              "title": "Colaborador Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Baja"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ColaboradorDetalle"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Baja (COL-05)",
+        "tags": [
+          "colaboradores"
+        ]
+      }
+    },
+    "/api/v1/colaboradores/{colaborador_id}/consentimiento": {
+      "put": {
+        "operationId": "consentimiento_api_v1_colaboradores__colaborador_id__consentimiento_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "colaborador_id",
+            "required": true,
+            "schema": {
+              "title": "Colaborador Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Consentimiento"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ColaboradorDetalle"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Consentimiento de WhatsApp (COL-07)",
+        "tags": [
+          "colaboradores"
+        ]
+      }
+    },
+    "/api/v1/colaboradores/{colaborador_id}/reactivar": {
+      "post": {
+        "operationId": "reactivar_api_v1_colaboradores__colaborador_id__reactivar_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "colaborador_id",
+            "required": true,
+            "schema": {
+              "title": "Colaborador Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Reactivar"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ColaboradorDetalle"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Reactivación (COL-06)",
+        "tags": [
+          "colaboradores"
+        ]
+      }
+    },
     "/api/v1/organizaciones": {
       "get": {
         "operationId": "listar_api_v1_organizaciones_get",

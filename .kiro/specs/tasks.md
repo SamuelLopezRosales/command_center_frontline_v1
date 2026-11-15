@@ -592,7 +592,7 @@ Objetivo: CRUD de colaboradores, organizaciones y plantas con cifrado, elegibili
     - (T-054, Implementar organizaciones, logotipo y plantas (COL-08 a COL-15)) pruebas de integración: clave única por empresa e inmutable; RFC de 12 o 13 caracteres; sin endpoint de borrado, solo `activa = false`; el logotipo valida tipo real, tamaño de 1 MB y la ruta bajo `logotipos/{empresa_id}/` con LocalStack; nombre de planta único sin distinguir mayúsculas
   - Requiere aprobación: no
 
-- [ ] T-202. Colaboradores: alta, detalle, edición, baja, reactivación, consentimiento, elegibilidad y listado (COL-01 a COL-07)
+- [x] T-202. Colaboradores: alta, detalle, edición, baja, reactivación, consentimiento, elegibilidad y listado (COL-01 a COL-07)
   - Fase: 2
   - Agrupa: T-055, T-056, T-057, T-058
   - Requisitos: CC-REQ-020, CC-REQ-021, CC-REQ-022, CC-REQ-023, CC-REQ-024, CC-REQ-025, CC-REQ-026, CC-REQ-027, CC-REQ-028, CC-REQ-029, CC-REQ-030, CC-REQ-031, CC-REQ-032, CC-REQ-033, CC-REQ-150, CC-REQ-153, CC-REQ-154, CC-REQ-156, CC-REQ-157, CC-REQ-161

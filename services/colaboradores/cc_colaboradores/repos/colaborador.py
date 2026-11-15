@@ -148,3 +148,111 @@ async def por_hash_celular(conn: AsyncConnection, celular_hash: bytes) -> int | 
         {"h": celular_hash},
     )
     return r.scalar_one_or_none()
+
+
+# ------------------------------------------------------------------ lectura y cambios (T-202)
+
+_DETALLE = """
+    SELECT c.id, c.numero_empleado, c.nombres, c.apellido_paterno, c.apellido_materno,
+           c.celular_cifrado, c.celular_ultimos4, c.celular_invalido, c.fecha_ingreso, c.puesto,
+           c.tipo_empleado, c.estatus, c.fecha_baja, c.consentimiento_whatsapp,
+           c.fecha_consentimiento, c.consentimiento_vigente_hasta, c.fecha_creacion,
+           c.fecha_modificacion,
+           o.id AS organizacion_id, o.clave AS organizacion_clave,
+           o.razon_social AS organizacion_razon_social,
+           p.id AS planta_id, p.nombre AS planta_nombre
+    FROM colaboradores.colaborador c
+    JOIN colaboradores.organizacion o ON o.id = c.organizacion_id
+    JOIN colaboradores.planta p ON p.id = c.planta_id
+    WHERE c.id = :id
+"""
+
+EDITABLES = frozenset(
+    {
+        "nombres",
+        "apellido_paterno",
+        "apellido_materno",
+        "organizacion_id",
+        "planta_id",
+        "fecha_ingreso",
+        "puesto",
+        "tipo_empleado",
+    }
+)
+
+
+async def obtener(conn: AsyncConnection, colaborador_id: int, *, bloquear: bool = False):
+    sql = _DETALLE + (" FOR UPDATE OF c" if bloquear else "")
+    r = await conn.execute(text(sql), {"id": colaborador_id})
+    f = r.mappings().first()
+    return dict(f) if f else None
+
+
+async def actualizar(conn: AsyncConnection, colaborador_id: int, cambios: dict) -> None:
+    """Actualiza los fijos editables (lista cerrada) y marca ``fecha_modificacion``."""
+    columnas = [c for c in cambios if c in EDITABLES]
+    asignaciones = "".join(f"{c} = :{c}, " for c in columnas)  # nombres de una lista fija
+    await conn.execute(
+        text(
+            f"UPDATE colaboradores.colaborador SET {asignaciones}"  # noqa: S608
+            "fecha_modificacion = clock_timestamp() WHERE id = :id"
+        ),
+        {"id": colaborador_id, **{c: cambios[c] for c in columnas}},
+    )
+
+
+async def dar_de_baja(conn: AsyncConnection, colaborador_id: int, fecha_baja: date) -> bool:
+    r = await conn.execute(
+        text(
+            "UPDATE colaboradores.colaborador SET estatus = 'BAJA', fecha_baja = :f, "
+            "fecha_modificacion = clock_timestamp() WHERE id = :id AND estatus = 'ACTIVO'"
+        ),
+        {"id": colaborador_id, "f": fecha_baja},
+    )
+    return r.rowcount == 1
+
+
+async def reactivar(conn: AsyncConnection, colaborador_id: int) -> bool:
+    r = await conn.execute(
+        text(
+            "UPDATE colaboradores.colaborador SET estatus = 'ACTIVO', fecha_baja = NULL, "
+            "fecha_modificacion = clock_timestamp() WHERE id = :id AND estatus = 'BAJA'"
+        ),
+        {"id": colaborador_id},
+    )
+    return r.rowcount == 1
+
+
+async def fijar_consentimiento(
+    conn: AsyncConnection,
+    colaborador_id: int,
+    *,
+    otorgado: bool,
+    vigente_hasta,
+    registrado_por: int,
+) -> None:
+    await conn.execute(
+        text(
+            """
+            UPDATE colaboradores.colaborador SET
+              consentimiento_whatsapp = :o,
+              fecha_consentimiento = CASE WHEN :o THEN now() ELSE fecha_consentimiento END,
+              consentimiento_vigente_hasta = CASE WHEN :o THEN CAST(:h AS timestamptz) END,
+              consentimiento_registrado_por = :u,
+              fecha_modificacion = clock_timestamp()
+            WHERE id = :id
+            """
+        ),
+        {"id": colaborador_id, "o": otorgado, "h": vigente_hasta, "u": registrado_por},
+    )
+
+
+async def catalogo_activo(conn: AsyncConnection, tabla: str, fila_id: int) -> bool:
+    """``organizacion`` o ``planta`` existente, de la empresa (RLS) y activa."""
+    if tabla not in ("organizacion", "planta"):
+        raise ValueError(tabla)
+    r = await conn.execute(
+        text(f"SELECT activa FROM colaboradores.{tabla} WHERE id = :id"),  # noqa: S608
+        {"id": fila_id},
+    )
+    return bool(r.scalar_one_or_none())

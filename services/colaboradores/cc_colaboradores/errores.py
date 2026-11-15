@@ -15,6 +15,24 @@ CATALOGO_RESTRICCIONES.update(
 )
 
 
+def version_desactualizada() -> ErrorDominio:
+    """412: el ``If-Match`` no coincide con la versión actual (bloqueo optimista, §8.2)."""
+    return ErrorDominio(
+        codigo="VERSION_DESACTUALIZADA",
+        mensaje_publico="El registro cambió desde que se leyó; recárguelo.",
+        http=412,
+    )
+
+
+def precondicion_requerida() -> ErrorDominio:
+    """428: la edición exige el encabezado ``If-Match`` con el ``ETag`` leído."""
+    return ErrorDominio(
+        codigo="PRECONDICION_REQUERIDA",
+        mensaje_publico="Falta el encabezado If-Match con la versión leída.",
+        http=428,
+    )
+
+
 def nombre_restriccion(exc: BaseException) -> str | None:
     """Nombre de la restricción violada en un ``IntegrityError`` de SQLAlchemy con asyncpg."""
     actual: Any = exc
