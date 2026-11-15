@@ -5,8 +5,8 @@ from datetime import UTC, datetime, timedelta
 import httpx
 import psycopg
 import pytest
-from ayudantes_colaboradores import cab, construir_app, emitir
-from cc_colaboradores.campos_cliente import CacheCampos, DefinicionCampo, OpcionCampo, StubCampos
+from ayudantes_colaboradores import StubCampos, cab, construir_app, emitir
+from cc_colaboradores.campos_cliente import CacheCampos, DefinicionCampo, OpcionCampo
 from cc_colaboradores.servicios import elegibilidad
 
 pytestmark = pytest.mark.docker

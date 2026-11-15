@@ -328,16 +328,17 @@ async def ejecutar(cfg: Any | None = None) -> None:  # pragma: no cover - requie
     from cc_common.recursos import motor_desde_config
 
     from cc_colaboradores.almacenamiento import almacen_cargas_desde_config
-    from cc_colaboradores.campos_cliente import CacheCampos, StubCampos
+    from cc_colaboradores.campos_cliente import cache_desde_config
     from cc_colaboradores.cifrado import cifrador_desde_config
     from cc_colaboradores.config import ConfigColaboradores
+    from cc_colaboradores.main import _secreto_interno_de
 
     cfg = cfg or ConfigColaboradores()
     configurar_logging("worker-cargas", cfg.ambiente, cfg.log_nivel)
     motor = motor_desde_config(cfg)
     cif = cifrador_desde_config(cfg)
     almacen = almacen_cargas_desde_config(cfg)
-    campos = CacheCampos(StubCampos())  # T-206 lo reemplaza por el cliente de INT-CAM-01
+    campos = cache_desde_config(cfg, _secreto_interno_de(cfg))
     sqs = boto3.client("sqs", region_name=cfg.region, endpoint_url=cfg.sqs_endpoint or None)
     parar = asyncio.Event()
     asyncio.get_running_loop().add_signal_handler(signal.SIGTERM, parar.set)

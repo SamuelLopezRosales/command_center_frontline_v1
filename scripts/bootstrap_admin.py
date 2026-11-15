@@ -21,6 +21,7 @@ La siembra de campos sugeridos (INT-CAM-02) la hace el servicio ``campos`` cuand
 from __future__ import annotations
 
 import hashlib
+import json
 import os
 import re
 import secrets
@@ -31,7 +32,7 @@ from datetime import datetime
 from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parent.parent
-sys.path[:0] = [str(RAIZ), str(RAIZ / "services" / "shared")]
+sys.path[:0] = [str(RAIZ), str(RAIZ / "services" / "shared"), str(RAIZ / "services" / "campos")]
 
 RFC_ORG = re.compile(r"^[A-ZÑ&]{3}\d{6}[A-Z0-9]{3}$")
 CORREO = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
@@ -45,9 +46,69 @@ class ErrorBootstrap(Exception):  # noqa: N818
 class Resultado:
     empresa_id: int
     empresa_creada: bool
+    campos_creados: int = 0
     invitacion_id: int | None = None
     codigo: str | None = None
     fecha_expira: datetime | None = None
+
+
+def sembrar_campos(conn, empresa_id: int) -> int:
+    """Siembra los campos sugeridos (catálogo de `cc_campos.catalogo`, design.md §3.4).
+
+    Idempotente por clave; devuelve cuántos creó. Equivale a INT-CAM-02, sin pasar por el
+    servicio: el script corre con la URL del migrador antes de que exista ningún servicio.
+    """
+    from cc_campos.catalogo import SUGERIDOS
+
+    conn.execute("SELECT pg_advisory_xact_lock(hashtext('cc_campos_sembrado'), %s)", (empresa_id,))
+    presentes = {
+        c[0]
+        for c in conn.execute(
+            "SELECT clave FROM campos.campo_colaborador WHERE empresa_id = %s", (empresa_id,)
+        )
+    }
+    creados = 0
+    for s in SUGERIDOS:
+        if s.clave in presentes:
+            continue
+        ultimo = conn.execute(
+            "INSERT INTO campos.contador_campo (empresa_id, ultimo) VALUES (%s, 1) "
+            "ON CONFLICT (empresa_id) DO UPDATE SET ultimo = contador_campo.ultimo + 1 "
+            "RETURNING ultimo",
+            (empresa_id,),
+        ).fetchone()[0]
+        codigo = f"CAMP-{ultimo:04d}"
+        campo_id = conn.execute(
+            "INSERT INTO campos.campo_colaborador (empresa_id, nombre_campo, clave, "
+            "codigo_interno, tipo_dato, formato_validacion, obligatorio, orden, activo, "
+            "es_sensible, es_sugerido) VALUES (%s, %s, %s, %s, %s, %s, false, "
+            "(SELECT coalesce(max(orden), 0) + 1 FROM campos.campo_colaborador "
+            " WHERE empresa_id = %s AND NOT eliminado), %s, %s, true) RETURNING id",
+            (
+                empresa_id,
+                s.nombre,
+                s.clave,
+                codigo,
+                s.tipo_dato,
+                s.formato,
+                empresa_id,
+                s.activo,
+                s.es_sensible,
+            ),
+        ).fetchone()[0]
+        for orden, (etiqueta, valor) in enumerate(s.opciones, start=1):
+            conn.execute(
+                "INSERT INTO campos.opcion_campo (empresa_id, campo_id, etiqueta, valor, orden) "
+                "VALUES (%s, %s, %s, %s, %s)",
+                (empresa_id, campo_id, etiqueta, valor, orden),
+            )
+        conn.execute(
+            "INSERT INTO auditoria.bitacora (empresa_id, accion, entidad, entidad_id, origen, "
+            "detalle) VALUES (%s, 'CAMPO_CREADO', 'campo_colaborador', %s, 'SISTEMA', %s::jsonb)",
+            (empresa_id, campo_id, json.dumps({"codigos_internos": [codigo]})),
+        )
+        creados += 1
+    return creados
 
 
 def bootstrap(
@@ -91,8 +152,11 @@ def bootstrap(
         else:
             empresa_id = fila[0]
 
+        campos_creados = sembrar_campos(conn, empresa_id)
         if not creada and not nueva_invitacion:
-            return Resultado(empresa_id=empresa_id, empresa_creada=False)
+            return Resultado(
+                empresa_id=empresa_id, empresa_creada=False, campos_creados=campos_creados
+            )
         if not puede_mostrar_codigo:
             # Se lanza dentro de la transacción: la empresa recién creada se revierte.
             raise ErrorBootstrap(
@@ -115,6 +179,7 @@ def bootstrap(
     return Resultado(
         empresa_id=empresa_id,
         empresa_creada=creada,
+        campos_creados=campos_creados,
         invitacion_id=inv_id,
         codigo=codigo,
         fecha_expira=expira,
@@ -169,6 +234,8 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 0
     print(f"Empresa {'creada' if r.empresa_creada else 'existente'} (id {r.empresa_id}).")
+    if r.campos_creados:
+        print(f"Campos sugeridos sembrados: {r.campos_creados}.")
     print(f"Invitación {r.invitacion_id}, vigente hasta {r.fecha_expira:%Y-%m-%d %H:%M} UTC.")
     print()
     print(f"  CÓDIGO DE INVITACIÓN: {r.codigo}")

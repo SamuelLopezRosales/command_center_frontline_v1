@@ -160,3 +160,28 @@ async def organizacion(
     organizacion_id: int, ll: LlamadaInterna = CONSTANCIAS, m=Depends(motor)
 ) -> dict[str, Any]:
     return await servicio.organizacion(m, ll.empresa_id, organizacion_id)
+
+
+class Faltantes(_Entrada):
+    codigos_internos: list[Annotated[str, Field(min_length=1, max_length=20)]] = Field(
+        min_length=1, max_length=100
+    )
+
+
+class UsoDeCampo(BaseModel):
+    con_valores: bool
+
+
+@router.post("/colaboradores/faltantes:contar", response_model=dict[str, int], summary="INT-COL-09")
+async def faltantes_contar(
+    entrada: Faltantes, ll: LlamadaInterna = CONSTANCIAS, m=Depends(motor), c=Depends(campos)
+) -> dict[str, int]:
+    return await servicio.faltantes_contar(m, c, ll.empresa_id, entrada.codigos_internos)
+
+
+CAMPOS = requiere_servicio("campos")
+
+
+@router.get("/campos/{campo_id}/uso", response_model=UsoDeCampo, summary="INT-COL-10")
+async def uso_de_campo(campo_id: int, ll: LlamadaInterna = CAMPOS, m=Depends(motor)) -> UsoDeCampo:
+    return UsoDeCampo(con_valores=await servicio.campo_con_valores(m, ll.empresa_id, campo_id))

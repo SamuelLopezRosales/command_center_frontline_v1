@@ -5,8 +5,8 @@ import time
 import httpx
 import psycopg
 import pytest
-from ayudantes_colaboradores import cab, construir_app, emitir
-from cc_colaboradores.campos_cliente import CacheCampos, DefinicionCampo, OpcionCampo, StubCampos
+from ayudantes_colaboradores import StubCampos, cab, construir_app, emitir
+from cc_colaboradores.campos_cliente import CacheCampos, DefinicionCampo, OpcionCampo
 
 pytestmark = pytest.mark.docker
 

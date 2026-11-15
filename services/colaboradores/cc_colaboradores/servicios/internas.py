@@ -309,3 +309,51 @@ async def organizacion(motor, empresa_id: int, organizacion_id: int) -> dict[str
     if org is None:
         raise ErrorNoEncontrado()
     return org
+
+
+# ------------------------------------------------------------------ INT-COL-09 y 10 (T-206)
+
+
+async def faltantes_contar(
+    motor, campos_cli, empresa_id: int, codigos: list[str]
+) -> dict[str, int]:
+    """Cuántos colaboradores ``ACTIVO`` no tienen valor en cada campo (CC-REQ-013, 067).
+
+    Un código que la caché de definiciones aún no conoce (campo recién creado) se vuelve a
+    pedir una vez a `campos` antes de rechazarlo con 422."""
+    definiciones = {d.codigo_interno: d for d in await campos_cli.definiciones(empresa_id)}
+    if any(c not in definiciones for c in codigos):
+        campos_cli.invalidar(empresa_id)
+        definiciones = {d.codigo_interno: d for d in await campos_cli.definiciones(empresa_id)}
+    desconocidos = [c for c in codigos if c not in definiciones]
+    if desconocidos:
+        raise ErrorValidacion(
+            "CAMPO_DESCONOCIDO",
+            "Algún campo no existe.",
+            errores=[ErrorCampo("codigos_internos", "CAMPO_DESCONOCIDO", "El campo no existe.")],
+        )
+    ids = {c: definiciones[c].id for c in codigos}
+    async with transaccion(motor, empresa_id) as conn:
+        r = await conn.execute(
+            text(
+                "SELECT i.campo_id, count(c.id) FROM unnest(CAST(:ids AS bigint[])) AS i(campo_id) "
+                "LEFT JOIN colaboradores.colaborador c ON c.estatus = 'ACTIVO' "
+                "AND NOT EXISTS (SELECT 1 FROM colaboradores.valor_campo v "
+                "                WHERE v.colaborador_id = c.id AND v.campo_id = i.campo_id) "
+                "GROUP BY i.campo_id"
+            ),
+            {"ids": list(ids.values())},
+        )
+        por_id = {int(campo): int(total) for campo, total in r.all()}
+    return {codigo: por_id.get(campo_id, 0) for codigo, campo_id in ids.items()}
+
+
+async def campo_con_valores(motor, empresa_id: int, campo_id: int) -> bool:
+    """¿Algún colaborador de la empresa tiene valor en el campo? No consulta las definiciones:
+    un campo recién creado o de otra empresa simplemente no tiene valores."""
+    async with transaccion(motor, empresa_id) as conn:
+        r = await conn.execute(
+            text("SELECT EXISTS (SELECT 1 FROM colaboradores.valor_campo WHERE campo_id = :c)"),
+            {"c": campo_id},
+        )
+        return bool(r.scalar_one())

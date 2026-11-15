@@ -17,6 +17,8 @@ class ConfigCampos(Configuracion):
     constancias_url: str | None = None
     # Bus de EventBridge donde el relay publica ``campo.actualizado``.
     bus_eventos: str = "cc-local-eventos"
+    eventos_activos: bool = False  # inicia el relay-outbox con la API
+    aws_endpoint: str | None = None  # LocalStack en local; vacío en AWS
 
 
 @lru_cache(maxsize=1)

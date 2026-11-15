@@ -898,6 +898,27 @@
         "title": "EstadoConsentimiento",
         "type": "object"
       },
+      "Faltantes": {
+        "additionalProperties": false,
+        "properties": {
+          "codigos_internos": {
+            "items": {
+              "maxLength": 20,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 100,
+            "minItems": 1,
+            "title": "Codigos Internos",
+            "type": "array"
+          }
+        },
+        "required": [
+          "codigos_internos"
+        ],
+        "title": "Faltantes",
+        "type": "object"
+      },
       "FilaCarga": {
         "properties": {
           "errores": {
@@ -1613,6 +1634,19 @@
           "expira"
         ],
         "title": "UrlSubida",
+        "type": "object"
+      },
+      "UsoDeCampo": {
+        "properties": {
+          "con_valores": {
+            "title": "Con Valores",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "con_valores"
+        ],
+        "title": "UsoDeCampo",
         "type": "object"
       },
       "ValidationError": {
@@ -3231,6 +3265,80 @@
         ]
       }
     },
+    "/internal/campos/{campo_id}/uso": {
+      "get": {
+        "operationId": "uso_de_campo_internal_campos__campo_id__uso_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "campo_id",
+            "required": true,
+            "schema": {
+              "title": "Campo Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-empresa-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Empresa-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsoDeCampo"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "INT-COL-10",
+        "tags": [
+          "internas"
+        ]
+      }
+    },
     "/internal/colaboradores/buscar-por-celular": {
       "post": {
         "operationId": "buscar_por_celular_internal_colaboradores_buscar_por_celular_post",
@@ -3376,6 +3484,85 @@
           }
         },
         "summary": "INT-COL-05",
+        "tags": [
+          "internas"
+        ]
+      }
+    },
+    "/internal/colaboradores/faltantes:contar": {
+      "post": {
+        "operationId": "faltantes_contar_internal_colaboradores_faltantes_contar_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-empresa-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Empresa-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Faltantes"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "integer"
+                  },
+                  "title": "Response Faltantes Contar Internal Colaboradores Faltantes Contar Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "INT-COL-09",
         "tags": [
           "internas"
         ]

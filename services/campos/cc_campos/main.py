@@ -6,6 +6,7 @@ inyecte, y los clientes de colaboradores y constancias se crean al primer uso.
 
 from __future__ import annotations
 
+import asyncio
 import time
 from collections.abc import AsyncIterator, Callable
 from contextlib import asynccontextmanager
@@ -41,7 +42,16 @@ def crear_app(
             from cc_common.recursos import motor_desde_config
 
             creado = app.state.motor = motor_desde_config(cfg)
+        parar = asyncio.Event()
+        tareas = []
+        if cfg.eventos_activos:
+            tareas.append(asyncio.create_task(_relay(app, parar)))
         yield
+        parar.set()
+        if tareas:
+            _, pendientes = await asyncio.wait(tareas, timeout=5)
+            for t in pendientes:
+                t.cancel()
         if creado is not None:
             await creado.dispose()
 
@@ -70,6 +80,20 @@ def crear_app(
 
     registrar_rutas(app)
     return app
+
+
+async def _relay(app: FastAPI, parar: asyncio.Event) -> None:
+    """relay-outbox: publica campo.actualizado en EventBridge (design.md §4.7)."""
+    import boto3
+    from cc_common.outbox import publicador_aws
+    from cc_common.tareas import relay_outbox
+
+    cfg = app.state.config
+    opciones = {"region_name": cfg.region, "endpoint_url": cfg.aws_endpoint or None}
+    publicador = publicador_aws(
+        boto3.client("sqs", **opciones), boto3.client("events", **opciones), fuente="cc.campos"
+    )
+    await relay_outbox(app.state.motor, "campos", publicador, parar)
 
 
 def _secreto_interno_de(cfg: ConfigCampos) -> Callable[[], str]:

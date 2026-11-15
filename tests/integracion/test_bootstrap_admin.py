@@ -50,9 +50,10 @@ def test_crea_empresa_e_invitacion_y_guarda_solo_el_hash(bd_migrada):
         _q(bd_migrada, "SELECT * FROM auditoria.bitacora")
     )
     assert r.codigo not in todo
-    assert _q(bd_migrada, "SELECT accion, origen FROM auditoria.bitacora") == [
-        ("INVITACION_CREADA", "SISTEMA")
-    ]
+    assert _q(
+        bd_migrada,
+        "SELECT accion, origen FROM auditoria.bitacora WHERE accion <> 'CAMPO_CREADO'",
+    ) == [("INVITACION_CREADA", "SISTEMA")]
 
 
 def test_la_invitacion_es_valida_para_el_trigger_de_registro(bd_migrada):
@@ -156,3 +157,63 @@ def test_main_muestra_el_codigo_una_vez_en_consola_y_no_lo_registra(
 def test_main_sin_url_falla(monkeypatch, capsys):
     monkeypatch.delenv("CC_MIGRAR_URL", raising=False)
     assert main(["--razon-social", "Acme"]) == 2
+
+
+# ------------------------------------------------------------------ siembra de campos (T-206)
+
+CONSULTA_CAMPOS = (
+    "SELECT c.clave, c.codigo_interno, c.nombre_campo, c.tipo_dato, c.formato_validacion, "
+    "c.obligatorio, c.orden, c.activo, c.es_sensible, c.es_sugerido, "
+    "coalesce((SELECT json_agg(json_build_array(o.etiqueta, o.valor, o.orden) ORDER BY o.orden) "
+    "         FROM campos.opcion_campo o WHERE o.campo_id = c.id), '[]'::json) "
+    "FROM campos.campo_colaborador c ORDER BY c.orden"
+)
+
+
+def test_el_bootstrap_siembra_los_once_campos_sugeridos(bd_migrada):
+    r = bootstrap(_url(bd_migrada), razon_social="Acme", puede_mostrar_codigo=True)
+    assert r.campos_creados == 11
+    filas = _q(bd_migrada, CONSULTA_CAMPOS)
+    assert [f[0] for f in filas][:3] == ["area", "departamento", "turno"]
+    assert [f[1] for f in filas] == [f"CAMP-{i:04d}" for i in range(1, 12)]
+    por_clave = {f[0]: f for f in filas}
+    assert por_clave["ruta_transporte"][7] is False
+    assert sorted(k for k, f in por_clave.items() if f[8]) == ["curp", "nss", "rfc", "sueldo"]
+    assert [o[1] for o in por_clave["periodicidad_sueldo"][10]] == [
+        "SEMANAL",
+        "CATORCENAL",
+        "QUINCENAL",
+        "MENSUAL",
+    ]
+    assert _q(bd_migrada, "SELECT ultimo FROM campos.contador_campo") == [(11,)]
+    assert _q(
+        bd_migrada, "SELECT count(*) FROM auditoria.bitacora WHERE accion = 'CAMPO_CREADO'"
+    ) == [(11,)]
+
+
+def test_la_siembra_es_idempotente_y_respeta_lo_editado(bd_migrada):
+    bootstrap(_url(bd_migrada), razon_social="Acme", puede_mostrar_codigo=True)
+    antes = _q(bd_migrada, CONSULTA_CAMPOS)
+    # repetir el script (sin invitación nueva) no cambia nada
+    r = bootstrap(_url(bd_migrada), razon_social="Acme", puede_mostrar_codigo=True)
+    assert r.campos_creados == 0 and r.codigo is None
+    assert _q(bd_migrada, CONSULTA_CAMPOS) == antes
+    # lo que RH editó se respeta y lo que falte se completa
+    with psycopg.connect(bd_migrada.url_admin, autocommit=True) as c:
+        c.execute(
+            "UPDATE campos.campo_colaborador SET nombre_campo = 'Horario' WHERE clave = 'turno'"
+        )
+        c.execute("DELETE FROM campos.campo_colaborador WHERE clave = 'correo'")
+    r = bootstrap(
+        _url(bd_migrada), razon_social="Acme", nueva_invitacion=True, puede_mostrar_codigo=True
+    )
+    assert r.campos_creados == 1 and r.codigo
+    despues = {f[0]: f for f in _q(bd_migrada, CONSULTA_CAMPOS)}
+    assert despues["turno"][2] == "Horario" and "correo" in despues
+    assert len(despues) == 11
+
+
+def test_sin_consola_no_siembra_nada(bd_migrada):
+    with pytest.raises(ErrorBootstrap):
+        bootstrap(_url(bd_migrada), razon_social="Acme", puede_mostrar_codigo=False)
+    assert _q(bd_migrada, "SELECT count(*) FROM campos.campo_colaborador") == [(0,)]

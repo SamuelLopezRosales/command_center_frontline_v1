@@ -7,8 +7,8 @@ import httpx
 import psycopg
 import pytest
 from ayudantes_carga import fila_valida, libro, plantilla_llena
-from ayudantes_colaboradores import cab, construir_app, emitir
-from cc_colaboradores.campos_cliente import CacheCampos, DefinicionCampo, StubCampos
+from ayudantes_colaboradores import StubCampos, cab, construir_app, emitir
+from cc_colaboradores.campos_cliente import CacheCampos, DefinicionCampo
 from cc_colaboradores.excel.modelo import CLAVES_FIJAS
 from cc_colaboradores.servicios.cargas import neutralizar
 from cc_colaboradores.workers.worker_cargas import procesar_carga

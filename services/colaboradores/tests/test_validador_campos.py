@@ -4,7 +4,8 @@ from datetime import date
 from decimal import Decimal
 
 import pytest
-from cc_colaboradores.campos_cliente import CacheCampos, DefinicionCampo, OpcionCampo, StubCampos
+from ayudantes_colaboradores import StubCampos
+from cc_colaboradores.campos_cliente import CacheCampos, DefinicionCampo, OpcionCampo
 from cc_colaboradores.validador_campos import ValidadorCampos
 
 
@@ -119,3 +120,23 @@ async def test_stub_y_cache_de_60_segundos():
     await cache.definiciones(1)
     assert stub.llamadas == 3
     assert await cache.definiciones(2) == []
+
+
+def test_rfc_curp_y_registro_patronal_se_normalizan_a_mayusculas():
+    """DS-19: la minúscula no invalida el formato y se guarda en mayúsculas."""
+    defs = [
+        DefinicionCampo(
+            1, "RFC", "rfc", "CAMP-0001", "TEXTO", formato_validacion=r"^[A-Z]{4}\d{6}$"
+        ),
+        DefinicionCampo(2, "Reg", "registro_patronal", "CAMP-0002", "TEXTO"),
+        DefinicionCampo(3, "Otro", "notas", "CAMP-0003", "TEXTO"),
+    ]
+    valores, errores = ValidadorCampos(defs).validar(
+        {"CAMP-0001": " abcd010101 ", "CAMP-0002": "a0000000000", "CAMP-0003": "minúscula"}
+    )
+    assert errores == []
+    assert {v.codigo_interno: v.valor for v in valores} == {
+        "CAMP-0001": "ABCD010101",
+        "CAMP-0002": "A0000000000",
+        "CAMP-0003": "minúscula",  # solo los campos de identificación se normalizan
+    }

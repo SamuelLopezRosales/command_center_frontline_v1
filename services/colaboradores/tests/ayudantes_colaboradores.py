@@ -77,7 +77,7 @@ def interno(servicio: str, empresa_id: int | None) -> dict[str, str]:
 
 
 def construir_app(motor, cifrador, almacen=None, campos=None, almacen_cargas=None, **cfg):
-    from cc_colaboradores.campos_cliente import CacheCampos, StubCampos
+    from cc_colaboradores.campos_cliente import CacheCampos
     from cc_colaboradores.config import ConfigColaboradores
     from cc_colaboradores.main import crear_app
     from cc_common.auth import VerificadorToken
@@ -92,3 +92,15 @@ def construir_app(motor, cifrador, almacen=None, campos=None, almacen_cargas=Non
         campos=campos or CacheCampos(StubCampos()),
         secreto_interno=lambda: SECRETO_INTERNO,
     )
+
+
+class StubCampos:
+    """Definiciones fijas por empresa para las pruebas (el cliente real es ``CamposHttp``)."""
+
+    def __init__(self, por_empresa=None) -> None:
+        self.por_empresa = por_empresa or {}
+        self.llamadas = 0
+
+    async def definiciones(self, empresa_id):
+        self.llamadas += 1
+        return list(self.por_empresa.get(empresa_id, []))

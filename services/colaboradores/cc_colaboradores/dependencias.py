@@ -50,8 +50,18 @@ def cifrador(request: Request) -> Any:
     return estado.cifrador
 
 
+def obtener_campos(app: Any) -> Any:
+    """Caché de definiciones: la inyectada o la del cliente real de INT-CAM-01 (primer uso)."""
+    estado = app.state
+    if estado.campos is None:
+        from cc_colaboradores.campos_cliente import cache_desde_config
+
+        estado.campos = cache_desde_config(estado.config, estado.secreto_interno)
+    return estado.campos
+
+
 def campos(request: Request) -> Any:
-    return request.app.state.campos
+    return obtener_campos(request.app)
 
 
 def ip_cliente(request: Request) -> str | None:

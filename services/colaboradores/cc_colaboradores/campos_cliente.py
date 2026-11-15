@@ -1,7 +1,9 @@
 """Definiciones de campos dinámicos (INT-CAM-01) con caché de 60 segundos (design.md §3.3).
 
-``StubCampos`` devuelve definiciones fijas y es **temporal**: T-206 lo reemplaza por el cliente
-HTTP de INT-CAM-01, y el evento ``campo.actualizado`` invalida la caché.
+``CamposHttp`` es el cliente de INT-CAM-01 y ``CacheCampos`` lo envuelve con una caché por empresa
+que el evento ``campo.actualizado`` invalida (``consumidores.py``). Se piden también los campos
+desactivados no eliminados: conservan sus valores y siguen resolviendo variables ya publicadas
+(``DefinicionCampo.activo`` dice cuáles no se capturan ni se filtran).
 """
 
 from __future__ import annotations
@@ -9,7 +11,7 @@ from __future__ import annotations
 import time
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Protocol
+from typing import Any, Protocol
 
 TTL_CACHE_S = 60
 
@@ -44,18 +46,6 @@ class ClienteCampos(Protocol):
     async def definiciones(self, empresa_id: int) -> list[DefinicionCampo]: ...
 
 
-class StubCampos:
-    """Temporal (se reemplaza en T-206 por INT-CAM-01): definiciones fijas por empresa."""
-
-    def __init__(self, por_empresa: dict[int, list[DefinicionCampo]] | None = None) -> None:
-        self.por_empresa = por_empresa or {}
-        self.llamadas = 0
-
-    async def definiciones(self, empresa_id: int) -> list[DefinicionCampo]:
-        self.llamadas += 1
-        return list(self.por_empresa.get(empresa_id, []))
-
-
 class CacheCampos:
     """Caché en memoria por empresa con vencimiento; ``invalidar`` la limpia (evento)."""
 
@@ -83,3 +73,61 @@ class CacheCampos:
             self._cache.clear()
         else:
             self._cache.pop(empresa_id, None)
+
+
+class CamposHttp:
+    """Cliente de INT-CAM-01 (``GET /internal/campos``) con el token de ``colaboradores``."""
+
+    def __init__(self, cliente: Any) -> None:
+        self._c = cliente
+
+    async def definiciones(self, empresa_id: int) -> list[DefinicionCampo]:
+        from cc_common.errores import ErrorProveedor
+
+        r = await self._c.solicitar(
+            "GET",
+            "/internal/campos",
+            params={"incluir_inactivos": "true"},
+            headers={"X-Empresa-Id": str(empresa_id)},
+        )
+        if r.status_code != 200:
+            raise ErrorProveedor()
+        return [
+            DefinicionCampo(
+                id=int(c["id"]),
+                nombre_campo=c["nombre_campo"],
+                clave=c["clave"],
+                codigo_interno=c["codigo_interno"],
+                tipo_dato=c["tipo_dato"],
+                obligatorio=c["obligatorio"],
+                activo=c["activo"],
+                es_sensible=c["es_sensible"],
+                es_sugerido=c["es_sugerido"],
+                formato_validacion=c.get("formato_validacion"),
+                orden=c["orden"],
+                opciones=tuple(
+                    OpcionCampo(
+                        id=int(o["id"]),
+                        etiqueta=o["etiqueta"],
+                        valor=o["valor"],
+                        activo=o["activo"],
+                        descripcion=o.get("descripcion"),
+                        orden=o["orden"],
+                    )
+                    for o in c.get("opciones", [])
+                ),
+            )
+            for c in r.json()["campos"]
+        ]
+
+
+def cache_desde_config(cfg: Any, secreto: Callable[[], str]) -> CacheCampos:
+    """Caché sobre el cliente real; falla si ``CC_CAMPOS_URL`` no está configurada."""
+    from cc_common.errores import ErrorInterno
+    from cc_common.internal_client import ClienteInterno
+
+    if not cfg.campos_url:
+        raise ErrorInterno("SERVICIO_NO_CONFIGURADO", "Servicio no configurado.")
+    return CacheCampos(
+        CamposHttp(ClienteInterno(cfg.campos_url, servicio="colaboradores", secreto=secreto))
+    )

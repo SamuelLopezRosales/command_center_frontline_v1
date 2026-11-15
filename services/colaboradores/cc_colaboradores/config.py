@@ -26,6 +26,10 @@ class ConfigColaboradores(Configuracion):
     carga_max_filas: int = 2000
     carga_lote: int = 200
     carga_sin_confirmar_segundos: int = 3600
+    # Integración con campos (T-206): INT-CAM-01 y el evento campo.actualizado.
+    campos_url: str | None = None
+    cola_eventos_url: str = "ev-colaboradores"
+    eventos_activos: bool = False  # inicia el consumidor de eventos con la API
 
 
 @lru_cache(maxsize=1)

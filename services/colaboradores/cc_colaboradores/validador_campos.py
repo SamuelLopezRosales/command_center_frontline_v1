@@ -21,6 +21,7 @@ from cc_colaboradores.campos_cliente import DefinicionCampo
 
 TEXTO_MAXIMO = 500
 NUMERO_MAXIMO = Decimal("99999999999999.9999")  # numeric(18, 4)
+MAYUSCULAS = frozenset({"rfc", "curp", "registro_patronal"})  # campos sugeridos (DS-19)
 VERDADEROS = {"si", "sí", "s", "true", "1", "verdadero"}
 FALSOS = {"no", "n", "false", "0", "falso"}
 
@@ -119,6 +120,8 @@ def _normalizar(d: DefinicionCampo, crudo: Any) -> tuple[Any, tuple[str, str] | 
         if not isinstance(crudo, str | int):
             return None, ("FORMATO_INVALIDO", "Debe ser texto.")
         texto = str(crudo).strip()
+        if d.clave in MAYUSCULAS:
+            texto = texto.upper()  # DS-19: se normaliza antes de validar y de guardar
         if len(texto) > TEXTO_MAXIMO:
             return None, ("DEMASIADO_LARGO", "El valor es demasiado largo.")
         if d.formato_validacion and not _coincide(d.formato_validacion, texto):

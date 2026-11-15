@@ -6,8 +6,9 @@ import uuid
 import psycopg
 import pytest
 from ayudantes_carga import fila_valida, libro
+from ayudantes_colaboradores import StubCampos
 from botocore.exceptions import ClientError
-from cc_colaboradores.campos_cliente import CacheCampos, DefinicionCampo, OpcionCampo, StubCampos
+from cc_colaboradores.campos_cliente import CacheCampos, DefinicionCampo, OpcionCampo
 from cc_colaboradores.excel.modelo import CLAVES_FIJAS
 from cc_colaboradores.repos import carga as repo_carga
 from cc_colaboradores.workers.worker_cargas import procesar_carga

@@ -653,7 +653,7 @@ Objetivo: Campos dinámicos con su catálogo e integración con colaboradores. T
     - (T-070, Implementar el catálogo sembrado y las interfaces internas de campos (INT-CAM-01 y INT-CAM-02)) pruebas de integración: la siembra crea los once campos sugeridos con el catálogo de §3.4 (ruta de transporte inactiva; sueldo, NSS, RFC y CURP sensibles; opciones de periodicidad); es idempotente; INT-CAM-01 devuelve solo campos activos con sus opciones
   - Requiere aprobación: no
 
-- [ ] T-206. Integración de campos con colaboradores: INT-COL-09 y 10, evento `campo.actualizado`, fin del stub y siembra en `bootstrap_admin.py`
+- [x] T-206. Integración de campos con colaboradores: INT-COL-09 y 10, evento `campo.actualizado`, fin del stub y siembra en `bootstrap_admin.py`
   - Fase: 3
   - Agrupa: T-071, T-072, T-073, T-074, T-075
   - Requisitos: CC-REQ-013, CC-REQ-021, CC-REQ-025, CC-REQ-045, CC-REQ-048, CC-REQ-049, CC-REQ-050, CC-REQ-067, CC-NFR-012

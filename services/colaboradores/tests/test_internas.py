@@ -3,8 +3,8 @@
 import httpx
 import psycopg
 import pytest
-from ayudantes_colaboradores import LLAVE_HMAC, cab, construir_app, emitir, interno
-from cc_colaboradores.campos_cliente import CacheCampos, DefinicionCampo, OpcionCampo, StubCampos
+from ayudantes_colaboradores import LLAVE_HMAC, StubCampos, cab, construir_app, emitir, interno
+from cc_colaboradores.campos_cliente import CacheCampos, DefinicionCampo, OpcionCampo
 from cc_colaboradores.servicios.internas import normalizar_celular
 from cc_common.crypto import hmac_celular
 

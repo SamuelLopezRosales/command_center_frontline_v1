@@ -7,6 +7,7 @@ OpenAPI y se prueba sin infraestructura.
 
 from __future__ import annotations
 
+import asyncio
 import time
 from collections.abc import AsyncIterator, Callable
 from contextlib import asynccontextmanager
@@ -18,7 +19,6 @@ from cc_common.logging import configurar_logging
 from fastapi import FastAPI
 
 import cc_colaboradores.errores  # noqa: F401 - registra las restricciones del servicio
-from cc_colaboradores.campos_cliente import CacheCampos, StubCampos
 from cc_colaboradores.config import ConfigColaboradores
 
 VERSION = "0.1.0"
@@ -45,7 +45,18 @@ def crear_app(
             from cc_common.recursos import motor_desde_config
 
             creado = app.state.motor = motor_desde_config(cfg)
+        parar = asyncio.Event()
+        tareas = []
+        if cfg.eventos_activos:
+            from cc_colaboradores import consumidores
+
+            tareas.append(asyncio.create_task(consumidores.ejecutar(app, parar)))
         yield
+        parar.set()
+        if tareas:
+            _, pendientes = await asyncio.wait(tareas, timeout=5)
+            for t in pendientes:
+                t.cancel()
         if creado is not None:
             await creado.dispose()
 
@@ -64,8 +75,7 @@ def crear_app(
     app.state.cifrador = cifrador
     app.state.almacen = almacen
     app.state.almacen_cargas = almacen_cargas
-    # Temporal: StubCampos se reemplaza por el cliente de INT-CAM-01 en T-206.
-    app.state.campos = campos or CacheCampos(StubCampos())
+    app.state.campos = campos  # None: el cliente real de INT-CAM-01 se crea al primer uso
     app.state.secreto_interno = secreto_interno or _secreto_interno_de(cfg)
     instalar_manejadores(app)
 

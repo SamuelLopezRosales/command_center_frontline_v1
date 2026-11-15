@@ -7,6 +7,9 @@ WORKDIR /app
 RUN pip install --no-cache-dir "psycopg[binary]>=3.2"
 COPY scripts/bootstrap_admin.py ./scripts/bootstrap_admin.py
 COPY scripts/asignar_contrasenas.py ./scripts/asignar_contrasenas.py
+# Catálogo de campos sugeridos (solo biblioteca estándar) para la siembra del bootstrap.
+COPY services/campos/cc_campos/__init__.py ./services/campos/cc_campos/__init__.py
+COPY services/campos/cc_campos/catalogo.py ./services/campos/cc_campos/catalogo.py
 COPY infra/docker/ops/ops.sh ./ops.sh
 RUN sed -i 's/\r$//' ops.sh && chmod 0555 ops.sh && useradd --uid 10001 --no-create-home ops
 USER 10001
