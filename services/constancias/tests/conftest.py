@@ -89,3 +89,61 @@ def h(datos):
 @pytest.fixture
 def hb(datos):
     return cab(emitir("sub-b", datos["b"], datos["ub"]))
+
+
+# ------------------------------------------------------------------ T-209: emisión
+
+
+@pytest.fixture
+def s3_constancias(localstack, s3_plantillas):
+    """Bucket ``constancias`` con Object Lock: ``(AlmacenConstancias, cliente, bucket)``."""
+    from cc_constancias.almacenamiento import AlmacenConstancias
+
+    cliente = s3_plantillas[1]
+    bucket = f"cc-constancias-{uuid.uuid4().hex[:10]}"
+    cliente.create_bucket(Bucket=bucket, ObjectLockEnabledForBucket=True)
+    return AlmacenConstancias(bucket, cliente, retencion_dias=1), cliente, bucket
+
+
+@pytest.fixture
+def cifrador():
+    from ayudantes_emision import KmsFalso
+    from cc_constancias.cifrado import Cifrador
+
+    return Cifrador(KmsFalso(), "llave-de-prueba")
+
+
+@pytest.fixture(scope="session")
+def llave_cloudfront():
+    from cryptography.hazmat.primitives.asymmetric import rsa
+
+    return rsa.generate_private_key(public_exponent=65537, key_size=2048)
+
+
+@pytest.fixture
+def firmador(llave_cloudfront):
+    from cc_constancias.servicios.firma_cloudfront import FirmadorCloudFront
+    from cryptography.hazmat.primitives import serialization
+
+    pem = llave_cloudfront.private_bytes(
+        serialization.Encoding.PEM,
+        serialization.PrivateFormat.PKCS8,
+        serialization.NoEncryption(),
+    )
+    return FirmadorCloudFront("cdn.prueba.test", "KPAR1", pem)
+
+
+@pytest.fixture
+async def http_e(motor, s3_plantillas, s3_constancias, campos, colaboradores, firmador):
+    """Cliente HTTP con el firmador y el almacén de constancias inyectados."""
+    app = construir_app(
+        motor,
+        almacen=s3_plantillas[0],
+        campos=campos,
+        colaboradores=colaboradores,
+        dominio="cc.prueba.test",
+    )
+    app.state.firmador = firmador
+    app.state.almacen_constancias = s3_constancias[0]
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://t") as c:
+        yield c

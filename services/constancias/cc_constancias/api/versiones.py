@@ -7,7 +7,7 @@ from typing import Any
 
 from cc_common.auth import UsuarioActual, requiere_permiso
 from cc_common.permisos import Permiso
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, Request
 from pydantic import BaseModel, ConfigDict
 
 from cc_constancias.contenido import ContenidoPlantilla
@@ -20,6 +20,7 @@ from cc_constancias.dependencias import (
     usuario_actual,
 )
 from cc_constancias.servicios import publicacion as servicio
+from cc_constancias.workers.alertas_plantilla import recalcular_sin_fallar
 
 router = APIRouter(tags=["versiones"])
 
@@ -98,6 +99,7 @@ async def validar(
 async def publicar(
     plantilla_id: int,
     request: Request,
+    segundo_plano: BackgroundTasks,
     entrada: PublicarEntrada | None = None,
     u: UsuarioActual = requiere_permiso(Publicar, usuario_actual),
     m=Depends(motor),
@@ -107,6 +109,7 @@ async def publicar(
 ) -> Version:
     confirmar = bool(entrada and entrada.confirmar_sensibles)
     f = await servicio.publicar(m, a, c, col, u, plantilla_id, confirmar, ip_cliente(request))
+    segundo_plano.add_task(recalcular_sin_fallar, m, a, c, col, u.empresa_id, plantilla_id)
     return Version.de_fila(f)
 
 
@@ -153,6 +156,7 @@ async def restaurar(
     plantilla_id: int,
     numero: int,
     request: Request,
+    segundo_plano: BackgroundTasks,
     u: UsuarioActual = requiere_permiso(Publicar, usuario_actual),
     m=Depends(motor),
     a=Depends(almacen),
@@ -160,4 +164,5 @@ async def restaurar(
     col=Depends(colaboradores),
 ) -> Version:
     f = await servicio.restaurar(m, a, c, col, u, plantilla_id, numero, ip_cliente(request))
+    segundo_plano.add_task(recalcular_sin_fallar, m, a, c, col, u.empresa_id, plantilla_id)
     return Version.de_fila(f)

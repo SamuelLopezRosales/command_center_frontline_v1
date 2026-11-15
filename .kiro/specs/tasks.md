@@ -701,7 +701,7 @@ Objetivo: Plantillas de constancia, versiones, PDF, folio, entrega por enlace y 
     - (T-083, Generar el PDF con WeasyPrint y la vista previa (CON-14)) pruebas de integración con las tres plantillas de referencia (laboral, guardería y consulado, ya con las variables corregidas): el PDF es tamaño carta y se abre; el `url_fetcher` rechaza `http` y `file`; la vista previa devuelve HTML con folio de muestra y los faltantes, y registra `CONSULTA_SENSIBLE` cuando hay datos sensibles
   - Requiere aprobación: no
 
-- [ ] T-209. Solicitudes y entrega: folio, INT-CON-01 a 06, `worker-pdf`, enlaces de un solo uso, descarga, reenvío, verificación pública y `alerta_plantilla`
+- [x] T-209. Solicitudes y entrega: folio, INT-CON-01 a 06, `worker-pdf`, enlaces de un solo uso, descarga, reenvío, verificación pública y `alerta_plantilla`
   - Fase: 4
   - Agrupa: T-084, T-085, T-086, T-087, T-088, T-089
   - Requisitos: CC-REQ-013, CC-REQ-052, CC-REQ-067, CC-REQ-070, CC-REQ-075, CC-REQ-076, CC-REQ-077, CC-REQ-079, CC-REQ-081, CC-REQ-082, CC-REQ-083, CC-REQ-084, CC-REQ-088, CC-REQ-089, CC-REQ-090, CC-REQ-091, CC-NFR-001, CC-NFR-007

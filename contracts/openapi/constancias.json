@@ -120,6 +120,87 @@
         "title": "BorradorLeido",
         "type": "object"
       },
+      "ConstanciaDetalle": {
+        "properties": {
+          "colaborador_id": {
+            "title": "Colaborador Id",
+            "type": "integer"
+          },
+          "colaborador_nombre": {
+            "title": "Colaborador Nombre",
+            "type": "string"
+          },
+          "estado_entrega": {
+            "title": "Estado Entrega",
+            "type": "string"
+          },
+          "estado_vigencia": {
+            "title": "Estado Vigencia",
+            "type": "string"
+          },
+          "fecha_entrega": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fecha Entrega"
+          },
+          "fecha_generacion": {
+            "format": "date-time",
+            "title": "Fecha Generacion",
+            "type": "string"
+          },
+          "folio": {
+            "title": "Folio",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "numero_empleado": {
+            "title": "Numero Empleado",
+            "type": "string"
+          },
+          "plantilla_id": {
+            "title": "Plantilla Id",
+            "type": "integer"
+          },
+          "plantilla_nombre": {
+            "title": "Plantilla Nombre",
+            "type": "string"
+          },
+          "solicitud_id": {
+            "title": "Solicitud Id",
+            "type": "integer"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "folio",
+          "solicitud_id",
+          "colaborador_id",
+          "colaborador_nombre",
+          "numero_empleado",
+          "plantilla_id",
+          "plantilla_nombre",
+          "version",
+          "fecha_generacion",
+          "estado_entrega",
+          "estado_vigencia"
+        ],
+        "title": "ConstanciaDetalle",
+        "type": "object"
+      },
       "ContenidoPlantilla": {
         "additionalProperties": false,
         "properties": {
@@ -426,85 +507,6 @@
         "title": "Pagina",
         "type": "object"
       },
-      "Plantilla": {
-        "properties": {
-          "activa": {
-            "title": "Activa",
-            "type": "boolean"
-          },
-          "descripcion": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Descripcion"
-          },
-          "emitidas": {
-            "title": "Emitidas",
-            "type": "integer"
-          },
-          "estado": {
-            "enum": [
-              "ACTIVA",
-              "INACTIVA",
-              "BORRADOR"
-            ],
-            "title": "Estado",
-            "type": "string"
-          },
-          "fecha_creacion": {
-            "format": "date-time",
-            "title": "Fecha Creacion",
-            "type": "string"
-          },
-          "fecha_modificacion": {
-            "format": "date-time",
-            "title": "Fecha Modificacion",
-            "type": "string"
-          },
-          "id": {
-            "title": "Id",
-            "type": "integer"
-          },
-          "nombre": {
-            "title": "Nombre",
-            "type": "string"
-          },
-          "tiene_borrador": {
-            "title": "Tiene Borrador",
-            "type": "boolean"
-          },
-          "version": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Version"
-          }
-        },
-        "required": [
-          "id",
-          "nombre",
-          "descripcion",
-          "estado",
-          "activa",
-          "version",
-          "tiene_borrador",
-          "emitidas",
-          "fecha_creacion",
-          "fecha_modificacion"
-        ],
-        "title": "Plantilla",
-        "type": "object"
-      },
       "PlantillaActualizar": {
         "additionalProperties": false,
         "properties": {
@@ -576,11 +578,76 @@
         "title": "PlantillaCrear",
         "type": "object"
       },
+      "PlantillaDisponible": {
+        "properties": {
+          "descripcion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Descripcion"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "nombre": {
+            "title": "Nombre",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "nombre",
+          "version"
+        ],
+        "title": "PlantillaDisponible",
+        "type": "object"
+      },
+      "PlantillaElegida": {
+        "additionalProperties": false,
+        "properties": {
+          "plantilla_id": {
+            "minimum": 1.0,
+            "title": "Plantilla Id",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "plantilla_id"
+        ],
+        "title": "PlantillaElegida",
+        "type": "object"
+      },
+      "PlantillasDisponibles": {
+        "properties": {
+          "plantillas": {
+            "items": {
+              "$ref": "#/components/schemas/PlantillaDisponible"
+            },
+            "title": "Plantillas",
+            "type": "array"
+          }
+        },
+        "required": [
+          "plantillas"
+        ],
+        "title": "PlantillasDisponibles",
+        "type": "object"
+      },
       "PlantillasSalida": {
         "properties": {
           "items": {
             "items": {
-              "$ref": "#/components/schemas/Plantilla"
+              "$ref": "#/components/schemas/cc_constancias__api__plantillas__Plantilla"
             },
             "title": "Items",
             "type": "array"
@@ -626,6 +693,113 @@
           "advertencias"
         ],
         "title": "ResultadoValidacion",
+        "type": "object"
+      },
+      "SolicitudEntrada": {
+        "additionalProperties": false,
+        "properties": {
+          "colaborador_id": {
+            "minimum": 1.0,
+            "title": "Colaborador Id",
+            "type": "integer"
+          },
+          "colaborador_nombre": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Colaborador Nombre",
+            "type": "string"
+          },
+          "conversacion_id": {
+            "anyOf": [
+              {
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Conversacion Id"
+          }
+        },
+        "required": [
+          "colaborador_id",
+          "colaborador_nombre"
+        ],
+        "title": "SolicitudEntrada",
+        "type": "object"
+      },
+      "SolicitudSalida": {
+        "properties": {
+          "estado": {
+            "title": "Estado",
+            "type": "string"
+          },
+          "fecha_solicitud": {
+            "format": "date-time",
+            "title": "Fecha Solicitud",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "version_plantilla_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version Plantilla Id"
+          }
+        },
+        "required": [
+          "id",
+          "estado",
+          "fecha_solicitud"
+        ],
+        "title": "SolicitudSalida",
+        "type": "object"
+      },
+      "UrlDescarga": {
+        "properties": {
+          "expira": {
+            "format": "date-time",
+            "title": "Expira",
+            "type": "string"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url",
+          "expira"
+        ],
+        "title": "UrlDescarga",
+        "type": "object"
+      },
+      "Usos": {
+        "properties": {
+          "usos": {
+            "additionalProperties": {
+              "items": {
+                "$ref": "#/components/schemas/cc_constancias__api__internas__Usos__Plantilla"
+              },
+              "type": "array"
+            },
+            "title": "Usos",
+            "type": "object"
+          }
+        },
+        "required": [
+          "usos"
+        ],
+        "title": "Usos",
         "type": "object"
       },
       "ValidationError": {
@@ -716,6 +890,35 @@
           "items"
         ],
         "title": "VariablesSalida",
+        "type": "object"
+      },
+      "Verificacion": {
+        "properties": {
+          "estado": {
+            "title": "Estado",
+            "type": "string"
+          },
+          "fecha_emision": {
+            "format": "date-time",
+            "title": "Fecha Emision",
+            "type": "string"
+          },
+          "folio": {
+            "title": "Folio",
+            "type": "string"
+          },
+          "nombre": {
+            "title": "Nombre",
+            "type": "string"
+          }
+        },
+        "required": [
+          "nombre",
+          "folio",
+          "fecha_emision",
+          "estado"
+        ],
+        "title": "Verificacion",
         "type": "object"
       },
       "Version": {
@@ -857,6 +1060,103 @@
         ],
         "title": "VistaPreviaSalida",
         "type": "object"
+      },
+      "cc_constancias__api__internas__Usos__Plantilla": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "nombre": {
+            "title": "Nombre",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "nombre"
+        ],
+        "title": "Plantilla",
+        "type": "object"
+      },
+      "cc_constancias__api__plantillas__Plantilla": {
+        "properties": {
+          "activa": {
+            "title": "Activa",
+            "type": "boolean"
+          },
+          "descripcion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Descripcion"
+          },
+          "emitidas": {
+            "title": "Emitidas",
+            "type": "integer"
+          },
+          "estado": {
+            "enum": [
+              "ACTIVA",
+              "INACTIVA",
+              "BORRADOR"
+            ],
+            "title": "Estado",
+            "type": "string"
+          },
+          "fecha_creacion": {
+            "format": "date-time",
+            "title": "Fecha Creacion",
+            "type": "string"
+          },
+          "fecha_modificacion": {
+            "format": "date-time",
+            "title": "Fecha Modificacion",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "nombre": {
+            "title": "Nombre",
+            "type": "string"
+          },
+          "tiene_borrador": {
+            "title": "Tiene Borrador",
+            "type": "boolean"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          }
+        },
+        "required": [
+          "id",
+          "nombre",
+          "descripcion",
+          "estado",
+          "activa",
+          "version",
+          "tiene_borrador",
+          "emitidas",
+          "fecha_creacion",
+          "fecha_modificacion"
+        ],
+        "title": "Plantilla",
+        "type": "object"
       }
     }
   },
@@ -912,6 +1212,178 @@
         "summary": "Variables disponibles para las plantillas (CON-15)",
         "tags": [
           "variables"
+        ]
+      }
+    },
+    "/api/v1/constancias/{constancia_id}": {
+      "get": {
+        "operationId": "detalle_api_v1_constancias__constancia_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "constancia_id",
+            "required": true,
+            "schema": {
+              "title": "Constancia Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConstanciaDetalle"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Detalle de una constancia emitida (CON-16)",
+        "tags": [
+          "constancias"
+        ]
+      }
+    },
+    "/api/v1/constancias/{constancia_id}/descarga": {
+      "post": {
+        "operationId": "descarga_api_v1_constancias__constancia_id__descarga_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "constancia_id",
+            "required": true,
+            "schema": {
+              "title": "Constancia Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UrlDescarga"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "URL firmada de 24 horas para RH (CON-17)",
+        "tags": [
+          "constancias"
+        ]
+      }
+    },
+    "/api/v1/constancias/{constancia_id}/reenviar": {
+      "post": {
+        "operationId": "reenviar_api_v1_constancias__constancia_id__reenviar_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "constancia_id",
+            "required": true,
+            "schema": {
+              "title": "Constancia Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Reenvía una constancia cuya entrega falló (CON-18)",
+        "tags": [
+          "constancias"
         ]
       }
     },
@@ -998,7 +1470,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Plantilla"
+                  "$ref": "#/components/schemas/cc_constancias__api__plantillas__Plantilla"
                 }
               }
             },
@@ -1105,7 +1577,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Plantilla"
+                  "$ref": "#/components/schemas/cc_constancias__api__plantillas__Plantilla"
                 }
               }
             },
@@ -1171,7 +1643,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Plantilla"
+                  "$ref": "#/components/schemas/cc_constancias__api__plantillas__Plantilla"
                 }
               }
             },
@@ -1427,7 +1899,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Plantilla"
+                  "$ref": "#/components/schemas/cc_constancias__api__plantillas__Plantilla"
                 }
               }
             },
@@ -1782,6 +2254,574 @@
         "summary": "Vista previa con los datos de un colaborador (CON-14)",
         "tags": [
           "vista-previa"
+        ]
+      }
+    },
+    "/api/v1/publico/verificar/{codigo}": {
+      "get": {
+        "operationId": "verificar_api_v1_publico_verificar__codigo__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "codigo",
+            "required": true,
+            "schema": {
+              "title": "Codigo",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Verificacion"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Verifica una constancia por el código del QR (CON-19)",
+        "tags": [
+          "publico"
+        ]
+      }
+    },
+    "/d/{token}": {
+      "get": {
+        "operationId": "pagina_d__token__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "token",
+            "required": true,
+            "schema": {
+              "title": "Token",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Página de descarga; no consume el enlace (CON-20)",
+        "tags": [
+          "publico"
+        ]
+      }
+    },
+    "/d/{token}/descargar": {
+      "post": {
+        "operationId": "descargar_d__token__descargar_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "token",
+            "required": true,
+            "schema": {
+              "title": "Token",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Consume el enlace y redirige al PDF firmado (CON-21)",
+        "tags": [
+          "publico"
+        ]
+      }
+    },
+    "/internal/plantillas/activas": {
+      "get": {
+        "operationId": "disponibles_internal_plantillas_activas_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-empresa-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Empresa-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlantillasDisponibles"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Plantillas activas con versión publicada (INT-CON-01)",
+        "tags": [
+          "internas"
+        ]
+      }
+    },
+    "/internal/plantillas/uso-de-variable": {
+      "get": {
+        "operationId": "uso_de_variable_internal_plantillas_uso_de_variable_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "variable",
+            "required": true,
+            "schema": {
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 50,
+              "minItems": 1,
+              "title": "Variable",
+              "type": "array"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-empresa-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Empresa-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Usos"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Plantillas que usan cada variable (INT-CON-06)",
+        "tags": [
+          "internas"
+        ]
+      }
+    },
+    "/internal/solicitudes": {
+      "post": {
+        "operationId": "crear_internal_solicitudes_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-empresa-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Empresa-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SolicitudEntrada"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SolicitudSalida"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Crea una solicitud de constancia (INT-CON-02)",
+        "tags": [
+          "internas"
+        ]
+      }
+    },
+    "/internal/solicitudes/{solicitud_id}/cancelar": {
+      "post": {
+        "operationId": "cancelar_internal_solicitudes__solicitud_id__cancelar_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "solicitud_id",
+            "required": true,
+            "schema": {
+              "title": "Solicitud Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-empresa-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Empresa-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SolicitudSalida"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Cancela una solicitud recibida (INT-CON-05)",
+        "tags": [
+          "internas"
+        ]
+      }
+    },
+    "/internal/solicitudes/{solicitud_id}/generar": {
+      "post": {
+        "operationId": "generar_internal_solicitudes__solicitud_id__generar_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "solicitud_id",
+            "required": true,
+            "schema": {
+              "title": "Solicitud Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-empresa-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Empresa-Id"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Valida los datos y encola el PDF (INT-CON-04)",
+        "tags": [
+          "internas"
+        ]
+      }
+    },
+    "/internal/solicitudes/{solicitud_id}/plantilla": {
+      "post": {
+        "operationId": "elegir_internal_solicitudes__solicitud_id__plantilla_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "solicitud_id",
+            "required": true,
+            "schema": {
+              "title": "Solicitud Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-empresa-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Empresa-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlantillaElegida"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SolicitudSalida"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Fija la plantilla elegida (INT-CON-03)",
+        "tags": [
+          "internas"
         ]
       }
     }

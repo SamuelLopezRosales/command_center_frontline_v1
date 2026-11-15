@@ -12,7 +12,14 @@ from cc_common.errores import (
 )
 
 CATALOGO_RESTRICCIONES.update(
-    {"plantilla_nombre_key": (ErrorConflicto, "NOMBRE_DUPLICADO", "nombre")}
+    {
+        "plantilla_nombre_key": (ErrorConflicto, "NOMBRE_DUPLICADO", "nombre"),
+        "solicitud_una_abierta_por_conversacion": (
+            ErrorConflicto,
+            "SOLICITUD_ABIERTA",
+            "conversacion_id",
+        ),
+    }
 )
 
 

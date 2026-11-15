@@ -95,3 +95,21 @@ def ip_cliente(request: Request) -> str | None:
     if visor:
         return visor.rsplit(":", 1)[0].strip("[]")
     return request.client.host if request.client else None
+
+
+def firmador(request: Request) -> Any:
+    estado = request.app.state
+    if estado.firmador is None:
+        from cc_constancias.servicios.firma_cloudfront import firmador_desde_config
+
+        estado.firmador = firmador_desde_config(estado.config)
+    return estado.firmador
+
+
+def almacen_constancias(request: Request) -> Any:
+    estado = request.app.state
+    if estado.almacen_constancias is None:
+        from cc_constancias.almacenamiento import almacen_constancias_desde_config
+
+        estado.almacen_constancias = almacen_constancias_desde_config(estado.config)
+    return estado.almacen_constancias

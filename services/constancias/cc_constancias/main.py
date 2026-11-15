@@ -7,6 +7,7 @@ exporta el OpenAPI y se prueba sin infraestructura.
 
 from __future__ import annotations
 
+import asyncio
 import time
 from collections.abc import AsyncIterator, Callable
 from contextlib import asynccontextmanager
@@ -32,6 +33,8 @@ def crear_app(
     campos: Any | None = None,
     colaboradores: Any | None = None,
     logotipos: Any | None = None,
+    almacen_constancias: Any | None = None,
+    firmador: Any | None = None,
     secreto_interno: Callable[[], str] | None = None,
 ) -> FastAPI:
     cfg = config or ConfigConstancias()
@@ -44,7 +47,19 @@ def crear_app(
             from cc_common.recursos import motor_desde_config
 
             creado = app.state.motor = motor_desde_config(cfg)
+        parar = asyncio.Event()
+        tareas = []
+        if cfg.eventos_activos:
+            from cc_constancias import consumidores
+
+            tareas.append(asyncio.create_task(_relay(app, parar)))
+            tareas.append(asyncio.create_task(consumidores.ejecutar(app, parar)))
         yield
+        parar.set()
+        if tareas:
+            _, pendientes = await asyncio.wait(tareas, timeout=5)
+            for t in pendientes:
+                t.cancel()
         if creado is not None:
             await creado.dispose()
 
@@ -64,6 +79,8 @@ def crear_app(
     app.state.campos = campos
     app.state.colaboradores = colaboradores
     app.state.logotipos = logotipos
+    app.state.almacen_constancias = almacen_constancias
+    app.state.firmador = firmador
     app.state.secreto_interno = secreto_interno or _secreto_interno_de(cfg)
     instalar_manejadores(app)
 
@@ -72,9 +89,32 @@ def crear_app(
         return {"estado": "ok", "servicio": cfg.servicio, "version": VERSION}
 
     from cc_constancias.api import registrar_rutas
+    from cc_constancias.api.publico import CABECERAS, es_ruta_publica
+
+    @app.middleware("http")
+    async def cabeceras_publicas(request, call_next):
+        # También en los errores (404, 410): nada de lo público se guarda ni se indexa.
+        respuesta = await call_next(request)
+        if es_ruta_publica(request.url.path):
+            respuesta.headers.update(CABECERAS)
+        return respuesta
 
     registrar_rutas(app)
     return app
+
+
+async def _relay(app: FastAPI, parar: asyncio.Event) -> None:
+    """relay-outbox: publica el mensaje de entrega y los eventos de falla (design.md §4.7)."""
+    import boto3
+    from cc_common.outbox import publicador_aws
+    from cc_common.tareas import relay_outbox
+
+    cfg = app.state.config
+    opciones = {"region_name": cfg.region, "endpoint_url": cfg.aws_endpoint or None}
+    publicador = publicador_aws(
+        boto3.client("sqs", **opciones), boto3.client("events", **opciones), fuente="cc.constancias"
+    )
+    await relay_outbox(app.state.motor, "constancias", publicador, parar)
 
 
 def _secreto_interno_de(cfg: ConfigConstancias) -> Callable[[], str]:
