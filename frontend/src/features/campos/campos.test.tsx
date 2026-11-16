@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { renderizar, simularApi } from "@/test/ayudantes";
 import { CAMPO_BONO, CAMPO_TURNO, DINAMICOS, campo, json, listadoCampos, problema } from "@/test/fixturas220";
 import { RutasCampos } from "./RutasCampos";
+import { esperarAccesible } from "@/test/axe";
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -259,5 +260,14 @@ describe("configuración de campos (cv1_04)", () => {
     montar();
     await u.click(await screen.findByRole("button", { name: "Editar Turno" }));
     expect(screen.queryByRole("button", { name: "Eliminar campo" })).not.toBeInTheDocument();
+  });
+});
+
+describe("accesibilidad (CC-NFR-012)", () => {
+  it("la configuración de campos no tiene violaciones críticas ni serias de axe", async () => {
+    simularApi({ "/api/v1/campos": listadoCampos() });
+    const { container } = montar();
+    await screen.findByText("Bono de productividad");
+    await esperarAccesible(container);
   });
 });

@@ -6,6 +6,7 @@ import { renderizar } from "@/test/ayudantes";
 import { RutasConstancias } from "../RutasConstancias";
 import { CONTENIDO, VARIABLES, VERSIONES, plantilla } from "../test/datos";
 import { json, parchearJsdom, problema, simulador, type Llamada } from "../test/simulador";
+import { esperarAccesible } from "@/test/axe";
 
 beforeAll(parchearJsdom);
 afterEach(() => vi.unstubAllGlobals());
@@ -281,5 +282,15 @@ describe("versiones", () => {
     montar();
     await usuario.click(await screen.findByRole("button", { name: "Restaurar v1" }));
     expect(await screen.findByRole("alert")).toHaveTextContent("Hay variables que no existen");
+  });
+});
+
+describe("accesibilidad (CC-NFR-012)", () => {
+  it("el editor de plantilla no tiene violaciones críticas ni serias de axe", async () => {
+    simulador(base());
+    const { container } = montar();
+    await screen.findByRole("textbox", { name: "Contenido de la constancia" });
+    await screen.findByText(/última versión publicada v3/);
+    await esperarAccesible(container);
   });
 });

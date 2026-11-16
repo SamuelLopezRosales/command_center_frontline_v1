@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { Dashboard } from "./Dashboard";
 import { USUARIO_PRUEBA, authSimulado, renderizar, simularApi } from "@/test/ayudantes";
 import type { Alerta, ItemConstancia, ItemSolicitud, ResumenDashboard } from "./tipos";
+import { esperarAccesible } from "@/test/axe";
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -132,5 +133,40 @@ describe("dashboard (cv1_01)", () => {
     const seccionAle = (await screen.findByRole("heading", { name: "Alertas" })).closest("section")!;
     expect(await within(seccionAle).findByRole("alert")).toHaveTextContent("No se pudo cargar esta sección.");
     expect(within(seccionAle).getByRole("button", { name: "Reintentar" })).toBeInTheDocument();
+  });
+});
+
+describe("accesibilidad (CC-NFR-012)", () => {
+  it("el dashboard con datos no tiene violaciones críticas ni serias de axe", async () => {
+    simularApi({
+      "/api/v1/usuarios/yo": USUARIO_PRUEBA,
+      "/api/v1/sesion/iniciar": undefined,
+      "/api/v1/dashboard/resumen": resumen,
+      "/api/v1/dashboard/solicitudes-recientes": solicitudes,
+      "/api/v1/dashboard/constancias-recientes": constancias,
+      "/api/v1/dashboard/alertas": alertas,
+    });
+    const { container } = montar();
+    await screen.findByText("CG-2026-0142");
+    await screen.findByText("3 colaboradores sin consentimiento de WhatsApp");
+    await esperarAccesible(container);
+  });
+});
+
+describe("fechas en la zona de México (CC-NFR-014)", () => {
+  it("una hora UTC de madrugada cae en el día anterior de la Ciudad de México", async () => {
+    simularApi({
+      "/api/v1/usuarios/yo": USUARIO_PRUEBA,
+      "/api/v1/sesion/iniciar": undefined,
+      "/api/v1/dashboard/resumen": resumen,
+      "/api/v1/dashboard/solicitudes-recientes": [],
+      "/api/v1/dashboard/constancias-recientes": [{ ...constancias[0]!, fecha: "2026-11-14T03:30:00Z" }],
+      "/api/v1/dashboard/alertas": [],
+    });
+    montar();
+    // 03:30 UTC del 14 de noviembre son las 21:30 del 13 de noviembre en México (UTC-6).
+    const texto = await screen.findByText(/21:30/);
+    expect(texto.textContent).toMatch(/13/);
+    expect(texto.textContent).not.toMatch(/03:30/);
   });
 });

@@ -6,6 +6,7 @@ import { renderizar } from "@/test/ayudantes";
 import { DINAMICOS, FIJOS, ORGS, PLANTAS, detalle, fila, json, listadoCampos, problema, simularRutas, type Llamada } from "@/test/fixturas220";
 import type { ColaboradorDetalle } from "./api";
 import { RutasColaboradores } from "./RutasColaboradores";
+import { esperarAccesible } from "@/test/axe";
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -342,5 +343,15 @@ describe("edición, baja y reactivación", () => {
     await u.click(screen.getByRole("checkbox", { name: "El colaborador otorgó su consentimiento" }));
     await u.click(screen.getByRole("button", { name: "Confirmar reactivación" }));
     await waitFor(() => expect(llamadas.filter((l) => l.url.endsWith("/reactivar")).at(-1)?.cuerpo).toEqual({ consentimiento: true }));
+  });
+});
+
+describe("accesibilidad (CC-NFR-012)", () => {
+  it("el formulario de alta no tiene violaciones críticas ni serias de axe", async () => {
+    api();
+    const { container } = montar("/colaboradores/nuevo");
+    await screen.findByLabelText("Número de empleado");
+    await screen.findByLabelText("Área");
+    await esperarAccesible(container);
   });
 });

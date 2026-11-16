@@ -7,6 +7,7 @@ import { RutasConstancias } from "../RutasConstancias";
 import { plantilla } from "../test/datos";
 import { json, problema, simulador } from "../test/simulador";
 import type { ItemHistorial } from "./tipos";
+import { esperarAccesible } from "@/test/axe";
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -179,5 +180,23 @@ describe("historial de constancias (cv1_07)", () => {
     montar();
     expect(await screen.findByText("No hay constancias con esos filtros.")).toBeInTheDocument();
     expect(screen.getByText("Mostrando 0 constancias")).toBeInTheDocument();
+  });
+});
+
+describe("accesibilidad (CC-NFR-012)", () => {
+  it("el historial no tiene violaciones críticas ni serias de axe", async () => {
+    simulador(baseApi());
+    const { container } = montar();
+    await screen.findByRole("table", { name: "Historial de constancias" });
+    await esperarAccesible(container);
+  });
+});
+
+describe("fechas en la zona de México (CC-NFR-014)", () => {
+  it("una hora UTC de madrugada cae en el día anterior de la Ciudad de México", async () => {
+    simulador(baseApi({ "GET /api/v1/constancias/historial": pagina([item({ id: 150, folio: "CG-2026-0150", fecha: "2026-11-14T03:30:00Z" })]) }));
+    montar();
+    await screen.findByRole("table", { name: "Historial de constancias" });
+    expect(fila("CG-2026-0150").getByText("13 nov, 21:30")).toBeInTheDocument();
   });
 });

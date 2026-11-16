@@ -2,12 +2,14 @@ import type { ReactNode } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { RutasCampos } from "@/features/campos/RutasCampos";
 import { RutasCarga } from "@/features/carga/RutasCarga";
+import { RutasChat } from "@/features/chat/RutasChat";
 import { RutasColaboradores } from "@/features/colaboradores/RutasColaboradores";
 import { RutasConstancias } from "@/features/constancias/RutasConstancias";
 import { Dashboard } from "@/features/dashboard/Dashboard";
 import { RutasNotificaciones } from "@/features/notificaciones/RutasNotificaciones";
 import { RutasOrganizaciones } from "@/features/organizaciones/RutasOrganizaciones";
 import { RutasPublicas } from "@/features/publico/RutasPublicas";
+import { RutasUsuarios } from "@/features/usuarios/RutasUsuarios";
 import { PaginaAcceso } from "@/features/auth/PaginaAcceso";
 import { PaginaRecuperar } from "@/features/auth/PaginaRecuperar";
 import { PaginaRegistro } from "@/features/auth/PaginaRegistro";
@@ -50,6 +52,8 @@ export function Rutas() {
         <Route path="organizaciones/*" element={<RutasOrganizaciones />} />
         <Route path="constancias/*" element={<RutasConstancias />} />
         <Route path="notificaciones/*" element={<RutasNotificaciones />} />
+        <Route path="chat/*" element={<RutasChat />} />
+        <Route path="usuarios/*" element={<RutasUsuarios />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

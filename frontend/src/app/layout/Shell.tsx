@@ -7,6 +7,8 @@ const ENLACES = [
   { a: "/colaboradores", texto: es.nav.colaboradores },
   { a: "/constancias", texto: es.nav.constancias },
   { a: "/notificaciones", texto: es.nav.notificaciones },
+  { a: "/chat", texto: es.nav.chat },
+  { a: "/usuarios", texto: es.nav.usuarios },
 ];
 
 function iniciales(nombre: string): string {

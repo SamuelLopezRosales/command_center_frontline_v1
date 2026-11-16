@@ -9,7 +9,10 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "api:generar": "node scripts/generar-api.mjs",
-    "api:verificar": "node scripts/generar-api.mjs --verificar"
+    "api:verificar": "node scripts/generar-api.mjs --verificar",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "e2e:capturas": "node scripts/capturas.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^7.0.6",
@@ -29,6 +32,7 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@playwright/test": "^1.65.1",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.10",
@@ -36,6 +40,7 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.3.0",
+    "axe-core": "^4.14.0",
     "jsdom": "^31.0.1",
     "openapi-typescript": "^7.13.0",
     "typescript": "5.9",

@@ -311,6 +311,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/internal/colaboradores/audiencias:evaluar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * INT-COL-06
+         * @description Evalúa criterios de audiencia (CC-REQ-100, 105). Devuelve el embudo y, salvo con
+         *     ``solo_conteo``, los colaboradores seleccionados con datos mínimos no sensibles (id, nombre,
+         *     planta, últimos 4 del celular y motivo de exclusión). Nunca el celular completo.
+         */
+        post: operations["evaluar_audiencia_internal_colaboradores_audiencias_evaluar_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/internal/colaboradores/buscar-por-celular": {
         parameters: {
             query?: never;
@@ -451,6 +473,16 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AudienciaEvaluada */
+        AudienciaEvaluada: {
+            embudo: components["schemas"]["EmbudoDto"];
+            /** Items */
+            items: components["schemas"]["ItemAudienciaDto"][];
+            /** Siguiente Cursor */
+            siguiente_cursor?: string | null;
+            /** Total */
+            total: number;
+        };
         /** Baja */
         Baja: {
             /**
@@ -703,6 +735,8 @@ export interface components {
             correo?: string | null;
             /** Elegible */
             elegible: boolean;
+            /** Faltantes */
+            faltantes?: string[];
             /** Id */
             id: number;
             /** Motivo */
@@ -739,6 +773,17 @@ export interface components {
              */
             tipo: "NSS_ULTIMOS4" | "FECHA_INGRESO_DDMM";
         };
+        /** EmbudoDto */
+        EmbudoDto: {
+            /** Activos */
+            activos: number;
+            /** Celular Valido */
+            celular_valido: number;
+            /** Con Consentimiento */
+            con_consentimiento: number;
+            /** Seleccionados */
+            seleccionados: number;
+        };
         /** ErrorDeFila */
         ErrorDeFila: {
             /** Codigo */
@@ -756,6 +801,27 @@ export interface components {
             vigente: boolean;
             /** Vigente Hasta */
             vigente_hasta: string | null;
+        };
+        /** EvaluarAudiencia */
+        EvaluarAudiencia: {
+            /** Criterios */
+            criterios: {
+                [key: string]: unknown;
+            };
+            /** Cursor */
+            cursor?: string | null;
+            /**
+             * Limite
+             * @default 500
+             */
+            limite: number;
+            /**
+             * Solo Conteo
+             * @default false
+             */
+            solo_conteo: boolean;
+            /** Zona Horaria */
+            zona_horaria?: string | null;
         };
         /** Faltantes */
         Faltantes: {
@@ -778,6 +844,19 @@ export interface components {
         HTTPValidationError: {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
+        };
+        /** ItemAudienciaDto */
+        ItemAudienciaDto: {
+            /** Celular Ultimos4 */
+            celular_ultimos4: string;
+            /** Id */
+            id: number;
+            /** Motivo Exclusion */
+            motivo_exclusion: ("SIN_CONSENTIMIENTO" | "ESTATUS_BAJA" | "SIN_CELULAR_VALIDO") | null;
+            /** Nombre */
+            nombre: string;
+            /** Planta Nombre */
+            planta_nombre: string | null;
         };
         /** LogotipoConfirmar */
         LogotipoConfirmar: {
@@ -951,6 +1030,11 @@ export interface components {
              * @enum {string}
              */
             proposito: "NOTIFICACION" | "CONSTANCIA" | "VERIFICACION" | "CHAT" | "CORREO";
+            /**
+             * Solo Elegibilidad
+             * @default false
+             */
+            solo_elegibilidad: boolean;
             /** Variables */
             variables?: string[] | null;
         };
@@ -1803,6 +1887,42 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UsoDeCampo"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    evaluar_audiencia_internal_colaboradores_audiencias_evaluar_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+                "x-empresa-id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EvaluarAudiencia"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AudienciaEvaluada"];
                 };
             };
             /** @description Validation Error */

@@ -6,6 +6,7 @@ import { renderizar } from "@/test/ayudantes";
 import { json, problema, simularRutas, type Llamada } from "@/test/fixturas220";
 import type { Carga, CargaDetalle } from "./api";
 import { RutasCarga } from "./RutasCarga";
+import { esperarAccesible } from "@/test/axe";
 
 const XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 let clics: string[];
@@ -242,5 +243,25 @@ describe("carga masiva: seguimiento, resumen y reporte", () => {
     );
     montar("/cargas/5");
     expect(await screen.findByText("Carga cancelada: el archivo no se confirmó en 1 hora.")).toBeInTheDocument();
+  });
+});
+
+describe("accesibilidad (CC-NFR-012)", () => {
+  it("la carga masiva (listado) no tiene violaciones críticas ni serias de axe", async () => {
+    simularRutas((url) =>
+      url.pathname === "/api/v1/cargas"
+        ? json({ items: [carga(), carga({ id: 4, estado: "CANCELADA", nombre_archivo: "viejo.xlsx", filas_ok: 0, filas_error: 0 })], pagina: 1, limite: 10, total: 2 })
+        : undefined,
+    );
+    const { container } = montar();
+    await screen.findByText("empleados.xlsx");
+    await esperarAccesible(container);
+  });
+
+  it("el seguimiento de una carga con filas con error no tiene violaciones críticas ni serias de axe", async () => {
+    simularRutas((url) => (url.pathname === "/api/v1/cargas/5" ? json(detalle(carga(), [FILA_ERROR], 1)) : undefined));
+    const { container } = montar("/cargas/5");
+    await screen.findByText("El celular debe tener 10 dígitos.");
+    await esperarAccesible(container);
   });
 });

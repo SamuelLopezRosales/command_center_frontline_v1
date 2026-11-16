@@ -6,6 +6,7 @@ import { renderizar } from "@/test/ayudantes";
 import { RutasConstancias } from "../RutasConstancias";
 import { plantilla } from "../test/datos";
 import { json, problema, simulador } from "../test/simulador";
+import { esperarAccesible } from "@/test/axe";
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -117,5 +118,14 @@ describe("listado de plantillas (cv1_05)", () => {
     montar();
     await usuario.click(await screen.findByRole("button", { name: "Activar Inactiva" }));
     expect(await screen.findByRole("alert")).toHaveTextContent("Publica una versión antes de activar la plantilla.");
+  });
+});
+
+describe("accesibilidad (CC-NFR-012)", () => {
+  it("el listado de plantillas no tiene violaciones críticas ni serias de axe", async () => {
+    simulador({ "GET /api/v1/plantillas": { items: PLANTILLAS } });
+    const { container } = montar();
+    await screen.findByRole("table", { name: "Plantillas de constancia" });
+    await esperarAccesible(container);
   });
 });

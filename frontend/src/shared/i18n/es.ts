@@ -1,7 +1,7 @@
 // Todas las cadenas de la SPA están en español (CC-NFR-012).
 export const es = {
   marca: "Command Center",
-  nav: { dashboard: "Dashboard", colaboradores: "Colaboradores", constancias: "Constancias", notificaciones: "Notificaciones" },
+  nav: { dashboard: "Dashboard", colaboradores: "Colaboradores", constancias: "Constancias", notificaciones: "Notificaciones", chat: "Chat", usuarios: "Usuarios" },
   comun: {
     cargando: "Cargando…",
     guardar: "Guardar",

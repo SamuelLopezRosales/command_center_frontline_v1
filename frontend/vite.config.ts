@@ -16,8 +16,12 @@ export default defineConfig({
   },
   test: {
     globals: true,
+    // Las pruebas de Playwright (tests/e2e) tienen su propio ejecutor.
+    include: ["src/**/*.test.{ts,tsx}"],
     environment: "jsdom",
     setupFiles: ["./src/test/setup.ts"],
     css: false,
+    // Con la máquina cargada (suite completa, otros procesos) 5 s no alcanzan para pantallas grandes.
+    testTimeout: 20000,
   },
 });

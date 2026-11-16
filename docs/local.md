@@ -36,7 +36,7 @@ ejemplo. Registros, PIDs, la llave del proveedor de identidad y los secretos gen
 | --- | --- |
 | SPA | http://localhost:5173 (abre **localhost**, no 127.0.0.1: la política de seguridad de desarrollo y las URL firmadas de S3 lo usan) |
 | Pasarela (API) | http://127.0.0.1:8000 |
-| Servicios | dashboard 8101, colaboradores 8102, campos 8103, constancias 8104, whatsapp 8105 (`/docs` de cada uno) |
+| Servicios | dashboard 8101, colaboradores 8102, campos 8103, constancias 8104, whatsapp 8105, notificaciones 8106 (`/docs` de cada uno) |
 | LocalStack | http://localhost:4566 |
 | PostgreSQL | `127.0.0.1:55432`, base `command_center` |
 
@@ -84,6 +84,36 @@ dashboard muestra una alerta), la plantilla publicada «Constancia laboral» y 3
   Las Lambdas no se levantan.
 - **PDF en Windows sin Docker**: con `--sin-pdf` las solicitudes de constancia quedan sin generar.
 - CloudFront, WAF, RDS Proxy, Scheduler, SES y las alarmas no existen en local.
+
+## Pruebas de la SPA (T-132 a T-134)
+
+**Unitarias y de contrato** (Vitest, sin navegador; en `frontend/`): `npm test`. Incluye localización (todo texto en
+español, `src/shared/localizacion.test.ts`), fechas en `America/Mexico_City`, accesibilidad con `axe-core`
+(sin violaciones críticas ni serias por pantalla; reglas desactivadas y motivo en `src/test/axe.ts`) y contratos:
+`src/api-client/contratos.test.ts` ejecuta `npm run api:verificar` y falla si un OpenAPI de `contracts/openapi/`
+cambió sin regenerar el cliente. Para regenerarlo: `npm run api:generar` y confirmar `src/api-client/generado/`.
+
+**Extremo a extremo** (Playwright contra este stack; `frontend/tests/e2e/`):
+
+```powershell
+.\scripts\local.ps1 up            # el stack debe estar corriendo (SPA en http://localhost:5173)
+cd frontend
+npm run test:e2e                  # los 8 flujos de los casos de uso
+npm run test:e2e:ui               # modo interactivo
+npm run e2e:capturas              # captura las pantallas en docs/capturas_spa/ (1440x900)
+```
+
+- **No se descargan navegadores**: se usa el Microsoft Edge de Windows (`channel: "msedge"`). Con
+  `CC_E2E_NAVEGADOR=chrome` se usa Google Chrome. Si el stack no responde, las pruebas se saltan con un mensaje claro.
+- Un solo worker (el stack es compartido y con estado). Cada corrida crea datos con sufijo único, así que se puede
+  repetir sin limpiar; los datos E2E se acumulan hasta `reiniciar-datos`.
+- Algunos flujos usan Python del repositorio (`uv run python frontend/tests/e2e/apoyo/*.py`): llenan la plantilla de
+  carga (openpyxl), simulan a Meta escribiendo en `wa-entrada.fifo` de LocalStack, leen las respuestas del bot del
+  `outbox` de `whatsapp` y cierran la ventana de 24 h de una conversación de prueba. Necesitan Docker y LocalStack.
+- Límites del stack local: no hay enviador ni Meta, así que la entrega de WhatsApp queda en «Pendiente» y un envío
+  de notificación se queda en «Enviando».
+- Si LocalStack se reinicia sin `reiniciar-datos`, la base conserva las plantillas pero los objetos de S3 desaparecen
+  («No fue posible leer el borrador/contenido», 500 al generar constancias). Usa `reiniciar-datos`.
 
 ## Reiniciar los datos
 

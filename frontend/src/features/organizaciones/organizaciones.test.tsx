@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { renderizar } from "@/test/ayudantes";
 import { ORGS, PLANTAS, json, problema, simularRutas } from "@/test/fixturas220";
 import { RutasOrganizaciones } from "./RutasOrganizaciones";
+import { esperarAccesible } from "@/test/axe";
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -206,5 +207,14 @@ describe("plantas", () => {
     await u.type(screen.getByLabelText("Nombre de la planta"), "monterrey");
     await u.click(screen.getByRole("button", { name: "Agregar planta" }));
     expect(await screen.findByText("Ya existe una planta con ese nombre.")).toBeInTheDocument();
+  });
+});
+
+describe("accesibilidad (CC-NFR-012)", () => {
+  it("el listado de organizaciones no tiene violaciones críticas ni serias de axe", async () => {
+    simularRutas((url) => (url.pathname === "/api/v1/organizaciones" ? json({ items: ORGS }) : undefined));
+    const { container } = montar();
+    await screen.findByText("Empresa Grupo Industrial Norte");
+    await esperarAccesible(container);
   });
 });

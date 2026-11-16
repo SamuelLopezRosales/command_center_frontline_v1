@@ -4,6 +4,7 @@ import { describe, expect, it, vi, afterEach } from "vitest";
 import { Rutas } from "./rutas";
 import { USUARIO_PRUEBA, authSimulado, renderizar, simularApi } from "@/test/ayudantes";
 import { ErrorAcceso, type PasoAcceso } from "@/shared/sesion/servicioAuth";
+import { esperarAccesible } from "@/test/axe";
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -147,11 +148,13 @@ describe("navegación y sesión", () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     renderizar(<Rutas />, { auth });
     await screen.findByRole("navigation", { name: "Principal" });
+    await act(async () => {}); // vacía los efectos pendientes: ahí se registra el temporizador
     await act(async () => {
       vi.advanceTimersByTime(30 * 60 * 1000 + 100);
     });
-    expect(await screen.findByText("Tu sesión se cerró por inactividad.")).toBeInTheDocument();
-    expect(auth.llamadas).toContain("cerrarSesion");
+    // El cierre es asíncrono (cerrarSesion y luego el estado): se espera la llamada y luego el aviso.
+    await waitFor(() => expect(auth.llamadas).toContain("cerrarSesion"), { timeout: 5000 });
+    expect(await screen.findByText("Tu sesión se cerró por inactividad.", {}, { timeout: 5000 })).toBeInTheDocument();
   });
 
   it("la actividad del usuario reinicia el temporizador", async () => {
@@ -160,6 +163,7 @@ describe("navegación y sesión", () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     renderizar(<Rutas />, { auth });
     await screen.findByRole("navigation", { name: "Principal" });
+    await act(async () => {});
     await act(async () => {
       vi.advanceTimersByTime(29 * 60 * 1000);
       window.dispatchEvent(new Event("mousemove"));
@@ -173,5 +177,19 @@ describe("navegación y sesión", () => {
     renderizar(<Rutas />, { auth: conSesion() });
     await screen.findByRole("navigation", { name: "Principal" });
     expect(window.localStorage.length).toBe(0);
+  });
+});
+
+describe("accesibilidad (CC-NFR-012)", () => {
+  it("el acceso (usuario y contraseña, y paso del código MFA) no tiene violaciones críticas ni serias de axe", async () => {
+    const auth = authSimulado({ iniciarSesion: async () => ({ paso: "TOTP" }) as PasoAcceso });
+    const usuario = userEvent.setup();
+    const { container } = renderizar(<Rutas />, { auth, ruta: "/acceso" });
+    await usuario.type(await screen.findByLabelText("Usuario o correo"), "a@b.com");
+    await esperarAccesible(container);
+    await usuario.type(screen.getByLabelText("Contraseña"), "x");
+    await usuario.click(screen.getByRole("button", { name: "Iniciar sesión" }));
+    await screen.findByLabelText("Código de verificación");
+    await esperarAccesible(container);
   });
 });

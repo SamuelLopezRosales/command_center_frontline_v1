@@ -1,0 +1,16 @@
+/* Usuarios, invitaciones y bitácora (DSH-05, 08, 09, 10). Prefijo: usr-. */
+.usr-tarjeta { padding: 0; overflow: hidden; }
+.usr-suave { color: var(--suave); font-size: 12px; }
+.usr-vacio { padding: 32px; text-align: center; color: var(--suave); margin: 0; }
+.usr-acciones { display: flex; gap: 12px; align-items: center; }
+.usr-enlace-boton { text-decoration: none; display: inline-block; }
+.usr-peligro { color: var(--rojo); }
+.usr-ok { color: var(--verde); font-size: 13px; }
+.usr-filtros { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; margin-bottom: 18px; }
+.usr-filtros input, .usr-filtros select { border: 1px solid var(--borde); border-radius: 6px; padding: 10px 12px; background: #fff; min-width: 0; }
+.usr-pie { display: flex; justify-content: space-between; align-items: center; padding: 18px 24px; border-top: 1px solid var(--borde); }
+.usr-fondo { position: fixed; inset: 0; background: #14213f99; display: grid; place-items: center; z-index: 20; padding: 16px; }
+.usr-dialogo { background: var(--blanco); border-radius: 10px; padding: 24px; width: 460px; max-width: 100%; outline: none; }
+.usr-dialogo-acciones { display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; }
+.usr-codigo-etiqueta { margin: 12px 0 4px; font-size: 12px; font-weight: 700; color: var(--suave); text-transform: uppercase; letter-spacing: 0.06em; }
+.usr-codigo { display: block; font-size: 18px; letter-spacing: 0.08em; background: #f3f4f6; padding: 12px 14px; border-radius: 6px; word-break: break-all; user-select: all; }

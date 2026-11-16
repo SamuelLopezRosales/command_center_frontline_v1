@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { renderizar } from "@/test/ayudantes";
 import { DINAMICOS, ORGS, PLANTAS, fila, json, listadoCampos, simularRutas, type Llamada } from "@/test/fixturas220";
 import { RutasColaboradores } from "./RutasColaboradores";
+import { esperarAccesible } from "@/test/axe";
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -145,5 +146,14 @@ describe("listado de colaboradores (cv1_02)", () => {
     montar();
     expect(await screen.findByText("No hay colaboradores con estos filtros.")).toBeInTheDocument();
     expect(screen.getByText("Mostrando 0–0 de 0 colaboradores")).toBeInTheDocument();
+  });
+});
+
+describe("accesibilidad (CC-NFR-012)", () => {
+  it("el listado de colaboradores no tiene violaciones críticas ni serias de axe", async () => {
+    api();
+    const { container } = montar();
+    await screen.findByText("Colaborador Número 1");
+    await esperarAccesible(container);
   });
 });
