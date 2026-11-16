@@ -1,4 +1,5 @@
 import { NavLink, Outlet } from "react-router-dom";
+import logoHonne from "@/assets/imagen-honne.png";
 import { es } from "@/shared/i18n/es";
 import { useSesion } from "@/shared/sesion/SesionProvider";
 
@@ -25,7 +26,9 @@ export function Shell() {
   return (
     <div className="shell">
       <aside className="lateral">
-        <div className="logo">HONNE</div>
+        <div className="logo">
+          <img src={logoHonne} alt={es.comun.logoAlt} width={361} height={97} />
+        </div>
         {usuario && (
           <div className="perfil">
             <div className="avatar" aria-hidden="true">{iniciales(usuario.nombre)}</div>

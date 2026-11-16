@@ -87,6 +87,49 @@ describe("acceso con MFA", () => {
   });
 });
 
+describe("identidad visual y carga del acceso", () => {
+  it("muestra el logo en la tarjeta de inicio de sesión", async () => {
+    renderizar(<Rutas />, { ruta: "/acceso" });
+    const logo = await screen.findByRole("img", { name: "Honne" });
+    expect(logo.getAttribute("src")).toContain("imagen-honne");
+    expect(screen.queryByText("HONNE")).toBeNull(); // ya no es texto
+  });
+
+  it("deshabilita el botón y muestra «Ingresando…» con spinner mientras autentica, y lo restaura al terminar", async () => {
+    let terminar: (p: PasoAcceso) => void = () => undefined;
+    const auth = authSimulado({ iniciarSesion: () => new Promise<PasoAcceso>((r) => (terminar = r)) });
+    const usuario = userEvent.setup();
+    renderizar(<Rutas />, { auth, ruta: "/acceso" });
+    await usuario.type(await screen.findByLabelText("Usuario o correo"), "ana@empresa.com");
+    await usuario.type(screen.getByLabelText("Contraseña"), "Contrasena-Larga-1!");
+    await usuario.click(screen.getByRole("button", { name: "Iniciar sesión" }));
+    const cargando = await screen.findByRole("button", { name: "Ingresando…" });
+    expect((cargando as HTMLButtonElement).disabled).toBe(true);
+    expect(cargando.getAttribute("aria-busy")).toBe("true");
+    expect(cargando.querySelector(".spinner")).not.toBeNull();
+    terminar({ paso: "TOTP" });
+    await screen.findByRole("heading", { name: "Código de verificación" }); // pasó al siguiente paso
+    expect(screen.queryByRole("button", { name: "Ingresando…" })).toBeNull();
+  });
+
+  it("tras un error de credenciales restaura el botón", async () => {
+    const auth = authSimulado({
+      iniciarSesion: async () => {
+        throw new Error("Correo o contraseña incorrectos.");
+      },
+    });
+    const usuario = userEvent.setup();
+    renderizar(<Rutas />, { auth, ruta: "/acceso" });
+    await usuario.type(await screen.findByLabelText("Usuario o correo"), "ana@empresa.com");
+    await usuario.type(screen.getByLabelText("Contraseña"), "Contrasena-Larga-1!");
+    await usuario.click(screen.getByRole("button", { name: "Iniciar sesión" }));
+    expect(await screen.findByText("Correo o contraseña incorrectos.")).toBeTruthy();
+    const boton = screen.getByRole("button", { name: "Iniciar sesión" }) as HTMLButtonElement;
+    expect(boton.disabled).toBe(false);
+    expect(boton.querySelector(".spinner")).toBeNull();
+  });
+});
+
 describe("registro con invitación", () => {
   it("pide el código de invitación y luego confirma el correo", async () => {
     const auth = authSimulado();

@@ -3,6 +3,7 @@ export const es = {
   marca: "Command Center",
   nav: { dashboard: "Dashboard", colaboradores: "Colaboradores", constancias: "Constancias", notificaciones: "Notificaciones", chat: "Chat", usuarios: "Usuarios" },
   comun: {
+    logoAlt: "Honne",
     cargando: "Cargando…",
     guardar: "Guardar",
     cancelar: "Cancelar",
@@ -18,6 +19,7 @@ export const es = {
     correoEjemplo: "ejemplo@empresa.com",
     contrasena: "Contraseña", // pragma: allowlist secret
     iniciar: "Iniciar sesión",
+  ingresando: "Ingresando…",
     olvido: "¿Olvidaste tu contraseña?",
     credencialesInvalidas: "Correo o contraseña incorrectos.",
     codigoTotp: "Código de verificación",

@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { Campo } from "@/shared/ui/Campo";
+import logoHonne from "@/assets/imagen-honne.png";
 import { es } from "@/shared/i18n/es";
 import { useSesion } from "@/shared/sesion/SesionProvider";
 import type { PasoAcceso } from "@/shared/sesion/servicioAuth";
@@ -20,7 +21,7 @@ function Marco({ children }: { children: React.ReactNode }) {
   return (
     <main className="acceso">
       <div className="tarjeta">
-        <div className="marca">HONNE</div>
+        <img className="marca" src={logoHonne} alt={es.comun.logoAlt} width={361} height={97} />
         {children}
       </div>
     </main>
@@ -120,8 +121,20 @@ export function PaginaAcceso() {
           error={credenciales.formState.errors.contrasena?.message}
           {...credenciales.register("contrasena")}
         />
-        <button className="btn btn-primario" type="submit" disabled={credenciales.formState.isSubmitting}>
-          {t.iniciar}
+        <button
+          className="btn btn-primario"
+          type="submit"
+          disabled={credenciales.formState.isSubmitting}
+          aria-busy={credenciales.formState.isSubmitting}
+        >
+          {credenciales.formState.isSubmitting ? (
+            <>
+              <span className="spinner" aria-hidden="true" />
+              {t.ingresando}
+            </>
+          ) : (
+            t.iniciar
+          )}
         </button>
       </form>
       <div className="enlaces">
