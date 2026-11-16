@@ -54,6 +54,8 @@ class Economia:
     permite_borrado: bool
     # Falso en cuentas nuevas con cuota de Lambda de 10: sin reservas no se exige dejar 100 libres.
     reservar_concurrencia: bool = True
+    # MFA de Cognito: ON (obligatorio, CC-REQ-002), OPTIONAL u OFF. Solo ON es válido en prod.
+    mfa: str = "ON"
 
 
 @dataclass(frozen=True)
@@ -132,7 +134,14 @@ def _construir_ambiente(nombre: str, datos: dict[str, Any], proyecto: str) -> Am
         retencion_respaldos_dias=int(eco["retencion_respaldos_dias"]),
         permite_borrado=bool(eco["permite_borrado"]),
         reservar_concurrencia=bool(eco.get("reservar_concurrencia", True)),
+        mfa=str(eco.get("mfa", "ON")),
     )
+    if economia.mfa not in ("ON", "OPTIONAL", "OFF"):
+        raise ConfiguracionInvalida(f"{ctx}: 'mfa' debe ser ON, OPTIONAL u OFF")
+    if not economia.permite_borrado and economia.mfa != "ON":
+        raise ConfiguracionInvalida(
+            f"{ctx}: un ambiente tipo prod exige MFA obligatorio (CC-REQ-002)"
+        )
     if economia.nat not in ("instancia", "gateway"):
         raise ConfiguracionInvalida(f"{ctx}: 'nat' debe ser 'instancia' o 'gateway'")
     return Ambiente(

@@ -62,7 +62,8 @@
         "concurrencia_aprovisionada_webhook": 0,
         "retencion_respaldos_dias": 1,
         "permite_borrado": true,
-        "reservar_concurrencia": false
+        "reservar_concurrencia": false,
+        "mfa": "OFF"
       },
       "dominio": null
     }

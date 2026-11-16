@@ -199,3 +199,10 @@ def test_cada_lambda_puede_descifrar_con_la_llave_del_secreto(plantilla):
                     por_rol[json.dumps(rol)] = True
     for nombre in ("presignup", "postconfirmation", "pretoken"):
         assert any(nombre in rol.lower() for rol in por_rol), nombre
+
+
+def test_mfa_apagado_en_el_ambiente_samuel_y_obligatorio_en_los_demas():
+    app, amb, destino = crear_app("samuel", {"CDK_DEFAULT_ACCOUNT": "795359731321"})
+    p = _pool(Template.from_stack(construir_stacks(app, amb, destino)["auth"]))
+    assert p["MfaConfiguration"] == "OFF"
+    assert "EnabledMfas" not in p and "SmsConfiguration" not in p

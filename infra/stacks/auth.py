@@ -43,6 +43,12 @@ PAQUETE = RAIZ / "build" / "lambdas"
 FUENTE = RAIZ / "lambdas"
 GRUPO_SUBREDES_APLICACION = "aplicacion"
 CONCURRENCIA_RESERVADA = 5
+# Por defecto el MFA es obligatorio (CC-REQ-002); "OPTIONAL" u "OFF" solo en ambientes de prueba.
+MODOS_MFA = {
+    "ON": cognito.Mfa.REQUIRED,
+    "OPTIONAL": cognito.Mfa.OPTIONAL,
+    "OFF": cognito.Mfa.OFF,
+}
 ATRIBUTO_CODIGO = "codigo_invitacion"  # se lee como custom:codigo_invitacion
 
 # nombre -> (módulo del handler, descripción)
@@ -114,8 +120,12 @@ class AuthStack(cdk.Stack):
                 require_symbols=True,
                 temp_password_validity=cdk.Duration.days(3),
             ),
-            mfa=cognito.Mfa.REQUIRED,
-            mfa_second_factor=cognito.MfaSecondFactor(sms=False, otp=True),
+            mfa=MODOS_MFA[ambiente.economia.mfa],
+            mfa_second_factor=(
+                cognito.MfaSecondFactor(sms=False, otp=True)
+                if ambiente.economia.mfa != "OFF"
+                else None
+            ),
             account_recovery=cognito.AccountRecovery.EMAIL_ONLY,
             feature_plan=cognito.FeaturePlan.ESSENTIALS,
             email=cognito.UserPoolEmail.with_cognito(),
@@ -214,7 +224,7 @@ class AuthStack(cdk.Stack):
             roles=[self.funciones["post-confirmation"].role],
         )
 
-        self._reconocer_reglas(env, es_prod)
+        self._reconocer_reglas(env, es_prod, ambiente.economia.mfa)
 
         cdk.CfnOutput(self, "UserPoolId", value=self.pool.user_pool_id)
         cdk.CfnOutput(self, "UserPoolArn", value=self.pool.user_pool_arn)
@@ -225,7 +235,7 @@ class AuthStack(cdk.Stack):
             value=f"https://cognito-idp.{self.region}.amazonaws.com/{self.pool.user_pool_id}",
         )
 
-    def _reconocer_reglas(self, env: str, es_prod: bool) -> None:
+    def _reconocer_reglas(self, env: str, es_prod: bool, mfa: str) -> None:
         for regla in ("AwsSolutions-COG3", "AwsSolutions-COG8"):
             reconocer(
                 self.pool,
@@ -233,6 +243,13 @@ class AuthStack(cdk.Stack):
                 "El modo de seguridad avanzada y la rotación a plan Plus tienen un costo mayor. "
                 "Se usa el plan Essentials (DS-20); el bloqueo por intentos fallidos integrado "
                 "cubre CC-REQ-003.",
+            )
+        if mfa != "ON":
+            reconocer(
+                self.pool,
+                "AwsSolutions-COG2",
+                f"MFA {mfa} por decisión del responsable del ambiente (docs/desviaciones.md). "
+                "Solo se admite fuera de los ambientes tipo prod.",
             )
         for fn in self.funciones.values():
             reconocer(

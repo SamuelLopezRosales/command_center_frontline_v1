@@ -164,3 +164,11 @@ Ninguna se aplica a `prod`. Ver también `docs/ambientes.md` §2.
   como máximo) alcance para las migraciones.
 - La conexión de CodeConnections debe estar `AVAILABLE` (autorizada a mano) antes de la primera
   ejecución; si no, la etapa Fuente falla.
+
+
+## Ambiente `samuel`: MFA apagado y sin concurrencia reservada
+
+| # | Diseño | Lo que se construyó | Motivo |
+|---|---|---|---|
+| 1 | MFA obligatorio con app autenticadora (CC-REQ-002, DS-21) | `economia.mfa` en `infra/config/ambientes.json`: `ON` (por defecto), `OPTIONAL` u `OFF`. El ambiente `samuel` usa `OFF`: Cognito no pide el segundo factor. `prod` (tipo prod, `permite_borrado: false`) **solo admite `ON`**: el cargador de configuración lo rechaza | Decisión de Samuel (15 de noviembre de 2026): el ambiente lo usarán varias personas del equipo y el MFA estorba durante el desarrollo. Con MFA apagado la seguridad de acceso depende de la contraseña de 12 caracteres, el bloqueo por intentos de Cognito y el código de invitación. cdk-nag `AwsSolutions-COG2` se reconoce solo cuando el MFA no es `ON`. La SPA ya maneja el paso `DONE` de Amplify (sin pantalla de TOTP). Para volver a exigirlo basta cambiar el valor a `ON` y redesplegar `CcAuth` |
+| 2 | Concurrencia reservada por Lambda (§4.2 a §4.5) | `economia.reservar_concurrencia`: `false` en `samuel`; las Lambdas no reservan y los *pollers* de SQS estándar usan un tope de 2 | Una cuenta nueva de AWS tiene una cuota de 10 ejecuciones concurrentes y AWS exige dejar 100 sin reservar. Las funciones comparten esas 10; si hay estrangulamiento, pedir el aumento `L-B99A9384` y volver a `true` |

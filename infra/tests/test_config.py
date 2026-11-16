@@ -114,3 +114,21 @@ def test_el_archivo_real_no_contiene_credenciales():
     assert not esquema._LLAVE_AWS.search(contenido)
     for clave in esquema._CLAVES_PROHIBIDAS:
         assert clave not in contenido.lower()
+
+
+def test_mfa_obligatorio_por_defecto_y_apagado_solo_en_samuel():
+    assert esquema.obtener_ambiente("test").economia.mfa == "ON"
+    assert esquema.obtener_ambiente("samuel").economia.mfa == "OFF"
+
+
+def test_el_mfa_solo_admite_on_optional_u_off_y_prod_exige_on():
+    datos = _base()
+    datos["ambientes"]["test"]["economia"]["mfa"] = "MAYBE"
+    with pytest.raises(ConfiguracionInvalida, match="mfa"):
+        parsear(_texto(datos))
+    datos = _base()
+    datos["ambientes"]["test"]["economia"]["mfa"] = "OPTIONAL"
+    assert parsear(_texto(datos))["test"].economia.mfa == "OPTIONAL"
+    datos["ambientes"]["test"]["economia"]["permite_borrado"] = False  # tipo prod
+    with pytest.raises(ConfiguracionInvalida, match="MFA obligatorio"):
+        parsear(_texto(datos))
