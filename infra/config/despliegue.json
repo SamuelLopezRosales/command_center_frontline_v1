@@ -3,6 +3,9 @@
   "ambientes": {
     "test": {
       "frase_aprobacion": "apruebo T-229"
+    },
+    "samuel": {
+      "frase_aprobacion": "apruebo despliegue samuel"
     }
   }
 }

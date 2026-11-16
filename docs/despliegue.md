@@ -99,7 +99,11 @@ $env:AWS_PROFILE = "cc-cliente-a"
 .\scripts\aws_guard.ps1 -Ambiente cliente-a   # debe decir: PA-1 a PA-3 correctos
 ```
 
-Nunca guarde llaves de acceso en el repositorio ni en variables de entorno. Si hay un perfil
+Si no hay IAM Identity Center, se acepta un perfil con llaves de acceso de un **usuario IAM** (nunca
+del usuario raíz): `aws configure --profile <perfil>` las guarda en `~/.aws/credentials`, fuera del
+repositorio. Nunca guarde llaves en el repositorio ni en variables de entorno (el script rechaza
+`AWS_ACCESS_KEY_ID` y `AWS_SESSION_TOKEN`), y desactívelas en IAM al terminar la prueba. Ejemplo
+del ambiente `samuel`: perfil `cc-samuel-sdk`. Si hay un perfil
 `default` con otra cuenta, no pasa nada: el script solo usa el perfil del ambiente y la guardia
 compara la cuenta.
 
