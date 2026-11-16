@@ -47,6 +47,10 @@ class ClienteConstancias(Protocol):
     async def cancelar(self, empresa_id: int, solicitud_id: int) -> None: ...
 
 
+class ClienteNotificaciones(Protocol):
+    async def plantilla(self, empresa_id: int, plantilla_id: int) -> dict[str, Any] | None: ...
+
+
 def _error(r) -> Exception:
     if r.status_code >= 500:
         return ErrorProveedor()
@@ -127,3 +131,37 @@ class ConstanciasHttp(_Base):
 
     async def cancelar(self, empresa_id: int, solicitud_id: int) -> None:
         await self._llamar(empresa_id, "POST", f"/internal/solicitudes/{solicitud_id}/cancelar")
+
+
+class NotificacionesHttp(_Base):
+    """INT-NOT-01: una plantilla de mensaje de la empresa (estado en Meta, nombre y texto)."""
+
+    async def plantilla(self, empresa_id: int, plantilla_id: int) -> dict[str, Any] | None:
+        try:
+            r = await self._llamar(
+                empresa_id, "GET", f"/internal/plantillas-mensaje/{plantilla_id}"
+            )
+        except RespuestaError as exc:
+            if exc.status == 404:
+                return None
+            raise
+        return dict(r.json())
+
+
+class StubColaboradoresChat:
+    """Solo local, sin `colaboradores`: el nombre es un rótulo con el id."""
+
+    async def nombre(self, empresa_id: int, colaborador_id: int) -> str:
+        return f"Colaborador {colaborador_id}"
+
+
+class StubNotificaciones:
+    """``plantillas[(empresa, id)] = {"id", "nombre", "estado_meta", "texto_con_variables"}``."""
+
+    def __init__(self, plantillas: dict[tuple[int, int], dict[str, Any]] | None = None) -> None:
+        self.plantillas = plantillas or {}
+        self.llamadas: list[tuple[int, int]] = []
+
+    async def plantilla(self, empresa_id: int, plantilla_id: int) -> dict[str, Any] | None:
+        self.llamadas.append((empresa_id, plantilla_id))
+        return self.plantillas.get((empresa_id, plantilla_id))

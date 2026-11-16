@@ -1,0 +1,3265 @@
+{
+  "components": {
+    "schemas": {
+      "AudienciaActualizar": {
+        "additionalProperties": false,
+        "properties": {
+          "activa": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Activa"
+          },
+          "criterios": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Criterios"
+          },
+          "nombre": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nombre"
+          }
+        },
+        "title": "AudienciaActualizar",
+        "type": "object"
+      },
+      "AudienciaCrear": {
+        "additionalProperties": false,
+        "properties": {
+          "criterios": {
+            "additionalProperties": true,
+            "title": "Criterios",
+            "type": "object"
+          },
+          "nombre": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Nombre",
+            "type": "string"
+          }
+        },
+        "required": [
+          "nombre",
+          "criterios"
+        ],
+        "title": "AudienciaCrear",
+        "type": "object"
+      },
+      "AudienciaDto": {
+        "properties": {
+          "activa": {
+            "title": "Activa",
+            "type": "boolean"
+          },
+          "creada_por_usuario_id": {
+            "title": "Creada Por Usuario Id",
+            "type": "integer"
+          },
+          "criterios": {
+            "additionalProperties": true,
+            "title": "Criterios",
+            "type": "object"
+          },
+          "fecha_creacion": {
+            "format": "date-time",
+            "title": "Fecha Creacion",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "nombre": {
+            "title": "Nombre",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "nombre",
+          "activa",
+          "criterios",
+          "creada_por_usuario_id",
+          "fecha_creacion"
+        ],
+        "title": "AudienciaDto",
+        "type": "object"
+      },
+      "Cancelar": {
+        "additionalProperties": false,
+        "properties": {
+          "motivo": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motivo"
+          }
+        },
+        "title": "Cancelar",
+        "type": "object"
+      },
+      "Confirmar": {
+        "additionalProperties": false,
+        "properties": {
+          "confirmar_fuera_horario": {
+            "default": false,
+            "title": "Confirmar Fuera Horario",
+            "type": "boolean"
+          },
+          "modo_envio": {
+            "enum": [
+              "AHORA",
+              "PROGRAMAR"
+            ],
+            "title": "Modo Envio",
+            "type": "string"
+          },
+          "programada_para": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Programada Para"
+          },
+          "respaldo_correo": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Respaldo Correo"
+          }
+        },
+        "required": [
+          "modo_envio"
+        ],
+        "title": "Confirmar",
+        "type": "object"
+      },
+      "Contadores": {
+        "properties": {
+          "entregados": {
+            "title": "Entregados",
+            "type": "integer"
+          },
+          "enviados": {
+            "title": "Enviados",
+            "type": "integer"
+          },
+          "excluidos": {
+            "title": "Excluidos",
+            "type": "integer"
+          },
+          "fallidos": {
+            "title": "Fallidos",
+            "type": "integer"
+          },
+          "leidos": {
+            "title": "Leidos",
+            "type": "integer"
+          },
+          "respondieron": {
+            "title": "Respondieron",
+            "type": "integer"
+          },
+          "seleccionados": {
+            "title": "Seleccionados",
+            "type": "integer"
+          },
+          "validos": {
+            "title": "Validos",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "seleccionados",
+          "excluidos",
+          "validos",
+          "enviados",
+          "entregados",
+          "leidos",
+          "respondieron",
+          "fallidos"
+        ],
+        "title": "Contadores",
+        "type": "object"
+      },
+      "ConteoPestanas": {
+        "properties": {
+          "borradores": {
+            "title": "Borradores",
+            "type": "integer"
+          },
+          "envios": {
+            "title": "Envios",
+            "type": "integer"
+          },
+          "programadas": {
+            "title": "Programadas",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "envios",
+          "programadas",
+          "borradores"
+        ],
+        "title": "ConteoPestanas",
+        "type": "object"
+      },
+      "DestinatarioDto": {
+        "properties": {
+          "canal_usado": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Canal Usado"
+          },
+          "celular_enmascarado": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Celular Enmascarado"
+          },
+          "colaborador_id": {
+            "title": "Colaborador Id",
+            "type": "integer"
+          },
+          "conversacion_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Conversacion Id"
+          },
+          "estado": {
+            "enum": [
+              "PENDIENTE",
+              "EXCLUIDO",
+              "ENVIADO",
+              "ENTREGADO",
+              "LEIDO",
+              "RESPONDIO",
+              "FALLIDO"
+            ],
+            "title": "Estado",
+            "type": "string"
+          },
+          "fecha_estado": {
+            "format": "date-time",
+            "title": "Fecha Estado",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "intentos": {
+            "title": "Intentos",
+            "type": "integer"
+          },
+          "motivo_exclusion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motivo Exclusion"
+          },
+          "motivo_fallo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motivo Fallo"
+          },
+          "nombre": {
+            "title": "Nombre",
+            "type": "string"
+          },
+          "planta": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planta"
+          }
+        },
+        "required": [
+          "id",
+          "colaborador_id",
+          "nombre",
+          "planta",
+          "celular_enmascarado",
+          "estado",
+          "motivo_exclusion",
+          "motivo_fallo",
+          "canal_usado",
+          "conversacion_id",
+          "intentos",
+          "fecha_estado"
+        ],
+        "title": "DestinatarioDto",
+        "type": "object"
+      },
+      "EmbudoDto": {
+        "properties": {
+          "activos": {
+            "title": "Activos",
+            "type": "integer"
+          },
+          "celular_valido": {
+            "title": "Celular Valido",
+            "type": "integer"
+          },
+          "con_consentimiento": {
+            "title": "Con Consentimiento",
+            "type": "integer"
+          },
+          "seleccionados": {
+            "title": "Seleccionados",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "seleccionados",
+          "con_consentimiento",
+          "activos",
+          "celular_valido"
+        ],
+        "title": "EmbudoDto",
+        "type": "object"
+      },
+      "ExcluidosPorMotivo": {
+        "properties": {
+          "ESTATUS_BAJA": {
+            "title": "Estatus Baja",
+            "type": "integer"
+          },
+          "SIN_CELULAR_VALIDO": {
+            "title": "Sin Celular Valido",
+            "type": "integer"
+          },
+          "SIN_CONSENTIMIENTO": {
+            "title": "Sin Consentimiento",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "SIN_CONSENTIMIENTO",
+          "ESTATUS_BAJA",
+          "SIN_CELULAR_VALIDO"
+        ],
+        "title": "ExcluidosPorMotivo",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "HitoLineaTiempo": {
+        "properties": {
+          "en": {
+            "format": "date-time",
+            "title": "En",
+            "type": "string"
+          },
+          "evento": {
+            "enum": [
+              "CREADA",
+              "REVISADA",
+              "CONFIRMADA",
+              "PROGRAMADA_PARA",
+              "ENVIADA"
+            ],
+            "title": "Evento",
+            "type": "string"
+          }
+        },
+        "required": [
+          "evento",
+          "en"
+        ],
+        "title": "HitoLineaTiempo",
+        "type": "object"
+      },
+      "Indicadores": {
+        "properties": {
+          "conteos": {
+            "$ref": "#/components/schemas/ConteoPestanas"
+          },
+          "entregadas": {
+            "title": "Entregadas",
+            "type": "integer"
+          },
+          "enviadas": {
+            "title": "Enviadas",
+            "type": "integer"
+          },
+          "fallidas": {
+            "title": "Fallidas",
+            "type": "integer"
+          },
+          "leidas": {
+            "title": "Leidas",
+            "type": "integer"
+          },
+          "mes": {
+            "title": "Mes",
+            "type": "string"
+          },
+          "porcentaje_entregadas": {
+            "title": "Porcentaje Entregadas",
+            "type": "number"
+          },
+          "porcentaje_leidas": {
+            "title": "Porcentaje Leidas",
+            "type": "number"
+          }
+        },
+        "required": [
+          "mes",
+          "enviadas",
+          "entregadas",
+          "leidas",
+          "fallidas",
+          "porcentaje_entregadas",
+          "porcentaje_leidas",
+          "conteos"
+        ],
+        "title": "Indicadores",
+        "type": "object"
+      },
+      "NotificacionActualizar": {
+        "additionalProperties": false,
+        "properties": {
+          "audiencia_id": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Audiencia Id"
+          },
+          "colaborador_id": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Colaborador Id"
+          },
+          "criterios": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Criterios"
+          },
+          "modo": {
+            "anyOf": [
+              {
+                "enum": [
+                  "CRITERIOS",
+                  "INDIVIDUAL",
+                  "GRUPO"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Modo"
+          },
+          "plantilla_mensaje_id": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Plantilla Mensaje Id"
+          },
+          "respaldo_correo": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Respaldo Correo"
+          },
+          "titulo": {
+            "anyOf": [
+              {
+                "maxLength": 150,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Titulo"
+          },
+          "variables": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "$ref": "#/components/schemas/VariableAsignada"
+                },
+                "propertyNames": {
+                  "maxLength": 3
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Variables"
+          },
+          "zona_horaria": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Zona Horaria"
+          }
+        },
+        "title": "NotificacionActualizar",
+        "type": "object"
+      },
+      "NotificacionCrear": {
+        "additionalProperties": false,
+        "properties": {
+          "audiencia_id": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Audiencia Id"
+          },
+          "colaborador_id": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Colaborador Id"
+          },
+          "criterios": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Criterios"
+          },
+          "modo": {
+            "enum": [
+              "CRITERIOS",
+              "INDIVIDUAL",
+              "GRUPO"
+            ],
+            "title": "Modo",
+            "type": "string"
+          },
+          "plantilla_mensaje_id": {
+            "exclusiveMinimum": 0.0,
+            "title": "Plantilla Mensaje Id",
+            "type": "integer"
+          },
+          "respaldo_correo": {
+            "default": false,
+            "title": "Respaldo Correo",
+            "type": "boolean"
+          },
+          "titulo": {
+            "maxLength": 150,
+            "minLength": 1,
+            "title": "Titulo",
+            "type": "string"
+          },
+          "variables": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/VariableAsignada"
+            },
+            "default": {},
+            "propertyNames": {
+              "maxLength": 3
+            },
+            "title": "Variables",
+            "type": "object"
+          },
+          "zona_horaria": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Zona Horaria"
+          }
+        },
+        "required": [
+          "titulo",
+          "modo",
+          "plantilla_mensaje_id"
+        ],
+        "title": "NotificacionCrear",
+        "type": "object"
+      },
+      "NotificacionDto": {
+        "properties": {
+          "audiencia_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Audiencia Id"
+          },
+          "audiencia_nombre": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Audiencia Nombre"
+          },
+          "canal": {
+            "const": "PLANTILLA_META",
+            "default": "PLANTILLA_META",
+            "title": "Canal",
+            "type": "string"
+          },
+          "colaborador_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Colaborador Id"
+          },
+          "confirmada_en": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confirmada En"
+          },
+          "confirmada_fuera_horario": {
+            "title": "Confirmada Fuera Horario",
+            "type": "boolean"
+          },
+          "confirmada_por_usuario_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confirmada Por Usuario Id"
+          },
+          "contadores": {
+            "$ref": "#/components/schemas/Contadores"
+          },
+          "criterios": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Criterios"
+          },
+          "estado": {
+            "enum": [
+              "BORRADOR",
+              "PROGRAMADA",
+              "ENVIANDO",
+              "COMPLETADA",
+              "CON_FALLAS",
+              "CANCELADA"
+            ],
+            "title": "Estado",
+            "type": "string"
+          },
+          "fecha_creacion": {
+            "format": "date-time",
+            "title": "Fecha Creacion",
+            "type": "string"
+          },
+          "fecha_envio": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fecha Envio"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "linea_de_tiempo": {
+            "items": {
+              "$ref": "#/components/schemas/HitoLineaTiempo"
+            },
+            "title": "Linea De Tiempo",
+            "type": "array"
+          },
+          "modo": {
+            "enum": [
+              "CRITERIOS",
+              "INDIVIDUAL",
+              "GRUPO"
+            ],
+            "title": "Modo",
+            "type": "string"
+          },
+          "modo_envio": {
+            "anyOf": [
+              {
+                "enum": [
+                  "AHORA",
+                  "PROGRAMAR"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Modo Envio"
+          },
+          "motivo_cancelacion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motivo Cancelacion"
+          },
+          "plantilla": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PlantillaResumen"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "programada_para": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Programada Para"
+          },
+          "respaldo_correo": {
+            "title": "Respaldo Correo",
+            "type": "boolean"
+          },
+          "revisada_en": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revisada En"
+          },
+          "titulo": {
+            "title": "Titulo",
+            "type": "string"
+          },
+          "usuario_id": {
+            "title": "Usuario Id",
+            "type": "integer"
+          },
+          "variables": {
+            "additionalProperties": true,
+            "title": "Variables",
+            "type": "object"
+          },
+          "vista_previa": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vista Previa"
+          },
+          "zona_horaria": {
+            "title": "Zona Horaria",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "titulo",
+          "modo",
+          "estado",
+          "audiencia_id",
+          "audiencia_nombre",
+          "colaborador_id",
+          "criterios",
+          "plantilla",
+          "variables",
+          "vista_previa",
+          "respaldo_correo",
+          "zona_horaria",
+          "modo_envio",
+          "programada_para",
+          "revisada_en",
+          "confirmada_en",
+          "confirmada_por_usuario_id",
+          "confirmada_fuera_horario",
+          "motivo_cancelacion",
+          "contadores",
+          "linea_de_tiempo",
+          "usuario_id",
+          "fecha_creacion",
+          "fecha_envio"
+        ],
+        "title": "NotificacionDto",
+        "type": "object"
+      },
+      "PaginaAudiencias": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AudienciaDto"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "siguiente": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Siguiente"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "PaginaAudiencias",
+        "type": "object"
+      },
+      "PaginaDestinatarios": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DestinatarioDto"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "siguiente": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Siguiente"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "PaginaDestinatarios",
+        "type": "object"
+      },
+      "PaginaNotificaciones": {
+        "properties": {
+          "conteos": {
+            "$ref": "#/components/schemas/ConteoPestanas"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/NotificacionDto"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "siguiente": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Siguiente"
+          }
+        },
+        "required": [
+          "items",
+          "conteos"
+        ],
+        "title": "PaginaNotificaciones",
+        "type": "object"
+      },
+      "PaginaPlantillas": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/PlantillaDto"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "siguiente": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Siguiente"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "PaginaPlantillas",
+        "type": "object"
+      },
+      "PlantillaActualizar": {
+        "additionalProperties": false,
+        "properties": {
+          "categoria": {
+            "anyOf": [
+              {
+                "enum": [
+                  "UTILITY",
+                  "MARKETING",
+                  "AUTHENTICATION"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Categoria"
+          },
+          "ejemplos": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 20,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ejemplos"
+          },
+          "idioma": {
+            "anyOf": [
+              {
+                "maxLength": 10,
+                "minLength": 2,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Idioma"
+          },
+          "nombre": {
+            "anyOf": [
+              {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nombre"
+          },
+          "texto_con_variables": {
+            "anyOf": [
+              {
+                "maxLength": 1024,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Texto Con Variables"
+          }
+        },
+        "title": "PlantillaActualizar",
+        "type": "object"
+      },
+      "PlantillaCrear": {
+        "additionalProperties": false,
+        "properties": {
+          "categoria": {
+            "enum": [
+              "UTILITY",
+              "MARKETING",
+              "AUTHENTICATION"
+            ],
+            "title": "Categoria",
+            "type": "string"
+          },
+          "ejemplos": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 20,
+            "title": "Ejemplos",
+            "type": "array"
+          },
+          "idioma": {
+            "default": "es_MX",
+            "maxLength": 10,
+            "minLength": 2,
+            "title": "Idioma",
+            "type": "string"
+          },
+          "nombre": {
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Nombre",
+            "type": "string"
+          },
+          "texto_con_variables": {
+            "maxLength": 1024,
+            "minLength": 1,
+            "title": "Texto Con Variables",
+            "type": "string"
+          }
+        },
+        "required": [
+          "nombre",
+          "categoria",
+          "texto_con_variables"
+        ],
+        "title": "PlantillaCrear",
+        "type": "object"
+      },
+      "PlantillaDto": {
+        "properties": {
+          "cantidad_variables": {
+            "title": "Cantidad Variables",
+            "type": "integer"
+          },
+          "categoria": {
+            "enum": [
+              "UTILITY",
+              "MARKETING",
+              "AUTHENTICATION"
+            ],
+            "title": "Categoria",
+            "type": "string"
+          },
+          "creada_por_usuario_id": {
+            "title": "Creada Por Usuario Id",
+            "type": "integer"
+          },
+          "ejemplos": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Ejemplos",
+            "type": "array"
+          },
+          "estado_meta": {
+            "enum": [
+              "BORRADOR",
+              "EN_REVISION",
+              "APROBADA",
+              "RECHAZADA"
+            ],
+            "title": "Estado Meta",
+            "type": "string"
+          },
+          "fecha_creacion": {
+            "format": "date-time",
+            "title": "Fecha Creacion",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "id_plantilla_meta": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id Plantilla Meta"
+          },
+          "idioma": {
+            "title": "Idioma",
+            "type": "string"
+          },
+          "motivo_rechazo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motivo Rechazo"
+          },
+          "nombre": {
+            "title": "Nombre",
+            "type": "string"
+          },
+          "texto_con_variables": {
+            "title": "Texto Con Variables",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "nombre",
+          "categoria",
+          "idioma",
+          "texto_con_variables",
+          "ejemplos",
+          "cantidad_variables",
+          "estado_meta",
+          "id_plantilla_meta",
+          "motivo_rechazo",
+          "creada_por_usuario_id",
+          "fecha_creacion"
+        ],
+        "title": "PlantillaDto",
+        "type": "object"
+      },
+      "PlantillaInterna": {
+        "properties": {
+          "estado_meta": {
+            "title": "Estado Meta",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "idioma": {
+            "title": "Idioma",
+            "type": "string"
+          },
+          "nombre": {
+            "title": "Nombre",
+            "type": "string"
+          },
+          "texto_con_variables": {
+            "title": "Texto Con Variables",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "nombre",
+          "estado_meta",
+          "idioma",
+          "texto_con_variables"
+        ],
+        "title": "PlantillaInterna",
+        "type": "object"
+      },
+      "PlantillaResumen": {
+        "properties": {
+          "estado_meta": {
+            "title": "Estado Meta",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "nombre": {
+            "title": "Nombre",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "nombre",
+          "estado_meta"
+        ],
+        "title": "PlantillaResumen",
+        "type": "object"
+      },
+      "Previsualizar": {
+        "additionalProperties": false,
+        "properties": {
+          "criterios": {
+            "additionalProperties": true,
+            "title": "Criterios",
+            "type": "object"
+          }
+        },
+        "required": [
+          "criterios"
+        ],
+        "title": "Previsualizar",
+        "type": "object"
+      },
+      "Reintentar": {
+        "additionalProperties": false,
+        "properties": {
+          "confirmar_fuera_horario": {
+            "default": false,
+            "title": "Confirmar Fuera Horario",
+            "type": "boolean"
+          }
+        },
+        "title": "Reintentar",
+        "type": "object"
+      },
+      "Revision": {
+        "properties": {
+          "embudo": {
+            "$ref": "#/components/schemas/EmbudoDto"
+          },
+          "excluidos_por_motivo": {
+            "$ref": "#/components/schemas/ExcluidosPorMotivo"
+          },
+          "revisada_en": {
+            "format": "date-time",
+            "title": "Revisada En",
+            "type": "string"
+          },
+          "total_excluidos": {
+            "title": "Total Excluidos",
+            "type": "integer"
+          },
+          "total_seleccionados": {
+            "title": "Total Seleccionados",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "embudo",
+          "excluidos_por_motivo",
+          "total_seleccionados",
+          "total_excluidos",
+          "revisada_en"
+        ],
+        "title": "Revision",
+        "type": "object"
+      },
+      "Total": {
+        "properties": {
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total"
+        ],
+        "title": "Total",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      },
+      "VariableAsignada": {
+        "additionalProperties": false,
+        "properties": {
+          "campo": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Campo"
+          },
+          "origen": {
+            "enum": [
+              "COLABORADOR",
+              "FIJO"
+            ],
+            "title": "Origen",
+            "type": "string"
+          },
+          "valor": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Valor"
+          }
+        },
+        "required": [
+          "origen"
+        ],
+        "title": "VariableAsignada",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "title": "Command Center - notificaciones",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/v1/audiencias": {
+      "get": {
+        "operationId": "listar_api_v1_audiencias_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "estado",
+            "required": false,
+            "schema": {
+              "default": "activas",
+              "enum": [
+                "activas",
+                "inactivas",
+                "todas"
+              ],
+              "title": "Estado",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 200,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limite",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 200,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Limite"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaAudiencias"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Listado de audiencias (NOT-01)",
+        "tags": [
+          "audiencias"
+        ]
+      },
+      "post": {
+        "operationId": "crear_api_v1_audiencias_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AudienciaCrear"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AudienciaDto"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Alta (NOT-02)",
+        "tags": [
+          "audiencias"
+        ]
+      }
+    },
+    "/api/v1/audiencias/previsualizar": {
+      "post": {
+        "operationId": "previsualizar_api_v1_audiencias_previsualizar_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Previsualizar"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Total"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Conteo de la audiencia sin guardarla (NOT-06)",
+        "tags": [
+          "audiencias"
+        ]
+      }
+    },
+    "/api/v1/audiencias/{audiencia_id}": {
+      "delete": {
+        "operationId": "desactivar_api_v1_audiencias__audiencia_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "audiencia_id",
+            "required": true,
+            "schema": {
+              "title": "Audiencia Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Desactivación (NOT-05)",
+        "tags": [
+          "audiencias"
+        ]
+      },
+      "get": {
+        "operationId": "detalle_api_v1_audiencias__audiencia_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "audiencia_id",
+            "required": true,
+            "schema": {
+              "title": "Audiencia Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AudienciaDto"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Detalle (NOT-03)",
+        "tags": [
+          "audiencias"
+        ]
+      },
+      "patch": {
+        "operationId": "actualizar_api_v1_audiencias__audiencia_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "audiencia_id",
+            "required": true,
+            "schema": {
+              "title": "Audiencia Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AudienciaActualizar"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AudienciaDto"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Edición (NOT-04)",
+        "tags": [
+          "audiencias"
+        ]
+      }
+    },
+    "/api/v1/notificaciones": {
+      "get": {
+        "operationId": "listar_api_v1_notificaciones_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "pestana",
+            "required": false,
+            "schema": {
+              "default": "envios",
+              "enum": [
+                "envios",
+                "programadas",
+                "borradores"
+              ],
+              "title": "Pestana",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "estado",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "BORRADOR",
+                    "PROGRAMADA",
+                    "ENVIANDO",
+                    "COMPLETADA",
+                    "CON_FALLAS",
+                    "CANCELADA"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Estado"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 200,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limite",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 200,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Limite"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaNotificaciones"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Listado por pestañas (NOT-14)",
+        "tags": [
+          "notificaciones"
+        ]
+      },
+      "post": {
+        "operationId": "crear_api_v1_notificaciones_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NotificacionCrear"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificacionDto"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Alta (NOT-15)",
+        "tags": [
+          "notificaciones"
+        ]
+      }
+    },
+    "/api/v1/notificaciones/indicadores": {
+      "get": {
+        "operationId": "indicadores_api_v1_notificaciones_indicadores_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Indicadores"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Indicadores del mes (NOT-24)",
+        "tags": [
+          "notificaciones"
+        ]
+      }
+    },
+    "/api/v1/notificaciones/{notificacion_id}": {
+      "get": {
+        "operationId": "detalle_api_v1_notificaciones__notificacion_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "notificacion_id",
+            "required": true,
+            "schema": {
+              "title": "Notificacion Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificacionDto"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Detalle (NOT-16)",
+        "tags": [
+          "notificaciones"
+        ]
+      },
+      "patch": {
+        "operationId": "actualizar_api_v1_notificaciones__notificacion_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "notificacion_id",
+            "required": true,
+            "schema": {
+              "title": "Notificacion Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NotificacionActualizar"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificacionDto"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Edición (NOT-17)",
+        "tags": [
+          "notificaciones"
+        ]
+      }
+    },
+    "/api/v1/notificaciones/{notificacion_id}/cancelar": {
+      "post": {
+        "operationId": "cancelar_api_v1_notificaciones__notificacion_id__cancelar_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "notificacion_id",
+            "required": true,
+            "schema": {
+              "title": "Notificacion Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/Cancelar"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Entrada"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificacionDto"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Cancelar un borrador o una programada (NOT-20)",
+        "tags": [
+          "notificaciones"
+        ]
+      }
+    },
+    "/api/v1/notificaciones/{notificacion_id}/confirmar": {
+      "post": {
+        "operationId": "confirmar_api_v1_notificaciones__notificacion_id__confirmar_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "notificacion_id",
+            "required": true,
+            "schema": {
+              "title": "Notificacion Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Confirmar"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificacionDto"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Confirmar: enviar ahora o programar (NOT-19)",
+        "tags": [
+          "notificaciones"
+        ]
+      }
+    },
+    "/api/v1/notificaciones/{notificacion_id}/destinatarios": {
+      "get": {
+        "operationId": "destinatarios_api_v1_notificaciones__notificacion_id__destinatarios_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "notificacion_id",
+            "required": true,
+            "schema": {
+              "title": "Notificacion Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "estado",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "PENDIENTE",
+                    "EXCLUIDO",
+                    "ENVIADO",
+                    "ENTREGADO",
+                    "LEIDO",
+                    "RESPONDIO",
+                    "FALLIDO"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Estado"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 200,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limite",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 200,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Limite"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaDestinatarios"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Destinatarios con celular enmascarado (NOT-21)",
+        "tags": [
+          "notificaciones"
+        ]
+      }
+    },
+    "/api/v1/notificaciones/{notificacion_id}/duplicar": {
+      "post": {
+        "operationId": "duplicar_api_v1_notificaciones__notificacion_id__duplicar_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "notificacion_id",
+            "required": true,
+            "schema": {
+              "title": "Notificacion Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificacionDto"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Duplicar como borrador (NOT-23)",
+        "tags": [
+          "notificaciones"
+        ]
+      }
+    },
+    "/api/v1/notificaciones/{notificacion_id}/reintentar": {
+      "post": {
+        "operationId": "reintentar_api_v1_notificaciones__notificacion_id__reintentar_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "notificacion_id",
+            "required": true,
+            "schema": {
+              "title": "Notificacion Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/Reintentar"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Entrada"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificacionDto"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Reintentar los destinatarios fallidos (NOT-22)",
+        "tags": [
+          "notificaciones"
+        ]
+      }
+    },
+    "/api/v1/notificaciones/{notificacion_id}/revisar": {
+      "post": {
+        "operationId": "revisar_api_v1_notificaciones__notificacion_id__revisar_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "notificacion_id",
+            "required": true,
+            "schema": {
+              "title": "Notificacion Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Revision"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Revisión de la audiencia y embudo (NOT-18)",
+        "tags": [
+          "notificaciones"
+        ]
+      }
+    },
+    "/api/v1/plantillas-mensaje": {
+      "get": {
+        "operationId": "listar_api_v1_plantillas_mensaje_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "estado",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "BORRADOR",
+                    "EN_REVISION",
+                    "APROBADA",
+                    "RECHAZADA"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Estado"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 200,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limite",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 200,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Limite"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaPlantillas"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Listado de plantillas (NOT-07)",
+        "tags": [
+          "plantillas-mensaje"
+        ]
+      },
+      "post": {
+        "operationId": "crear_api_v1_plantillas_mensaje_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlantillaCrear"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlantillaDto"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Alta (NOT-08)",
+        "tags": [
+          "plantillas-mensaje"
+        ]
+      }
+    },
+    "/api/v1/plantillas-mensaje/{plantilla_id}": {
+      "get": {
+        "operationId": "detalle_api_v1_plantillas_mensaje__plantilla_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "plantilla_id",
+            "required": true,
+            "schema": {
+              "title": "Plantilla Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlantillaDto"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Detalle (NOT-09)",
+        "tags": [
+          "plantillas-mensaje"
+        ]
+      },
+      "patch": {
+        "operationId": "actualizar_api_v1_plantillas_mensaje__plantilla_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "plantilla_id",
+            "required": true,
+            "schema": {
+              "title": "Plantilla Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlantillaActualizar"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlantillaDto"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Edición (NOT-10)",
+        "tags": [
+          "plantillas-mensaje"
+        ]
+      }
+    },
+    "/api/v1/plantillas-mensaje/{plantilla_id}/duplicar": {
+      "post": {
+        "operationId": "duplicar_api_v1_plantillas_mensaje__plantilla_id__duplicar_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "plantilla_id",
+            "required": true,
+            "schema": {
+              "title": "Plantilla Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlantillaDto"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Duplicar como borrador (NOT-12)",
+        "tags": [
+          "plantillas-mensaje"
+        ]
+      }
+    },
+    "/api/v1/plantillas-mensaje/{plantilla_id}/enviar-revision": {
+      "post": {
+        "operationId": "enviar_revision_api_v1_plantillas_mensaje__plantilla_id__enviar_revision_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "plantilla_id",
+            "required": true,
+            "schema": {
+              "title": "Plantilla Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlantillaDto"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Envío a revisión de Meta (NOT-11)",
+        "tags": [
+          "plantillas-mensaje"
+        ]
+      }
+    },
+    "/api/v1/plantillas-mensaje/{plantilla_id}/sincronizar": {
+      "post": {
+        "operationId": "sincronizar_api_v1_plantillas_mensaje__plantilla_id__sincronizar_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "plantilla_id",
+            "required": true,
+            "schema": {
+              "title": "Plantilla Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlantillaDto"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Sincronizar el estado con Meta (NOT-13)",
+        "tags": [
+          "plantillas-mensaje"
+        ]
+      }
+    },
+    "/internal/plantillas-mensaje/{plantilla_id}": {
+      "get": {
+        "description": "La plantilla de mensaje de la empresa: el chat de RH (WAP-04) la usa para exigir que esté\nAPROBADA y para armar el texto. Solo lectura; sin datos personales.",
+        "operationId": "plantilla_internal_plantillas_mensaje__plantilla_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "plantilla_id",
+            "required": true,
+            "schema": {
+              "title": "Plantilla Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-empresa-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Empresa-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlantillaInterna"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "INT-NOT-01",
+        "tags": [
+          "internas"
+        ]
+      }
+    }
+  }
+}

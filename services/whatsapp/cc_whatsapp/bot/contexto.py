@@ -17,6 +17,9 @@ class Contexto:
     constancias: ClienteConstancias
     alertas: Alertas
     llave_codigos: bytes  # llave HMAC de los códigos (cc/{env}/whatsapp-hmac)
+    # Cifrador del contenido (``cc_whatsapp.cifrado``). Con él, el texto con que el colaborador
+    # responde a una notificación se guarda cifrado para el chat de RH; sin él, no se guarda nada.
+    cifrador: Any | None = None
 
 
 @dataclass

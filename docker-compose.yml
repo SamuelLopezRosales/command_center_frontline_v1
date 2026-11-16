@@ -21,7 +21,7 @@ services:
     # Versión fijada: las versiones de 2026 en adelante pueden exigir token de LocalStack.
     image: localstack/localstack:4.4
     environment:
-      SERVICES: s3,sqs,events,sns,ses,secretsmanager,kms,ssm
+      SERVICES: s3,sqs,events,sns,ses,secretsmanager,kms,ssm,scheduler
       AWS_DEFAULT_REGION: us-east-1
       EAGER_SERVICE_LOADING: "1"
     ports:

@@ -28,6 +28,7 @@ class ConfigWhatsapp(Configuracion):
     aws_endpoint: str | None = None  # LocalStack en local; vacío en AWS
     eventos_activos: bool = False  # inicia el relay del outbox con la API
     colaboradores_url: str | None = None
+    notificaciones_url: str | None = None  # INT-NOT-01: plantillas de mensaje (chat de RH)
     ventana_horas: int = 24
     # Bot (design.md §7). Una cuenta de WhatsApp atiende a una empresa: el worker de entrada usa la
     # empresa configurada (la asociación número-empresa llega con la vinculación, PQ-07).

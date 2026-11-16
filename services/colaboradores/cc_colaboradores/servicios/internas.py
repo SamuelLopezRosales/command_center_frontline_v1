@@ -193,6 +193,35 @@ class Contacto:
     celular: str | None = None
     correo: str | None = None
     valores: dict[str, str] = field(default_factory=dict)
+    faltantes: list[str] = field(default_factory=list)
+
+
+def _efectivas(token: str, por_clave: dict, por_codigo: dict) -> tuple[str, str | None]:
+    """``(clave, campo)`` de una variable pedida. Una variable de colaborador de una notificación
+    guarda el ``codigo_interno`` del campo dinámico (``CAMP-0003``); aquí se resuelve por ``clave``.
+    La clave tiene prioridad; ``campo`` es la definición dinámica implicada (si la hay)."""
+    if token in por_clave or token not in por_codigo:
+        return token, token if token in por_clave else None
+    clave = por_codigo[token].clave
+    return clave, clave
+
+
+def _sensibles_pedidas(pedidas: list[str], definiciones) -> list[str]:
+    """Variables pedidas que descifrarían un campo sensible (directa o por ``registro_patronal`` y
+    ``horario``, que se apoyan en el campo del mismo nombre y en ``turno``)."""
+    por_clave = {d.clave: d for d in definiciones}
+    por_codigo = {d.codigo_interno: d for d in definiciones}
+    salida = []
+    for token in pedidas:
+        clave, campo = _efectivas(token, por_clave, por_codigo)
+        implicados = {campo} if campo else set()
+        if clave == "horario":
+            implicados.add("turno")
+        if clave == "registro_patronal":
+            implicados.add("registro_patronal")
+        if any(por_clave[c].es_sensible for c in implicados if c in por_clave):
+            salida.append(token)
+    return salida
 
 
 async def resolver_contactos(
@@ -203,9 +232,22 @@ async def resolver_contactos(
     ids: list[int],
     proposito: str,
     pedidas: list[str] | None,
+    *,
+    solo_elegibilidad: bool = False,
 ) -> list[Contacto]:
     """Regla única de elegibilidad. El celular se entrega solo a un elegible y por WhatsApp; el
-    correo, solo con el propósito ``CORREO`` (respaldo de notificaciones)."""
+    correo, solo con el propósito ``CORREO`` (respaldo de notificaciones).
+
+    **Variables de plantilla** (T-217, INT-COL-05 ampliado). ``variables`` pide valores por
+    elegible; salen en ``valores`` con la misma llave con la que se pidieron y lo que no tenga valor
+    queda en ``faltantes``. Se aceptan las variables fijas y de organización, y los campos
+    dinámicos por su ``clave`` **o** por su ``codigo_interno`` (así los guarda ``notificaciones`` en
+    ``variables_json``: ``{"1": {"origen": "COLABORADOR", "campo": "CAMP-0003"}}``). Un campo
+    **sensible** nunca sale por aquí (422 ``VARIABLE_SENSIBLE``): para eso existe INT-COL-04, que sí
+    lo registra en la bitácora. Esta operación no registra valores ni en bitácora ni en logs.
+
+    ``solo_elegibilidad`` devuelve solo ``elegible`` y ``motivo`` (sin celular, correo ni
+    valores): para quien solo necesita saber a quién se puede escribir (NOT-22)."""
     if proposito not in elegibilidad.PROPOSITOS:
         raise ErrorValidacion(
             errores=[ErrorCampo("proposito", "VALOR_NO_PERMITIDO", "Propósito no válido.")]
@@ -215,14 +257,25 @@ async def resolver_contactos(
             errores=[ErrorCampo("ids", "DEMASIADO_LARGO", "Máximo 500 por llamada.")]
         )
     definiciones = await campos_cli.definiciones(empresa_id)
-    pedidas = list(dict.fromkeys(pedidas or []))
-    desconocidas = sorted(set(pedidas) - variables.conocidas(definiciones))
+    pedidas = [] if solo_elegibilidad else list(dict.fromkeys(pedidas or []))
+    por_clave = {d.clave: d for d in definiciones}
+    por_codigo = {d.codigo_interno: d for d in definiciones}
+    conocidas = variables.conocidas(definiciones)
+    desconocidas = sorted(v for v in pedidas if v not in conocidas and v not in por_codigo)
     if desconocidas:
         raise ErrorValidacion(
             "VARIABLE_DESCONOCIDA",
             "Hay variables que no existen.",
             errores=[ErrorCampo("variables", "VARIABLE_DESCONOCIDA", v) for v in desconocidas],
         )
+    sensibles = _sensibles_pedidas(pedidas, definiciones)
+    if sensibles:
+        raise ErrorValidacion(
+            "VARIABLE_SENSIBLE",
+            "Un campo sensible no se puede pedir por esta interfaz.",
+            errores=[ErrorCampo("variables", "VARIABLE_SENSIBLE", v) for v in sensibles],
+        )
+    claves = {v: _efectivas(v, por_clave, por_codigo)[0] for v in pedidas}
     correo_def = next((d for d in definiciones if d.clave == "correo"), None)
     salida: list[Contacto] = []
     async with transaccion(motor, empresa_id) as conn, cif.transaccion(conn, empresa_id):
@@ -237,6 +290,9 @@ async def resolver_contactos(
                 salida.append(Contacto(cid, False, e.motivo))
                 continue
             c = Contacto(cid, True)
+            if solo_elegibilidad:
+                salida.append(c)
+                continue
             if proposito == "CORREO":
                 correo = None
                 if correo_def is not None:
@@ -266,16 +322,21 @@ async def resolver_contactos(
                 org_id = fila["organizacion_id"]
                 if org_id not in orgs:
                     orgs[org_id] = await repo_catalogos.organizacion(conn, org_id) or {}
-                c.valores, _, descifrados = await variables.resolver(
+                por_clave_valor, _, descifrados = await variables.resolver(
                     conn,
                     cif,
                     empresa_id=empresa_id,
                     fila=fila,
                     organizacion=orgs[org_id],
                     definiciones=definiciones,
-                    variables=pedidas,
+                    variables=list(dict.fromkeys(claves.values())),
                 )
-                await _sensible(conn, empresa_id, cid, descifrados)
+                await _sensible(conn, empresa_id, cid, descifrados)  # vacío: no hay sensibles
+                for v in pedidas:
+                    if claves[v] in por_clave_valor:
+                        c.valores[v] = por_clave_valor[claves[v]]
+                    else:
+                        c.faltantes.append(v)
             salida.append(c)
     return salida
 

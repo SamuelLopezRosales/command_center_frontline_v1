@@ -81,9 +81,11 @@ async def registrar_fallo(
     solicitud: dict[str, Any],
     motivo: str,
     desde: tuple[str, ...],
+    campos: list[str] | None = None,
 ) -> bool:
     """Pasa la solicitud a FALLIDA y emite ``constancia.fallida`` (EventBridge; la regla hacia SNS
-    avisa a RH). Devuelve ``False`` si la solicitud ya no estaba en un estado de origen."""
+    avisa a RH). ``campos`` lleva los nombres de variable faltantes (nunca valores; design.md §5.6,
+    CC-REQ-076). Devuelve ``False`` si la solicitud ya no estaba en un estado de origen."""
     if not await repo.cambiar_estado(conn, solicitud["id"], "FALLIDA", motivo=motivo, desde=desde):
         return False
     await outbox.escribir(
@@ -97,6 +99,7 @@ async def registrar_fallo(
             "solicitud_id": solicitud["id"],
             "colaborador_id": solicitud["colaborador_id"],
             "motivo": motivo,
+            **({"campos": sorted(campos)} if campos else {}),
         },
         empresa_id=empresa_id,
     )
@@ -142,7 +145,7 @@ async def generar(
         if problemas:
             await registrar_fallo(
                 conn, cfg, empresa_id=empresa_id, solicitud=s, motivo="CAMPOS_FALTANTES",
-                desde=("RECIBIDA",),
+                desde=("RECIBIDA",), campos=problemas,
             )  # fmt: skip
         else:
             await outbox.escribir(

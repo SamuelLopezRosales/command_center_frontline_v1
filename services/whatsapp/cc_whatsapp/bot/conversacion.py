@@ -9,8 +9,10 @@ de confirmar.
 from __future__ import annotations
 
 import logging
+import uuid
+from datetime import UTC, datetime
 
-from cc_common import bitacora
+from cc_common import bitacora, outbox
 from cc_common.db import transaccion
 
 from cc_whatsapp.bot import maquina_estados as estados
@@ -84,6 +86,69 @@ async def _con_conversacion(t: Turno, busqueda, conv: dict) -> str:
     return await menu.atender(t, conv)
 
 
+RESPUESTA = "RESPUESTA"  # respuesta a una notificación: abre la conversación del chat de RH
+_ESPACIO_EVENTO = uuid.UUID("0b6f4a52-3c1d-4e7b-8f0a-6d9c2e1b7a34")
+EVENTO_RESPUESTA = "wa.respuesta_recibida"
+
+
+def evento_id_de(wamid: str) -> uuid.UUID:
+    """``evento_id`` determinista del aviso de respuesta: repetir el mensaje no lo duplica."""
+    return uuid.uuid5(_ESPACIO_EVENTO, wamid)
+
+
+async def _nueva_conversacion_de_respuesta(t: Turno, busqueda) -> dict | None:
+    """Un colaborador elegible que escribe sin conversación abierta y sin la palabra clave, y que
+    recibió una notificación dentro de la ventana de 24 horas, está respondiéndola: nace una
+    conversación ACTIVA, no verificada, de origen NOTIFICACION (design.md §7.1; no da acceso a
+    datos). Un no elegible, o quien no recibió nada reciente, no abre nada."""
+    if not (busqueda.encontrado and busqueda.elegible):
+        return None
+    if not await repo.notificacion_reciente(
+        t.conn, busqueda.colaborador_id, t.ctx.cfg.ventana_horas
+    ):
+        return None
+    return await repo.crear(
+        t.conn, empresa_id=t.empresa_id, huella=t.huella,
+        colaborador_id=busqueda.colaborador_id, estado=estados.ACTIVA, origen="NOTIFICACION",
+    )  # fmt: skip
+
+
+async def _guardar_para_chat(t: Turno, conv: dict, busqueda) -> None:
+    """Liga el mensaje al chat de RH y, si hay cifrador, guarda su texto cifrado (AAD: la
+    ``clave_idempotencia`` del mensaje y la empresa). Nunca se registra en logs."""
+    cifrado = None
+    ctx = t.ctx
+    if ctx.cifrador is not None and t.msg.texto:
+        async with ctx.cifrador.transaccion(t.conn, t.empresa_id):
+            cifrado = ctx.cifrador.cifrar(
+                t.msg.texto, empresa_id=t.empresa_id, clave=repo.clave_de(t.msg.wamid)
+            )
+    await repo.vincular_entrante(
+        t.conn, t.msg.wamid, conversacion_id=conv["id"],
+        colaborador_id=busqueda.colaborador_id, contenido_cifrado=cifrado,
+    )  # fmt: skip
+
+
+async def _avisar_respuesta(t: Turno, busqueda, conversacion_id: int | None) -> None:
+    """``wa.respuesta_recibida`` (CC-REQ-115) en la MISMA transacción del mensaje. Solo ids y la
+    hora: ni contenido, ni nombre, ni número."""
+    await outbox.escribir(
+        t.conn,
+        "whatsapp",
+        destino_tipo="EVENTBRIDGE",
+        destino=t.ctx.cfg.bus_eventos,
+        tipo=EVENTO_RESPUESTA,
+        payload={
+            "empresa_id": t.empresa_id,
+            "colaborador_id": busqueda.colaborador_id,
+            "conversacion_id": conversacion_id,
+            "recibido_en": datetime.now(UTC).isoformat(),
+        },
+        empresa_id=t.empresa_id,
+        evento_id=evento_id_de(t.msg.wamid),
+    )
+
+
 async def procesar(ctx: Contexto, msg: Mensaje) -> str:
     """Devuelve el resultado (para las pruebas y las métricas); una falla técnica se propaga."""
     cfg = ctx.cfg
@@ -106,10 +171,22 @@ async def procesar(ctx: Contexto, msg: Mensaje) -> str:
         conv = await repo.abierta_por_hash(conn, huella)
         if conv is None:
             if not texto.es_palabra_clave(msg.texto):
-                return "IGNORADO"
-            resultado = await _sin_conversacion(t, busqueda)
+                conv = await _nueva_conversacion_de_respuesta(t, busqueda)
+                resultado = RESPUESTA if conv is not None else "IGNORADO"
+            else:
+                resultado = await _sin_conversacion(t, busqueda)
         else:
             resultado = await _con_conversacion(t, busqueda, conv)
+        # Respuesta libre de un colaborador registrado (no es parte del bot: ni palabra clave, ni
+        # verificación, ni menú): se liga al chat de RH y se avisa a `notificaciones`. Un número
+        # no registrado (``encontrado = False``) nunca emite el evento.
+        if busqueda.encontrado and resultado in (RESPUESTA, "IGNORADO"):
+            chat = conv if (conv and conv["estado"] == estados.ACTIVA) else None
+            if chat is not None and not chat["verificada"]:
+                await _guardar_para_chat(t, chat, busqueda)
+            else:
+                chat = None
+            await _avisar_respuesta(t, busqueda, chat["id"] if chat else None)
         pendientes = t.alertas
     for tipo_alerta, datos in pendientes:  # después de confirmar; de mejor esfuerzo
         await ctx.alertas.avisar(cfg.empresa_id, tipo_alerta, datos)

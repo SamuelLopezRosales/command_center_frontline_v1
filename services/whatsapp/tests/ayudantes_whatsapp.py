@@ -235,3 +235,81 @@ def ultimo_codigo(datos) -> str:
         if encontrado:
             return encontrado.group(1)
     raise AssertionError("el bot no envió ningún código")
+
+
+# ------------------------------------------------------------------ cifrado y chat (T-218)
+
+
+class KmsFalso:
+    """KMS de mentira: la DEK "cifrada" es la clara XOR una máscara, ligada al contexto."""
+
+    def __init__(self, servicio: str = "whatsapp"):
+        import os
+
+        self._mascara = os.urandom(32)
+        self._servicio = servicio
+
+    def _etiqueta(self, contexto: dict) -> bytes:
+        return repr(sorted(contexto.items())).encode()
+
+    def generate_data_key(self, **kw):
+        import os
+
+        assert kw["EncryptionContext"]["servicio"] == self._servicio
+        claro = os.urandom(32)
+        envuelta = bytes(a ^ b for a, b in zip(claro, self._mascara, strict=True))
+        return {
+            "Plaintext": claro,
+            "CiphertextBlob": envuelta + self._etiqueta(kw["EncryptionContext"]),
+        }
+
+    def decrypt(self, **kw):
+        blob = kw["CiphertextBlob"]
+        if not blob.endswith(self._etiqueta(kw["EncryptionContext"])):
+            raise RuntimeError("InvalidCiphertextException")
+        return {"Plaintext": bytes(a ^ b for a, b in zip(blob[:32], self._mascara, strict=True))}
+
+
+def crear_notificacion_enviada(datos, colaborador_id: int, *, estado="ENVIADO", hace="1 hour"):
+    """Mensaje de notificación ya enviado al colaborador (lo que deja el ``enviador``)."""
+    sql(
+        datos,
+        "INSERT INTO whatsapp.mensaje_whatsapp (empresa_id, colaborador_id, direccion, tipo, "
+        "plantilla_meta, clave_idempotencia, estado, origen_tipo, origen_id, id_mensaje_proveedor, "
+        "fecha_hora) VALUES (%s, %s, 'SALIENTE', 'PLANTILLA', 'aviso', %s, %s, 'NOTIFICACION', 7, "
+        "%s, now() - %s::interval)",
+        (datos["empresa"], colaborador_id, str(uuid.uuid4()), estado, f"wamid.{uuid.uuid4().hex}",
+         hace),
+    )  # fmt: skip
+
+
+# ------------------------------------------------------------------ API del chat (T-218)
+
+import time  # noqa: E402
+
+import jwt  # noqa: E402
+from cryptography.hazmat.primitives.asymmetric import rsa  # noqa: E402
+
+EMISOR = "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_PRUEBA"
+CLIENTE = "cliente-spa"
+LLAVE_JWT = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+
+
+def cab(sub: str, empresa_id: int, usuario_id: int | None, rol: str = "RH") -> dict[str, str]:
+    ahora = int(time.time())
+    claims = {
+        "sub": sub, "iss": EMISOR, "client_id": CLIENTE, "token_use": "access", "iat": ahora,
+        "exp": ahora + 900, "jti": uuid.uuid4().hex, "empresa_id": str(empresa_id), "rol": rol,
+    }  # fmt: skip
+    if usuario_id is not None:
+        claims["usuario_id"] = str(usuario_id)
+    return {"Authorization": "Bearer " + jwt.encode(claims, LLAVE_JWT, algorithm="RS256")}
+
+
+def crear_usuario(datos, empresa_id: int, nombre: str = "Ana RH") -> int:
+    return sql(
+        datos,
+        "INSERT INTO identidad.usuario (empresa_id, nombre, correo, cognito_sub) "
+        "VALUES (%s, %s, %s, %s) RETURNING id",
+        (empresa_id, nombre, f"{uuid.uuid4().hex[:8]}@rh.test", uuid.uuid4().hex),
+    )[0][0]

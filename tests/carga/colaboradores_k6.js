@@ -14,6 +14,10 @@ import { check, sleep } from "k6";
 
 const BASE_URL = __ENV.BASE_URL || "http://localhost:8000";
 const TOKEN = __ENV.TOKEN;
+if (!TOKEN) throw new Error("Falta TOKEN (access token de un usuario RH de la empresa de prueba)");
+// Formato de numero_empleado de los datos sembrados (T-204: "N-000123"; pytest de T-142: "N00123").
+const PREFIJO = __ENV.NUMERO_PREFIJO || "N-";
+const ANCHO = Number(__ENV.NUMERO_ANCHO || 6);
 
 export const options = {
   scenarios: {
@@ -41,7 +45,7 @@ const cabeceras = { headers: { Authorization: `Bearer ${TOKEN}` } };
 const NOMBRES = ["maria", "jose", "ana", "luis", "carmen", "jorge"];
 
 export function listado() {
-  const pagina = 1 + Math.floor(Math.random() * 100);
+  const pagina = 1 + Math.floor(Math.random() * 200); // 10,000 / 50 = 200 páginas
   const r = http.get(`${BASE_URL}/api/v1/colaboradores?pagina=${pagina}&limite=50`, cabeceras);
   check(r, { "listado 200": (x) => x.status === 200 });
   sleep(0.2);
@@ -49,8 +53,8 @@ export function listado() {
 
 export function busqueda() {
   const nombre = NOMBRES[Math.floor(Math.random() * NOMBRES.length)];
-  const numero = String(Math.floor(Math.random() * 10000)).padStart(6, "0");
-  const q = Math.random() < 0.5 ? nombre : `N-${numero}`;
+  const numero = String(Math.floor(Math.random() * 10000)).padStart(ANCHO, "0");
+  const q = Math.random() < 0.5 ? nombre : `${PREFIJO}${numero}`;
   const r = http.get(`${BASE_URL}/api/v1/colaboradores?q=${encodeURIComponent(q)}`, cabeceras);
   check(r, { "busqueda 200": (x) => x.status === 200 });
   sleep(0.2);

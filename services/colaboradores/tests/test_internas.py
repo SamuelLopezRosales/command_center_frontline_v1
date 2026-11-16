@@ -1,5 +1,7 @@
 """T-203: interfaces internas de colaboradores (INT-COL-01 a 05, 07 y 08)."""
 
+import uuid
+
 import httpx
 import psycopg
 import pytest
@@ -370,6 +372,7 @@ async def test_resolver_contactos_aplica_elegibilidad(entorno):
         "celular": None,
         "correo": None,
         "valores": {},
+        "faltantes": [],
     }
     assert items[999999]["motivo"] == "NO_ENCONTRADO"
     assert "8119990000" not in r.text
@@ -416,6 +419,178 @@ async def test_resolver_valida_lote_y_proposito(entorno):
         headers=interno("whatsapp", a),
     )
     assert r.status_code == 422
+
+
+# ------------------------------------------------------------------ INT-COL-05 ampliado (T-217)
+
+
+async def _resolver(entorno, ids, proposito="NOTIFICACION", variables=None, **extra):
+    cuerpo = {"ids": ids, "proposito": proposito, **extra}
+    if variables is not None:
+        cuerpo["variables"] = variables
+    return await entorno["h"].post(
+        "/internal/colaboradores/contactos:resolver",
+        json=cuerpo,
+        headers=interno("notificaciones", entorno["a"]),
+    )
+
+
+async def test_variables_de_notificacion_por_clave_y_por_codigo_interno(entorno):
+    """``notificaciones`` guarda el ``codigo_interno`` del campo dinámico; se responde con la
+    misma llave con la que se pidió."""
+    r = await _resolver(
+        entorno,
+        [entorno["con_nss"]],
+        variables=["nombre_completo", "puesto", "CAMP-0002", "area", "CAMP-0006", "planta"],
+    )
+    assert r.status_code == 200, r.text
+    (item,) = r.json()["items"]
+    assert item["valores"] == {
+        "nombre_completo": "Ana Pérez Luna",
+        "puesto": "Analista",
+        "CAMP-0002": "Ventas",  # por codigo_interno
+        "area": "Ventas",  # por clave
+        "CAMP-0006": "ana@acme.com",
+        "planta": "Norte",
+    }
+    assert item["faltantes"] == []
+    assert item["celular"] == CELULAR  # solo en la respuesta interna, para el envío
+
+
+async def test_variable_sin_valor_queda_en_faltantes(entorno):
+    h, a = entorno["h"], entorno["a"]
+    rh = cab(emitir("sub-a", a, entorno["datos"]["ua"]))
+    with psycopg.connect(entorno["datos"]["bd"].url_admin) as c:
+        planta = c.execute("SELECT id FROM colaboradores.planta LIMIT 1").fetchone()[0]
+    r = await h.post(
+        "/api/v1/colaboradores",
+        json={
+            "numero_empleado": "E-3",
+            "nombres": "Luis",
+            "apellido_paterno": "Soto",
+            "apellido_materno": "Paz",
+            "celular": "8117770000",
+            "organizacion_id": entorno["org"],
+            "planta_id": planta,
+            "fecha_ingreso": "2021-01-04",
+            "puesto": "Chofer",
+            "tipo_empleado": "OPERATIVO",
+            "campos": {},
+            "consentimiento": True,
+        },
+        headers=rh,
+    )
+    assert r.status_code == 201, r.text
+    r = await _resolver(
+        entorno, [r.json()["id"]], variables=["nombre_completo", "CAMP-0006", "turno"]
+    )
+    (item,) = r.json()["items"]
+    assert item["valores"] == {"nombre_completo": "Luis Soto Paz"}
+    assert item["faltantes"] == ["CAMP-0006", "turno"]
+
+
+@pytest.mark.parametrize("variable", ["nss", "CAMP-0001", "sueldo", "CAMP-0003"])
+async def test_un_campo_sensible_no_sale_por_contactos_resolver(entorno, variable):
+    r = await _resolver(entorno, [entorno["con_nss"]], variables=["puesto", variable])
+    assert r.status_code == 422
+    assert {e["codigo"] for e in r.json()["errores"]} == {"VARIABLE_SENSIBLE"}
+    assert "12345678901" not in r.text and "9500" not in r.text
+    assert _bitacora_sensible(entorno["datos"]) == []  # nada se descifró
+
+
+async def test_variable_desconocida_422_tambien_por_codigo(entorno):
+    r = await _resolver(entorno, [entorno["con_nss"]], variables=["CAMP-9999"])
+    assert r.status_code == 422 and r.json()["codigo"] == "VARIABLE_DESCONOCIDA"
+
+
+async def test_el_no_elegible_no_recibe_variables_ni_contacto(entorno):
+    r = await _resolver(entorno, [entorno["sin_nss"]], variables=["nombre_completo"])
+    (item,) = r.json()["items"]
+    assert item["elegible"] is False and item["valores"] == {} and item["celular"] is None
+
+
+async def test_solo_elegibilidad_no_devuelve_celular_correo_ni_valores(entorno):
+    r = await _resolver(
+        entorno,
+        [entorno["con_nss"], entorno["sin_nss"]],
+        variables=["nombre_completo"],
+        solo_elegibilidad=True,
+    )
+    items = {i["id"]: i for i in r.json()["items"]}
+    assert items[entorno["con_nss"]] == {
+        "id": entorno["con_nss"],
+        "elegible": True,
+        "motivo": None,
+        "celular": None,
+        "correo": None,
+        "valores": {},
+        "faltantes": [],
+    }
+    assert items[entorno["sin_nss"]]["motivo"] == "SIN_CONSENTIMIENTO"
+    assert CELULAR not in r.text
+
+
+async def test_correo_para_respaldo_exige_consentimiento_y_resuelve_variables(entorno):
+    r = await _resolver(
+        entorno,
+        [entorno["con_nss"], entorno["sin_nss"]],
+        proposito="CORREO",
+        variables=["nombre_completo"],
+    )
+    items = {i["id"]: i for i in r.json()["items"]}
+    assert items[entorno["con_nss"]]["correo"] == "ana@acme.com"
+    assert items[entorno["con_nss"]]["celular"] is None
+    assert items[entorno["con_nss"]]["valores"] == {"nombre_completo": "Ana Pérez Luna"}
+    assert items[entorno["sin_nss"]]["elegible"] is False
+
+
+# ------------------------------------------------------------------ wa.numero_invalido (T-217)
+
+
+async def test_numero_invalido_marca_el_celular_y_lo_vuelve_no_elegible(entorno, motor):
+    from cc_colaboradores.consumidores import manejar_evento
+
+    cid, a = entorno["con_nss"], entorno["a"]
+    ev = {
+        "evento_id": "5b8a7a54-3c47-4c1c-8f7e-1f6ee3a5d001",
+        "tipo": "wa.numero_invalido",
+        "colaborador_id": cid,
+        "empresa_id": a,
+    }
+    assert await manejar_evento(motor, object(), ev) is True
+    assert await manejar_evento(motor, object(), ev) is False  # repetido
+    # otro evento para quien ya está marcado: sin efecto ni segunda bitácora
+    assert await manejar_evento(motor, object(), {**ev, "evento_id": str(uuid.uuid4())}) is False
+    with psycopg.connect(entorno["datos"]["bd"].url_admin) as c:
+        assert c.execute(
+            "SELECT celular_invalido FROM colaboradores.colaborador WHERE id = %s", (cid,)
+        ).fetchone() == (True,)
+        regs = c.execute(
+            "SELECT origen, colaborador_id, detalle FROM auditoria.bitacora "
+            "WHERE accion = 'MODIFICACION' AND colaborador_id = %s",
+            (cid,),
+        ).fetchall()
+    assert [(o, col, d) for o, col, d in regs if "celular_invalido" in str(d)] == [
+        ("SISTEMA", cid, {"campos": ["celular_invalido"]})
+    ]
+    (item,) = (await _resolver(entorno, [cid])).json()["items"]
+    assert item["elegible"] is False and item["motivo"] == "CELULAR_INVALIDO"
+    assert item["celular"] is None
+
+
+async def test_numero_invalido_respeta_la_empresa_y_los_datos_incompletos(entorno, motor):
+    from cc_colaboradores.consumidores import manejar_evento
+
+    cid = entorno["con_nss"]
+    otra = entorno["datos"]["b"]
+    ajeno = {"tipo": "wa.numero_invalido", "colaborador_id": cid, "empresa_id": otra}
+    assert await manejar_evento(motor, object(), ajeno) is False  # la RLS lo oculta
+    for roto in ({"tipo": "wa.numero_invalido"}, {**ajeno, "colaborador_id": "x"}):
+        assert await manejar_evento(motor, object(), roto) is False
+    with psycopg.connect(entorno["datos"]["bd"].url_admin) as c:
+        assert c.execute(
+            "SELECT celular_invalido FROM colaboradores.colaborador WHERE id = %s", (cid,)
+        ).fetchone() == (False,)
 
 
 # ------------------------------------------------------------------ INT-COL-07 y 08

@@ -1,15 +1,19 @@
 """Aplicación FastAPI del servicio whatsapp (design.md §3.7).
 
-En esta etapa expone ``/salud`` y ejecuta el ``relay-outbox`` que publica los eventos de las
-Lambdas (``wa.mensaje_estado``, ``wa.plantilla_estado``, ``wa.numero_invalido``). Las rutas de chat
-(WAP-01 a 05) y el ``worker-whatsapp-entrada`` se agregan en sus tareas.
+Expone ``/salud`` y el chat de RH (WAP-01 a 05, ``/api/v1/conversaciones``) y ejecuta el
+``relay-outbox`` que publica los eventos de las Lambdas y del bot (``wa.mensaje_estado``,
+``wa.plantilla_estado``, ``wa.numero_invalido``, ``wa.respuesta_recibida``) y los mensajes de salida
+del chat. El ``worker-whatsapp-entrada`` corre aparte. ``cifrador``, ``colaboradores``,
+``notificaciones`` y ``reloj`` son inyectables; los clientes se crean al primer uso.
 """
 
 from __future__ import annotations
 
 import asyncio
-from collections.abc import AsyncIterator
+import time
+from collections.abc import AsyncIterator, Callable
 from contextlib import asynccontextmanager
+from datetime import UTC, datetime
 from typing import Any
 
 from cc_common.auth import VerificadorToken
@@ -27,6 +31,11 @@ def crear_app(
     *,
     motor: Any | None = None,
     verificador: Any | None = None,
+    cifrador: Any | None = None,
+    colaboradores: Any | None = None,
+    notificaciones: Any | None = None,
+    reloj: Callable[[], datetime] | None = None,
+    secreto_interno: Callable[[], str] | None = None,
 ) -> FastAPI:
     cfg = config or ConfigWhatsapp()
 
@@ -63,13 +72,40 @@ def crear_app(
     app.state.verificador = verificador or VerificadorToken(
         cfg.cognito_emisor, cfg.cognito_client_id
     )
+    app.state.cifrador = cifrador
+    app.state.colaboradores = colaboradores
+    app.state.notificaciones = notificaciones
+    app.state.reloj = reloj or (lambda: datetime.now(UTC))
+    app.state.secreto_interno = secreto_interno or _secreto_interno_de(cfg)
     instalar_manejadores(app)
 
     @app.get("/salud", include_in_schema=False)
     def salud() -> dict[str, str]:
         return {"estado": "ok", "servicio": cfg.servicio, "version": VERSION}
 
+    from cc_whatsapp.api import registrar_rutas
+
+    registrar_rutas(app)
     return app
+
+
+def _secreto_interno_de(cfg: ConfigWhatsapp) -> Callable[[], str]:
+    """Lee ``cc/{env}/internal-auth`` al primer uso y lo guarda 5 minutos (tolera la rotación)."""
+    estado: dict[str, Any] = {"valor": None, "hasta": 0.0}
+
+    def leer() -> str:
+        if estado["valor"] is None or time.monotonic() > estado["hasta"]:
+            if not cfg.internal_auth_secreto_id:
+                from cc_common.errores import ErrorInterno
+
+                raise ErrorInterno("SECRETO_INTERNO_NO_CONFIGURADO", "Servicio no configurado.")
+            from cc_common.recursos import leer_secreto
+
+            estado["valor"] = leer_secreto(cfg.internal_auth_secreto_id, cfg.region)
+            estado["hasta"] = time.monotonic() + 300
+        return estado["valor"]
+
+    return leer
 
 
 async def _relay(app: FastAPI, parar: asyncio.Event) -> None:

@@ -1,4 +1,4 @@
-"""Rutas ``/internal`` de colaboradores (INT-COL-01 a 05, 07 y 08).
+"""Rutas ``/internal`` de colaboradores (INT-COL-01 a 10).
 
 No están en API Gateway: solo se alcanzan desde las tareas y Lambdas por grupo de seguridad, con
 el token interno (design.md §11.1). Cada ruta declara qué servicios pueden llamarla, y la empresa
@@ -10,11 +10,16 @@ from __future__ import annotations
 from typing import Annotated, Any, Literal
 
 from cc_common.internal_client import LlamadaInterna, requiere_servicio
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel, ConfigDict, Field
 
 from cc_colaboradores.dependencias import campos, cifrador, motor
 from cc_colaboradores.servicios import internas as servicio
+from cc_colaboradores.servicios.audiencia_query_service import (
+    LIMITE_MAXIMO,
+    LIMITE_POR_DEFECTO,
+    AudienciaQueryService,
+)
 
 router = APIRouter(prefix="/internal", tags=["internas"])
 
@@ -66,6 +71,8 @@ class ResolverContactos(_Entrada):
     ids: list[int] = Field(min_length=1, max_length=500)
     proposito: Literal["NOTIFICACION", "CONSTANCIA", "VERIFICACION", "CHAT", "CORREO"]
     variables: Variables | None = None
+    # Solo elegibilidad: sin celular, correo ni valores (lo usa NOT-22 para filtrar fallidos).
+    solo_elegibilidad: bool = False
 
 
 class Contacto(BaseModel):
@@ -75,6 +82,7 @@ class Contacto(BaseModel):
     celular: str | None = None
     correo: str | None = None
     valores: dict[str, str] = Field(default_factory=dict)
+    faltantes: list[str] = Field(default_factory=list)
 
 
 class Contactos(BaseModel):
@@ -145,7 +153,14 @@ async def resolver_contactos(
     c=Depends(campos),
 ) -> Contactos:
     items = await servicio.resolver_contactos(
-        m, cif, c, ll.empresa_id, entrada.ids, entrada.proposito, entrada.variables
+        m,
+        cif,
+        c,
+        ll.empresa_id,
+        entrada.ids,
+        entrada.proposito,
+        entrada.variables,
+        solo_elegibilidad=entrada.solo_elegibilidad,
     )
     return Contactos(items=[Contacto(**i.__dict__) for i in items])
 
@@ -187,3 +202,65 @@ CAMPOS = requiere_servicio("campos")
 @router.get("/campos/{campo_id}/uso", response_model=UsoDeCampo, summary="INT-COL-10")
 async def uso_de_campo(campo_id: int, ll: LlamadaInterna = CAMPOS, m=Depends(motor)) -> UsoDeCampo:
     return UsoDeCampo(con_valores=await servicio.campo_con_valores(m, ll.empresa_id, campo_id))
+
+
+AUDIENCIAS = requiere_servicio("notificaciones")
+
+
+class EvaluarAudiencia(_Entrada):
+    criterios: dict[str, Any]
+    solo_conteo: bool = False
+    cursor: str | None = Field(default=None, max_length=200)
+    limite: int = Field(default=LIMITE_POR_DEFECTO, ge=1, le=LIMITE_MAXIMO)
+    zona_horaria: str | None = Field(default=None, max_length=64)
+
+
+class EmbudoDto(BaseModel):
+    seleccionados: int
+    con_consentimiento: int
+    activos: int
+    celular_valido: int
+
+
+class ItemAudienciaDto(BaseModel):
+    id: int
+    nombre: str
+    planta_nombre: str | None
+    celular_ultimos4: str
+    motivo_exclusion: Literal["SIN_CONSENTIMIENTO", "ESTATUS_BAJA", "SIN_CELULAR_VALIDO"] | None
+
+
+class AudienciaEvaluada(BaseModel):
+    total: int
+    embudo: EmbudoDto
+    items: list[ItemAudienciaDto]
+    siguiente_cursor: str | None = None
+
+
+@router.post(
+    "/colaboradores/audiencias:evaluar", response_model=AudienciaEvaluada, summary="INT-COL-06"
+)
+async def evaluar_audiencia(
+    entrada: EvaluarAudiencia,
+    request: Request,
+    ll: LlamadaInterna = AUDIENCIAS,
+    m=Depends(motor),
+    c=Depends(campos),
+) -> AudienciaEvaluada:
+    """Evalúa criterios de audiencia (CC-REQ-100, 105). Devuelve el embudo y, salvo con
+    ``solo_conteo``, los colaboradores seleccionados con datos mínimos no sensibles (id, nombre,
+    planta, últimos 4 del celular y motivo de exclusión). Nunca el celular completo."""
+    r = await AudienciaQueryService(m, c, request.app.state.config.zona_horaria).evaluar(
+        ll.empresa_id,
+        entrada.criterios,
+        solo_conteo=entrada.solo_conteo,
+        cursor=entrada.cursor,
+        limite=entrada.limite,
+        zona_horaria=entrada.zona_horaria,
+    )
+    return AudienciaEvaluada(
+        total=r.total,
+        embudo=EmbudoDto(**r.embudo.__dict__),
+        items=[ItemAudienciaDto(**i.__dict__) for i in r.items],
+        siguiente_cursor=r.siguiente_cursor,
+    )

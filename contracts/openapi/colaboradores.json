@@ -1,6 +1,42 @@
 {
   "components": {
     "schemas": {
+      "AudienciaEvaluada": {
+        "properties": {
+          "embudo": {
+            "$ref": "#/components/schemas/EmbudoDto"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ItemAudienciaDto"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "siguiente_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Siguiente Cursor"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total",
+          "embudo",
+          "items"
+        ],
+        "title": "AudienciaEvaluada",
+        "type": "object"
+      },
       "Baja": {
         "additionalProperties": false,
         "properties": {
@@ -729,6 +765,13 @@
             "title": "Elegible",
             "type": "boolean"
           },
+          "faltantes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Faltantes",
+            "type": "array"
+          },
           "id": {
             "title": "Id",
             "type": "integer"
@@ -836,6 +879,34 @@
         "title": "Desafio",
         "type": "object"
       },
+      "EmbudoDto": {
+        "properties": {
+          "activos": {
+            "title": "Activos",
+            "type": "integer"
+          },
+          "celular_valido": {
+            "title": "Celular Valido",
+            "type": "integer"
+          },
+          "con_consentimiento": {
+            "title": "Con Consentimiento",
+            "type": "integer"
+          },
+          "seleccionados": {
+            "title": "Seleccionados",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "seleccionados",
+          "con_consentimiento",
+          "activos",
+          "celular_valido"
+        ],
+        "title": "EmbudoDto",
+        "type": "object"
+      },
       "ErrorDeFila": {
         "properties": {
           "codigo": {
@@ -896,6 +967,57 @@
           "vigente_hasta"
         ],
         "title": "EstadoConsentimiento",
+        "type": "object"
+      },
+      "EvaluarAudiencia": {
+        "additionalProperties": false,
+        "properties": {
+          "criterios": {
+            "additionalProperties": true,
+            "title": "Criterios",
+            "type": "object"
+          },
+          "cursor": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cursor"
+          },
+          "limite": {
+            "default": 500,
+            "maximum": 1000.0,
+            "minimum": 1.0,
+            "title": "Limite",
+            "type": "integer"
+          },
+          "solo_conteo": {
+            "default": false,
+            "title": "Solo Conteo",
+            "type": "boolean"
+          },
+          "zona_horaria": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Zona Horaria"
+          }
+        },
+        "required": [
+          "criterios"
+        ],
+        "title": "EvaluarAudiencia",
         "type": "object"
       },
       "Faltantes": {
@@ -962,6 +1084,58 @@
           }
         },
         "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "ItemAudienciaDto": {
+        "properties": {
+          "celular_ultimos4": {
+            "title": "Celular Ultimos4",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "motivo_exclusion": {
+            "anyOf": [
+              {
+                "enum": [
+                  "SIN_CONSENTIMIENTO",
+                  "ESTATUS_BAJA",
+                  "SIN_CELULAR_VALIDO"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motivo Exclusion"
+          },
+          "nombre": {
+            "title": "Nombre",
+            "type": "string"
+          },
+          "planta_nombre": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planta Nombre"
+          }
+        },
+        "required": [
+          "id",
+          "nombre",
+          "planta_nombre",
+          "celular_ultimos4",
+          "motivo_exclusion"
+        ],
+        "title": "ItemAudienciaDto",
         "type": "object"
       },
       "LogotipoConfirmar": {
@@ -1586,6 +1760,11 @@
             ],
             "title": "Proposito",
             "type": "string"
+          },
+          "solo_elegibilidad": {
+            "default": false,
+            "title": "Solo Elegibilidad",
+            "type": "boolean"
           },
           "variables": {
             "anyOf": [
@@ -3334,6 +3513,82 @@
           }
         },
         "summary": "INT-COL-10",
+        "tags": [
+          "internas"
+        ]
+      }
+    },
+    "/internal/colaboradores/audiencias:evaluar": {
+      "post": {
+        "description": "Evalúa criterios de audiencia (CC-REQ-100, 105). Devuelve el embudo y, salvo con\n``solo_conteo``, los colaboradores seleccionados con datos mínimos no sensibles (id, nombre,\nplanta, últimos 4 del celular y motivo de exclusión). Nunca el celular completo.",
+        "operationId": "evaluar_audiencia_internal_colaboradores_audiencias_evaluar_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-empresa-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Empresa-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EvaluarAudiencia"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AudienciaEvaluada"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "INT-COL-06",
         "tags": [
           "internas"
         ]

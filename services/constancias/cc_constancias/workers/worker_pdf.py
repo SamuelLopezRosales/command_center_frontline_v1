@@ -135,7 +135,7 @@ async def procesar_solicitud(
         async with transaccion(motor, empresa_id) as conn:
             await servicio.registrar_fallo(
                 conn, cfg, empresa_id=empresa_id, solicitud=s, motivo="CAMPOS_FALTANTES",
-                desde=ABIERTAS,
+                desde=ABIERTAS, campos=[*r.desconocidas, *r.faltantes],
             )  # fmt: skip
         return "FALLIDA"
     resumen = await colaboradores.resumen(empresa_id, s["colaborador_id"])

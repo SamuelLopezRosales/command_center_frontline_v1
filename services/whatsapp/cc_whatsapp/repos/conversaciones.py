@@ -41,7 +41,7 @@ async def abierta_por_hash(conn: AsyncConnection, huella: bytes) -> dict[str, An
     r = await conn.execute(
         text(
             f"SELECT {COLUMNAS} FROM whatsapp.conversacion_whatsapp "  # noqa: S608
-            f"WHERE celular_hash = :h AND estado IN {ABIERTAS} FOR UPDATE"
+            f"WHERE celular_hash = :h AND estado IN {ABIERTAS} FOR NO KEY UPDATE"
         ),
         {"h": huella},
     )
@@ -50,17 +50,56 @@ async def abierta_por_hash(conn: AsyncConnection, huella: bytes) -> dict[str, An
 
 
 async def crear(
-    conn: AsyncConnection, *, empresa_id: int, huella: bytes, colaborador_id: int, estado: str
+    conn: AsyncConnection,
+    *,
+    empresa_id: int,
+    huella: bytes,
+    colaborador_id: int,
+    estado: str,
+    origen: str = "CONSTANCIA",
 ) -> dict[str, Any]:
     r = await conn.execute(
         text(
             "INSERT INTO whatsapp.conversacion_whatsapp (empresa_id, colaborador_id, estado, "  # noqa: S608
             "celular_hash, origen, ultimo_mensaje_entrante_at) "
-            f"VALUES (:e, :c, :s, :h, 'CONSTANCIA', now()) RETURNING {COLUMNAS}"  # noqa: S608
+            f"VALUES (:e, :c, :s, :h, :o, now()) RETURNING {COLUMNAS}"  # noqa: S608
         ),
-        {"e": empresa_id, "c": colaborador_id, "s": estado, "h": huella},
+        {"e": empresa_id, "c": colaborador_id, "s": estado, "h": huella, "o": origen},
     )
     return dict(r.mappings().one())
+
+
+async def notificacion_reciente(conn: AsyncConnection, colaborador_id: int, horas: int) -> bool:
+    """El colaborador recibió (``ENVIADO`` o más) una notificación dentro de la ventana."""
+    r = await conn.execute(
+        text(
+            "SELECT EXISTS (SELECT 1 FROM whatsapp.mensaje_whatsapp WHERE colaborador_id = :c "
+            "AND direccion = 'SALIENTE' AND origen_tipo = 'NOTIFICACION' "
+            "AND estado IN ('ENVIADO', 'ENTREGADO', 'LEIDO') "
+            "AND fecha_hora > now() - make_interval(hours => :h))"
+        ),
+        {"c": colaborador_id, "h": horas},
+    )
+    return bool(r.scalar_one())
+
+
+async def vincular_entrante(
+    conn: AsyncConnection,
+    wamid: str,
+    *,
+    conversacion_id: int,
+    colaborador_id: int,
+    contenido_cifrado: bytes | None,
+) -> None:
+    """Liga el mensaje entrante a la conversación del chat de RH (y guarda su contenido cifrado,
+    solo si el bot tiene cifrador y la conversación es de respuesta a una notificación)."""
+    await conn.execute(
+        text(
+            "UPDATE whatsapp.mensaje_whatsapp SET conversacion_id = :c, colaborador_id = :k, "
+            "contenido_cifrado = :b WHERE clave_idempotencia = :id"
+        ),
+        {"c": conversacion_id, "k": colaborador_id, "b": contenido_cifrado, "id": clave_de(wamid)},
+    )
 
 
 async def tocar_entrante(conn: AsyncConnection, conversacion_id: int) -> None:

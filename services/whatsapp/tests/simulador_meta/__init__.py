@@ -8,6 +8,10 @@ Sustituye a Meta mientras no hay cuenta vinculada:
 - **API de mensajes:** un ``httpx.MockTransport`` que responde como Graph API: acepta envíos con
   identificador ``wamid``, valida el token y simula errores (número no válido, ventana cerrada,
   límite de tasa, fallo 5xx). Guarda lo recibido en ``enviados``.
+- **API de plantillas (T-216):** ``POST /{waba}/message_templates`` (crea en ``PENDING``),
+  ``POST /{id}`` (edita), ``GET /{waba}/message_templates?name=`` (consulta). ``aprobar`` y
+  ``rechazar`` cambian el estado en el simulador, como lo haría la revisión de Meta; el aviso por
+  webhook se arma con ``cambio_de_plantilla``. Los errores de ``siguientes`` también aplican.
 
 Corre dentro del proceso de prueba: no necesita puertos ni red.
 """
@@ -36,11 +40,14 @@ class SimuladorMeta:
         verify_token: str = "token-de-verificacion",
         phone_number_id: str = "PN-PRUEBA",
         access_token: str = "token-de-acceso",
+        waba_id: str = "WABA-PRUEBA",
     ) -> None:
         self.app_secret = app_secret
         self.verify_token = verify_token
         self.phone_number_id = phone_number_id
         self.access_token = access_token
+        self.waba_id = waba_id
+        self.plantillas: dict[str, dict[str, Any]] = {}  # nombre -> plantilla
         self.enviados: list[dict[str, Any]] = []
         self.por_destino: dict[str, tuple[int, int]] = {}  # destino -> error permanente
         self.siguientes: list[tuple[int, int]] = []  # errores de los próximos envíos
@@ -55,6 +62,7 @@ class SimuladorMeta:
             "verify_token": self.verify_token,
             "phone_number_id": self.phone_number_id,
             "access_token": self.access_token,
+            "waba_id": self.waba_id,
         }
 
     def firma(self, cuerpo: bytes, secreto: str | None = None) -> str:
@@ -146,9 +154,65 @@ class SimuladorMeta:
 
     # ------------------------------------------------------------------ API de mensajes
 
+    def aprobar(self, nombre: str) -> None:
+        self.plantillas[nombre]["status"] = "APPROVED"
+        self.plantillas[nombre]["rejected_reason"] = "NONE"
+
+    def rechazar(self, nombre: str, motivo: str = "INVALID_FORMAT") -> None:
+        self.plantillas[nombre]["status"] = "REJECTED"
+        self.plantillas[nombre]["rejected_reason"] = motivo
+
+    def _responder_plantillas(self, peticion: httpx.Request) -> httpx.Response:
+        ruta = peticion.url.path
+        if ruta.endswith(f"/{self.waba_id}/message_templates"):
+            if peticion.method == "GET":
+                nombre = peticion.url.params.get("name")
+                datos = [p for p in self.plantillas.values() if nombre in (None, p["name"])]
+                return httpx.Response(200, json={"data": datos})
+            cuerpo = json.loads(peticion.content)
+            if cuerpo.get("name") in self.plantillas:
+                return httpx.Response(
+                    400, json={"error": {"code": 100, "error_subcode": 2388024, "message": "dup"}}
+                )
+            cuerpo_texto = next(c for c in cuerpo["components"] if c["type"] == "BODY")
+            self._n += 1
+            self.plantillas[cuerpo["name"]] = {
+                "id": f"TPL{self._n}",
+                "name": cuerpo["name"],
+                "language": cuerpo["language"],
+                "category": cuerpo["category"],
+                "status": "PENDING",
+                "rejected_reason": "NONE",
+                "texto": cuerpo_texto["text"],
+                "ejemplo": cuerpo_texto.get("example"),
+            }
+            return httpx.Response(
+                200,
+                json={"id": f"TPL{self._n}", "status": "PENDING", "category": cuerpo["category"]},
+            )
+        existente = next(
+            (p for p in self.plantillas.values() if ruta.endswith(f"/{p['id']}")), None
+        )
+        if existente is None:
+            return httpx.Response(404, json={"error": {"code": 100, "message": "ruta"}})
+        cuerpo = json.loads(peticion.content)
+        existente["texto"] = next(c for c in cuerpo["components"] if c["type"] == "BODY")["text"]
+        existente["status"] = "PENDING"  # la edición vuelve a revisión
+        existente["rejected_reason"] = "NONE"
+        return httpx.Response(200, json={"success": True})
+
     def _responder(self, peticion: httpx.Request) -> httpx.Response:
         if peticion.headers.get("authorization") != f"Bearer {self.access_token}":
             return httpx.Response(401, json={"error": {"code": 190, "message": "token"}})
+        if "/message_templates" in peticion.url.path or (
+            peticion.method == "POST" and "/messages" not in peticion.url.path
+        ):
+            if self.siguientes:
+                error = self.siguientes.pop(0)
+                return httpx.Response(
+                    error[0], json={"error": {"code": error[1], "message": "sim"}}
+                )
+            return self._responder_plantillas(peticion)
         cuerpo = json.loads(peticion.content)
         if f"/{self.phone_number_id}/messages" not in peticion.url.path:
             return httpx.Response(404, json={"error": {"code": 100, "message": "ruta"}})
@@ -162,3 +226,7 @@ class SimuladorMeta:
 
     def cliente_http(self) -> httpx.Client:
         return httpx.Client(transport=httpx.MockTransport(self._responder))
+
+    def transporte(self) -> httpx.MockTransport:
+        """Para ``httpx.AsyncClient(transport=...)`` (cliente de plantillas de `notificaciones`)."""
+        return httpx.MockTransport(self._responder)
