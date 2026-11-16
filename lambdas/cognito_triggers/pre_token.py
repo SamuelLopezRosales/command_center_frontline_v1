@@ -28,6 +28,14 @@ class SesionNoPermitida(Exception):  # noqa: N818
     pass
 
 
+def _dict(padre: dict[str, Any], clave: str) -> dict[str, Any]:
+    """El diccionario `padre[clave]`; si falta o es `None`, lo crea y lo deja en `padre`."""
+    valor = padre.get(clave)
+    if not isinstance(valor, dict):
+        valor = padre[clave] = {}
+    return valor
+
+
 def handler(event: dict[str, Any], context: Any = None) -> dict[str, Any]:
     sub = (event.get("request", {}).get("userAttributes", {}) or {}).get("sub")
     if not sub:
@@ -54,13 +62,14 @@ def handler(event: dict[str, Any], context: Any = None) -> dict[str, Any]:
         log.warning("token rechazado", extra={"motivo": "inactividad"})
         raise SesionNoPermitida(MENSAJE)
 
-    respuesta = event.setdefault("response", {}) or {}
-    event["response"] = respuesta
-    detalles = respuesta.setdefault("claimsAndScopeOverrideDetails", {})
-    acceso = detalles.setdefault("accessTokenGeneration", {})
+    # Cognito envía las claves de la respuesta presentes pero en `null`: `setdefault` no las
+    # reemplaza, así que cada nivel se asegura con `_dict` (falla vista al iniciar sesión en AWS).
+    respuesta = _dict(event, "response")
+    detalles = _dict(respuesta, "claimsAndScopeOverrideDetails")
+    acceso = _dict(detalles, "accessTokenGeneration")
     # usuario_id: los servicios lo necesitan para la bitácora y sus llaves foráneas sin leer
     # identidad.usuario (D-03); decisión de Samuel del 14 de noviembre de 2026.
-    acceso.setdefault("claimsToAddOrOverride", {}).update(
+    _dict(acceso, "claimsToAddOrOverride").update(
         {"empresa_id": str(empresa_id), "rol": rol, "usuario_id": str(usuario_id)}
     )
     return event

@@ -20,7 +20,8 @@ export interface ConfigCognito {
   registroAbierto?: boolean;
 }
 
-function traducir(e: unknown): ErrorAcceso {
+/** `registro`: las Lambdas de Cognito rechazan el alta; en el acceso, un rechazo o una falla no es un alta. */
+function traducir(e: unknown, contexto: "acceso" | "registro" = "acceso"): ErrorAcceso {
   const nombre = (e as { name?: string })?.name ?? "";
   if (nombre === "NotAuthorizedException" || nombre === "UserNotFoundException")
     return new ErrorAcceso("CREDENCIALES", "Correo o contraseña incorrectos.");
@@ -28,8 +29,13 @@ function traducir(e: unknown): ErrorAcceso {
     return new ErrorAcceso("CODIGO_INVALIDO", "El código no es válido o venció.");
   if (nombre === "LimitExceededException" || nombre === "TooManyRequestsException")
     return new ErrorAcceso("LIMITE", "Demasiados intentos. Espera unos minutos.");
-  if (nombre === "UserLambdaValidationException" || nombre === "UsernameExistsException" || nombre === "InvalidPasswordException")
+  if (
+    contexto === "registro" &&
+    (nombre === "UserLambdaValidationException" || nombre === "UsernameExistsException" || nombre === "InvalidPasswordException")
+  )
     return new ErrorAcceso("REGISTRO", "No se pudo crear la cuenta. Revisa tus datos (y el código de invitación, si te lo pidieron).");
+  if (nombre === "UserLambdaValidationException" || nombre === "UnexpectedLambdaException")
+    return new ErrorAcceso("SESION", "No se pudo iniciar la sesión. Intenta de nuevo; si sigue igual, avisa a quien administra el sistema.");
   return new ErrorAcceso("DESCONOCIDO", "No se pudo completar la operación. Intenta de nuevo.");
 }
 
@@ -89,14 +95,14 @@ export function crearAmplifyAuth(cfg: ConfigCognito): ServicioAuth {
         });
         return { requiereConfirmacion: r.nextStep.signUpStep === "CONFIRM_SIGN_UP" };
       } catch (e) {
-        throw traducir(e);
+        throw traducir(e, "registro");
       }
     },
     async confirmarRegistro(correo, codigo) {
       try {
         await confirmSignUp({ username: correo, confirmationCode: codigo });
       } catch (e) {
-        throw traducir(e);
+        throw traducir(e, "registro");
       }
     },
     async solicitarRecuperacion(correo) {

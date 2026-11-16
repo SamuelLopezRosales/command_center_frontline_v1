@@ -30,7 +30,7 @@ export interface ServicioAuth {
 
 export class ErrorAcceso extends Error {
   constructor(
-    readonly codigo: "CREDENCIALES" | "CODIGO_INVALIDO" | "REGISTRO" | "LIMITE" | "DESCONOCIDO",
+    readonly codigo: "CREDENCIALES" | "CODIGO_INVALIDO" | "REGISTRO" | "SESION" | "LIMITE" | "DESCONOCIDO",
     mensaje: string,
   ) {
     super(mensaje);

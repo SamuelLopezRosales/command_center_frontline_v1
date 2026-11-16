@@ -94,3 +94,23 @@ def test_primer_inicio_sin_actividad_previa_se_permite(bd):
 def test_evento_sin_sub_no_agrega_nada(bd):
     ev = {"triggerSource": "TokenGeneration_Authentication", "request": {}, "response": {}}
     assert pre_token.handler(ev)["response"] == {}
+
+
+@pytest.mark.parametrize(
+    "respuesta",
+    [
+        None,
+        {"claimsAndScopeOverrideDetails": None},  # forma real de Cognito: la clave llega en `null`
+        {"claimsAndScopeOverrideDetails": {"accessTokenGeneration": None}},
+        {
+            "claimsAndScopeOverrideDetails": {
+                "accessTokenGeneration": {"claimsToAddOrOverride": None}
+            }
+        },
+    ],
+)
+def test_tolera_las_claves_de_la_respuesta_en_null(bd, respuesta):
+    ev = evento()
+    ev["response"] = respuesta
+    claims = _claims(pre_token.handler(ev))
+    assert claims["rol"] == "RH" and claims["empresa_id"] == str(bd["empresa"])
