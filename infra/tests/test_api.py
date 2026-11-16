@@ -168,19 +168,14 @@ def test_registro_de_acceso_sin_ruta_real_encabezados_ni_cuerpos(plantilla):
 
 
 # ------------------------------------------------------------------------------ test y prod
-def test_en_test_se_usa_el_endpoint_predeterminado_y_cors_de_cloudfront(plantilla):
+def test_en_test_se_usa_el_endpoint_predeterminado_y_sin_cors_con_comodines(plantilla):
     (api,) = propiedades(plantilla, "AWS::ApiGatewayV2::Api")
     assert api["ProtocolType"] == "HTTP"
     assert not api.get("DisableExecuteApiEndpoint")  # PQ-22: sin dominio propio en test
     assert not recursos(plantilla, "AWS::ApiGatewayV2::DomainName")
-    assert api["CorsConfiguration"]["AllowOrigins"] == ["https://*.cloudfront.net"]
-    assert set(api["CorsConfiguration"]["AllowMethods"]) == {
-        "GET",
-        "POST",
-        "PUT",
-        "PATCH",
-        "DELETE",
-    }
+    # API Gateway rechaza comodines en CORS (falla vista al desplegar `samuel`): mismo origen, sin CORS
+    assert "CorsConfiguration" not in api
+    assert "*" not in json.dumps(api)
 
 
 def test_prod_deshabilita_el_endpoint_predeterminado_y_usa_dominio_regional_tls12(plantilla_prod):

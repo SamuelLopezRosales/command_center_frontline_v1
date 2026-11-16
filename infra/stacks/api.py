@@ -30,8 +30,9 @@ Decisiones (``docs/desviaciones.md``):
 - **Registro de acceso**: sin ruta real (``$context.path`` llevaría el token de ``/d/{token}``),
   sin encabezados, sin consulta y sin cuerpos; solo la clave de ruta con plantilla, estado y
   latencia. ``requestId`` es la ``correlacion_id`` (§15.1) y se propaga al ALB.
-- **CORS**: mismo origen (CloudFront sirve la SPA y ``/api``); solo se admite el origen de
-  CloudFront (los dominios de CloudFront en ``test``, el dominio propio en ``prod``).
+- **CORS**: mismo origen (CloudFront sirve la SPA y ``/api``). Con dominio propio solo se admite
+  ese origen; sin dominio (``test``, ``samuel``) no se configura CORS: API Gateway no admite
+  comodines (``https://*.cloudfront.net``) y con el mismo origen no hay preflight.
 
 Todo lo de otros stacks llega por ARN o por referencia de salida: ningún permiso ni regla se
 agrega a un recurso ajeno.
@@ -55,7 +56,6 @@ from constructs import Construct
 from infra.config.esquema import Ambiente
 from infra.constructs.nag import reconocer
 from infra.constructs.retencion import politica_retencion
-from infra.stacks.storage import ORIGEN_CORS_SIN_DOMINIO
 
 GRUPO_SUBREDES_APLICACION = "aplicacion"
 ENCABEZADO_CORRELACION = "X-Correlation-Id"
@@ -188,16 +188,12 @@ class ApiStack(cdk.Stack):
         integracion_lambda = integrations.HttpLambdaIntegration("IntegracionWebhook", webhook)
 
         # ------------------------------------------------------------------ API
-        origen_cors = f"https://{ambiente.dominio}" if ambiente.dominio else ORIGEN_CORS_SIN_DOMINIO
-        self.api = apigw.HttpApi(
-            self,
-            "Api",
-            api_name=f"cc-{env}",
-            description="Command Center: API pública (JWT de Cognito, rutas públicas y webhook)",
-            create_default_stage=False,
-            disable_execute_api_endpoint=bool(dominio_origen),
-            cors_preflight=apigw.CorsPreflightOptions(
-                allow_origins=[origen_cors],
+        # Con dominio propio solo se admite ese origen. Sin dominio (test, samuel) el origen de
+        # CloudFront no se conoce al crear la API y API Gateway no admite comodines: no se
+        # configura CORS, porque la SPA y `/api` salen por el mismo dominio (sin preflight).
+        cors = (
+            apigw.CorsPreflightOptions(
+                allow_origins=[f"https://{ambiente.dominio}"],
                 allow_methods=[
                     apigw.CorsHttpMethod.GET,
                     apigw.CorsHttpMethod.POST,
@@ -207,7 +203,18 @@ class ApiStack(cdk.Stack):
                 ],
                 allow_headers=["Authorization", "Content-Type", "Accept", ENCABEZADO_CORRELACION],
                 max_age=cdk.Duration.hours(1),
-            ),
+            )
+            if ambiente.dominio
+            else None
+        )
+        self.api = apigw.HttpApi(
+            self,
+            "Api",
+            api_name=f"cc-{env}",
+            description="Command Center: API pública (JWT de Cognito, rutas públicas y webhook)",
+            create_default_stage=False,
+            disable_execute_api_endpoint=bool(dominio_origen),
+            cors_preflight=cors,
         )
         autorizador = authorizers.HttpJwtAuthorizer(
             "Jwt",
