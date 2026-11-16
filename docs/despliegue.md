@@ -216,6 +216,21 @@ proyecto. El script lo avisa en su salida. Si no se quiere ni eso, use `-SoloSyn
    `./ops.sh bootstrap --razon-social "..."` con `aws ecs execute-command` y detener la tarea. El código de
    invitación se muestra **una sola vez**, en la consola de la persona; el script nunca lo ve ni lo
    registra (ECS Exec no graba la sesión en CloudWatch; la auditoría queda en CloudTrail).
+
+   **Ejecute los comandos uno por uno, no pegados juntos.** El agente de ECS Exec tarda uno o dos
+   minutos en quedar listo: `aws ecs execute-command` falla con `execute command agent isn't running`
+   si se lanza justo al pasar la tarea a `RUNNING`. Antes de ejecutarlo, espere con:
+
+   ```powershell
+   do { Start-Sleep 8; $agente = aws ecs describe-tasks --cluster cc-<ambiente> --tasks $tarea --query "tasks[0].containers[0].managedAgents[?name=='ExecuteCommandAgent']|[0].lastStatus" --output text --profile <perfil> --region <region> } until ($agente -eq "RUNNING")
+   ```
+
+   **Con `economia.registro = ABIERTO` la empresa debe existir antes de que alguien se registre.**
+   `post-confirmation` asigna a quien se registra a la única empresa activa; si aún no hay ninguna lo
+   rechaza (`sin_empresa_unica`) y la SPA muestra el mensaje genérico de registro. Cognito deja al
+   usuario `CONFIRMED` sin fila en la base: hay que borrarlo (`aws cognito-idp admin-delete-user
+   --user-pool-id <id> --username <correo> --profile <perfil>`) y registrarse de nuevo. El código de
+   invitación que imprime `bootstrap` no se usa en ese modo.
 2. **`empresa_id_whatsapp`**: tras crear la empresa, anote su id y vuelva a ejecutar el script con
    `-Contexto empresa_id_whatsapp=<id>` para que el worker de WhatsApp lo reciba (las migraciones y las
    contraseñas son idempotentes).
