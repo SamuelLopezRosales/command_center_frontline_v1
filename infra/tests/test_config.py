@@ -132,3 +132,14 @@ def test_el_mfa_solo_admite_on_optional_u_off_y_prod_exige_on():
     datos["ambientes"]["test"]["economia"]["permite_borrado"] = False  # tipo prod
     with pytest.raises(ConfiguracionInvalida, match="MFA obligatorio"):
         parsear(_texto(datos))
+
+
+def test_todo_ambiente_de_ambientes_json_es_un_valor_valido_de_cc_ambiente(monkeypatch):
+    """Los servicios reciben ``CC_AMBIENTE=<nombre>``: un nombre que ``cc_common`` rechace tumba
+    todas las tareas al arrancar (falla vista al desplegar `samuel` por primera vez)."""
+    from cc_common.config import Configuracion
+
+    monkeypatch.setenv("CC_SERVICIO", "prueba")
+    for nombre in esquema.cargar():
+        monkeypatch.setenv("CC_AMBIENTE", nombre)
+        assert Configuracion().ambiente == nombre

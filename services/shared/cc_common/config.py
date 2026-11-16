@@ -18,7 +18,9 @@ class Configuracion(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="CC_", extra="ignore", frozen=True)
 
     servicio: str = Field(min_length=1)
-    ambiente: Literal["local", "dev", "test", "prod"] = "local"
+    # Nombre de un ambiente de `infra/config/ambientes.json` (test, prod, samuel...): el servicio no
+    # conoce la lista, solo exige un nombre bien formado. `local` es el equipo de desarrollo.
+    ambiente: str = Field(default="local", pattern=r"^[a-z][a-z0-9-]{1,19}$")
     region: str = "us-east-1"
     zona_horaria: str = "America/Mexico_City"
     log_nivel: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
