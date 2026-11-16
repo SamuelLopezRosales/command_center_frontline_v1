@@ -243,3 +243,11 @@ def test_la_plantilla_no_lleva_secretos(plantilla):
     assert "origin-verify" not in t
     assert "akia" not in t
     assert "secretsmanager:" not in t
+
+
+def test_la_etapa_se_crea_despues_de_todas_las_rutas(plantilla):
+    """Los ajustes por ruta de la etapa nombran rutas por texto; sin DependsOn, CloudFormation
+    podía crear la etapa antes (falla vista al desplegar `samuel`)."""
+    (etapa,) = recursos(plantilla, "AWS::ApiGatewayV2::Stage").values()
+    rutas = recursos(plantilla, "AWS::ApiGatewayV2::Route")
+    assert rutas and set(rutas) <= set(etapa["DependsOn"])

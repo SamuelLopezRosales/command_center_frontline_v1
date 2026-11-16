@@ -281,6 +281,10 @@ class ApiStack(cdk.Stack):
                     "ThrottlingBurstLimit": limite.rafaga,
                 }
         cfn_etapa.add_property_override("RouteSettings", configuracion)
+        # Los ajustes por ruta nombran las rutas con texto: CloudFormation no ve esa dependencia y
+        # podía crear la etapa antes (error "Unable to find Route by key ANY /api/{proxy+}").
+        for ruta in self.rutas:
+            cfn_etapa.node.add_dependency(ruta)
 
         # ------------------------------------------------------------------ dominio de origen
         if dominio_origen and certificado_origen_arn:
