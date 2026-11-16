@@ -19,6 +19,23 @@ datos de cada ambiente, sus diferencias y la limpieza.
 | Frase de aprobación del script | `apruebo T-229` (`infra/config/despliegue.json`) |
 | Contextos `-c` obligatorios | Ninguno (los opcionales: `empresa_id_whatsapp`, `respaldo`) |
 
+## 1b. Ambiente `samuel` (cuenta nueva de la organización)
+
+Es donde se hace el despliegue final de T-229 y T-230 (el ambiente `test` y su cuenta quedan sin tocar).
+
+| Dato | Valor |
+|---|---|
+| Ambiente | `samuel` |
+| Cuenta permitida | `795359731321` |
+| Región | `us-east-1` |
+| Perfil | `cc-samuel-sdk`: llaves de acceso del usuario IAM `samuel-depliegue-sdk-command-center` (nunca del usuario raíz), guardadas por `aws configure` fuera del repositorio. Se desactivan al terminar la ventana |
+| Presupuesto | 70 USD al mes (`command-center-samuel-mensual`); mismas alertas, a `samuel.lopez@honne.com` |
+| Frase de aprobación del script | `apruebo despliegue samuel` |
+| Economía | Igual que `test` (NAT por instancia, sin Multi-AZ, sin WAF, workers en 0) |
+| Diferencias propias | Sin reserva de concurrencia de Lambda (`reservar_concurrencia: false`, cuota de 10) y **sin MFA** (`mfa: OFF`); ver `desviaciones.md` |
+| Costo de la ventana (14 días, todo encendido) | 66.81 USD estimados por el script; no incluye transferencia de datos |
+| Limpieza | La ejecuta Samuel: `cdk destroy --all --profile cc-samuel-sdk` y después desactivar las llaves de acceso. La guía de T-230 irá en `docs/limpieza-samuel.md` |
+
 ## 2. Diferencias entre `test` y producción
 
 `prod` conserva el diseño de `design.md`. Ningún valor de `test` se aplica a `prod` sin revisión: `retencion.py` rechaza un `prod` con borrado permitido. **Un ambiente es "tipo prod" cuando su `economia.permite_borrado` es `false`** (retención `RETAIN`, región de recuperación, pipeline por defecto, contextos obligatorios). Hoy `ambientes.json` solo define `test`: `prod` se prueba con un ambiente sintético en `infra/tests` y en `scripts/tests/test_desplegar.py`.
