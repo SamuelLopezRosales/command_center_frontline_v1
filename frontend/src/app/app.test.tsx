@@ -115,6 +115,27 @@ describe("registro con invitación", () => {
   });
 });
 
+describe("registro abierto (ambientes de prueba)", () => {
+  it("no pide el código de invitación y registra sin él", async () => {
+    let recibido: unknown = null;
+    const auth = authSimulado({
+      registroAbierto: true,
+      registrar: async (d) => {
+        recibido = d;
+        return { requiereConfirmacion: true };
+      },
+    });
+    const usuario = userEvent.setup();
+    renderizar(<Rutas />, { auth, ruta: "/registro" });
+    await usuario.type(await screen.findByLabelText("Nombre completo"), "Ana Pérez");
+    expect(screen.queryByLabelText("Código de invitación")).toBeNull();
+    await usuario.type(screen.getByLabelText("Usuario o correo"), "ana@honne.com");
+    await usuario.type(screen.getByLabelText("Contraseña"), "Contrasena-Larga-1!");
+    await usuario.click(screen.getByRole("button", { name: "Crear cuenta" }));
+    expect(await screen.findByLabelText("Código del correo")).toBeTruthy();
+    expect(recibido).toMatchObject({ correo: "ana@honne.com", nombre: "Ana Pérez" });
+  });
+});
 describe("recuperación de contraseña", () => {
   it("envía el código y restablece", async () => {
     const auth = authSimulado();

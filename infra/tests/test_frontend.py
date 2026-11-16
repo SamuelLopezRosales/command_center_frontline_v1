@@ -73,7 +73,13 @@ def test_la_configuracion_de_ejecucion_lleva_solo_identificadores_publicos(
 ):
     stacks, _ = ensamblado_test
     config = stacks["frontend"].configuracion
-    assert set(config) == {"userPoolId", "userPoolClientId", "region", "apiBaseUrl"}
+    assert set(config) == {
+        "userPoolId",
+        "userPoolClientId",
+        "region",
+        "apiBaseUrl",
+        "registroAbierto",
+    }
     assert config["region"] == "us-east-1"
     # Los valores de Cognito y la URL de CloudFront llegan por marcadores (referencias de CDK).
     marcadores = {k: v for m in _despliegue(plantilla)["SourceMarkers"] for k, v in m.items()}

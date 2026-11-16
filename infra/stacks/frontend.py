@@ -72,6 +72,8 @@ class FrontendStack(cdk.Stack):
             "userPoolId": user_pool_id,
             "userPoolClientId": cliente_id,
             "region": self.region,
+            # La pantalla de registro no pide el código de invitación si el ambiente es abierto.
+            "registroAbierto": ambiente.economia.registro == "ABIERTO",
             # Mismo origen: CloudFront sirve la SPA y /api (design.md §11.4).
             "apiBaseUrl": f"https://{dominio_publico}",
         }

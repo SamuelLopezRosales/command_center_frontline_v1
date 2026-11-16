@@ -164,6 +164,9 @@ class AuthStack(cdk.Stack):
         self.alias: dict[str, lambda_.Alias] = {}
         for nombre, (modulo, descripcion) in TRIGGERS.items():
             entorno = {"CC_DB_SECRET_ARN": secreto_bd.secret_arn}
+            if nombre in ("pre-signup", "post-confirmation"):
+                entorno["CC_REGISTRO"] = ambiente.economia.registro
+                entorno["CC_REGISTRO_DOMINIOS"] = ",".join(ambiente.economia.registro_dominios)
             if host_bd:
                 entorno["CC_DB_HOST"] = host_bd
             fn = lambda_.Function(

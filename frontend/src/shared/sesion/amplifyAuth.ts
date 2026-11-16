@@ -16,6 +16,8 @@ import { ErrorAcceso, type PasoAcceso, type ServicioAuth } from "./servicioAuth"
 export interface ConfigCognito {
   userPoolId: string;
   userPoolClientId: string;
+  /** Sin código de invitación (ambientes de prueba con registro abierto). */
+  registroAbierto?: boolean;
 }
 
 function traducir(e: unknown): ErrorAcceso {
@@ -27,7 +29,7 @@ function traducir(e: unknown): ErrorAcceso {
   if (nombre === "LimitExceededException" || nombre === "TooManyRequestsException")
     return new ErrorAcceso("LIMITE", "Demasiados intentos. Espera unos minutos.");
   if (nombre === "UserLambdaValidationException" || nombre === "UsernameExistsException" || nombre === "InvalidPasswordException")
-    return new ErrorAcceso("REGISTRO", "No se pudo crear la cuenta. Revisa el código de invitación y tus datos.");
+    return new ErrorAcceso("REGISTRO", "No se pudo crear la cuenta. Revisa tus datos (y el código de invitación, si te lo pidieron).");
   return new ErrorAcceso("DESCONOCIDO", "No se pudo completar la operación. Intenta de nuevo.");
 }
 
@@ -54,6 +56,7 @@ export function crearAmplifyAuth(cfg: ConfigCognito): ServicioAuth {
   Amplify.configure({ Auth: { Cognito: { userPoolId: cfg.userPoolId, userPoolClientId: cfg.userPoolClientId } } });
 
   return {
+    registroAbierto: cfg.registroAbierto === true,
     async iniciarSesion(correo, contrasena) {
       try {
         const r = await signIn({ username: correo, password: contrasena });
@@ -75,7 +78,14 @@ export function crearAmplifyAuth(cfg: ConfigCognito): ServicioAuth {
         const r = await signUp({
           username: d.correo,
           password: d.contrasena,
-          options: { userAttributes: { email: d.correo, name: d.nombre, "custom:codigo_invitacion": d.codigoInvitacion } },
+          options: {
+            userAttributes: {
+              email: d.correo,
+              name: d.nombre,
+              // Con registro abierto no hay código: el trigger de Cognito no lo espera.
+              ...(cfg.registroAbierto ? {} : { "custom:codigo_invitacion": d.codigoInvitacion ?? "" }),
+            },
+          },
         });
         return { requiereConfirmacion: r.nextStep.signUpStep === "CONFIRM_SIGN_UP" };
       } catch (e) {

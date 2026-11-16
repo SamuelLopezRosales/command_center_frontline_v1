@@ -17,15 +17,18 @@ const esquema = z.object({
   contrasena: z.string().min(12, t.contrasenaCorta).refine(fuerte, t.politica),
   codigoInvitacion: z.string().trim().min(1, t.requerido),
 });
+// Con registro abierto no hay código de invitación: el resto de la validación es la misma.
+const esquemaAbierto = esquema.extend({ codigoInvitacion: z.string().trim().optional() });
 const esquemaConfirmar = z.object({ codigo: z.string().trim().min(1, t.requerido) });
 
-/** Registro con código de invitación (CC-REQ-008). Pantalla sin diseño: validación visual pendiente (PQ-09). */
+/** Registro con código de invitación (CC-REQ-008), o sin él en ambientes de registro abierto. Pantalla sin diseño: validación visual pendiente (PQ-09). */
 export function PaginaRegistro() {
   const { auth } = useSesion();
   const navegar = useNavigate();
   const [correoPendiente, setCorreoPendiente] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const form = useForm({ resolver: zodResolver(esquema) });
+  const abierto = auth.registroAbierto === true;
+  const form = useForm({ resolver: zodResolver(abierto ? esquemaAbierto : esquema) });
   const confirmar = useForm({ resolver: zodResolver(esquemaConfirmar) });
 
   const enviar = form.handleSubmit(async (v) => {
@@ -79,7 +82,9 @@ export function PaginaRegistro() {
           error={form.formState.errors.contrasena?.message}
           {...form.register("contrasena")}
         />
-        <Campo etiqueta={t.codigoInvitacion} autoComplete="off" error={form.formState.errors.codigoInvitacion?.message} {...form.register("codigoInvitacion")} />
+        {!abierto && (
+          <Campo etiqueta={t.codigoInvitacion} autoComplete="off" error={form.formState.errors.codigoInvitacion?.message} {...form.register("codigoInvitacion")} />
+        )}
         <button className="btn btn-primario" type="submit" disabled={form.formState.isSubmitting}>{t.crearCuenta}</button>
       </form>
       <div className="enlaces"><Link to="/acceso">{t.yaTienesCuenta}</Link></div>

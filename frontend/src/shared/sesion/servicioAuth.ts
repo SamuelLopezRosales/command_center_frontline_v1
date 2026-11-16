@@ -10,10 +10,13 @@ export interface DatosRegistro {
   nombre: string;
   correo: string;
   contrasena: string;
-  codigoInvitacion: string;
+  /** Obligatorio salvo que `registroAbierto` sea verdadero. */
+  codigoInvitacion?: string;
 }
 
 export interface ServicioAuth {
+  /** Registro sin código de invitación (ambientes de prueba). */
+  registroAbierto?: boolean;
   iniciarSesion(correo: string, contrasena: string): Promise<PasoAcceso>;
   confirmarTotp(codigo: string): Promise<PasoAcceso>;
   registrar(datos: DatosRegistro): Promise<{ requiereConfirmacion: boolean }>;

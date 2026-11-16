@@ -45,7 +45,8 @@ GRANT USAGE ON SCHEMA colaboradores, constancias TO svc_dashboard;
 GRANT SELECT ON colaboradores.v_resumen, colaboradores.v_alertas,
                 constancias.v_resumen, constancias.v_historial,
                 constancias.v_solicitudes_recientes, constancias.v_alertas TO svc_dashboard;
-GRANT EXECUTE ON FUNCTION identidad.validar_invitacion(bytea), identidad.usuario_por_sub(text) TO svc_dashboard;
+GRANT EXECUTE ON FUNCTION identidad.validar_invitacion(bytea), identidad.usuario_por_sub(text),
+  identidad.empresa_unica() TO svc_dashboard;
 
 -- Las funciones de las vistas de colaboradores no deben ejecutarse por otros roles.
 REVOKE EXECUTE ON FUNCTION colaboradores.f_unaccent(text) FROM PUBLIC;

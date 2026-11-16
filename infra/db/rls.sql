@@ -58,6 +58,15 @@ CREATE OR REPLACE FUNCTION identidad.usuario_por_sub(p_sub text)
 
 REVOKE ALL ON FUNCTION identidad.validar_invitacion(bytea) FROM PUBLIC;
 REVOKE ALL ON FUNCTION identidad.usuario_por_sub(text) FROM PUBLIC;
+-- Registro abierto (ambientes de prueba): la empresa a la que se asigna quien se registra sin
+-- invitación. Solo existe si hay exactamente una empresa activa; con cero o varias devuelve NULL
+-- y el registro se rechaza (nunca se adivina la empresa).
+CREATE OR REPLACE FUNCTION identidad.empresa_unica()
+  RETURNS bigint
+  LANGUAGE sql STABLE SECURITY DEFINER SET search_path = pg_catalog, identidad AS $$
+    SELECT CASE WHEN count(*) = 1 THEN min(e.id) END FROM identidad.empresa e WHERE e.activa
+  $$;
+REVOKE ALL ON FUNCTION identidad.empresa_unica() FROM PUBLIC;
 
 -- Descargas y verificación públicas de constancias (T-209): no hay sesión ni empresa, así que se
 -- resuelven por funciones que solo ven lo mínimo y se ejecutan con los privilegios del dueño.

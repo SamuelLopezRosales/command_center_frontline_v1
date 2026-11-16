@@ -1,5 +1,9 @@
 """``cognito-pre-signup`` (LAM-07): valida la invitación antes de permitir el registro.
 
+Con ``CC_REGISTRO=ABIERTO`` (solo ambientes de prueba) no hay invitación: se admite el registro de
+correos de ``CC_REGISTRO_DOMINIOS`` y Cognito sigue verificando que el correo sea de quien se
+registra.
+
 Rechaza, con un mensaje genérico, un registro sin código, con código inexistente, vencido o
 usado, o con un correo distinto al que exige la invitación. Nunca confirma al usuario ni verifica
 su correo: eso lo hace Cognito con el código enviado por correo (design.md §4.6; CC-REQ-007, 008).
@@ -19,6 +23,20 @@ def handler(event: dict[str, Any], context: Any = None) -> dict[str, Any]:
         raise comun.rechazar("origen_no_permitido")
 
     atributos = event.get("request", {}).get("userAttributes", {}) or {}
+    if comun.registro_abierto():
+        correo = (atributos.get("email") or "").strip().lower()
+        if not correo:
+            raise comun.rechazar("sin_correo")
+        if not comun.dominio_permitido(correo):
+            raise comun.rechazar("dominio_no_permitido")
+        event["response"] = {
+            **(event.get("response") or {}),
+            "autoConfirmUser": False,
+            "autoVerifyEmail": False,
+            "autoVerifyPhone": False,
+        }
+        return event
+
     codigo = (atributos.get(comun.ATRIBUTO_CODIGO) or "").strip()
     correo = (atributos.get("email") or "").strip().lower()
     if not codigo or len(codigo) > comun.CODIGO_LONGITUD_MAX:

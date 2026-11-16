@@ -84,7 +84,7 @@ def test_tareas_migrar_y_ops_en_fargate_arm64(plantilla):
 
 
 def test_cada_tarea_usa_la_etiqueta_publicada_de_su_imagen(plantilla):
-    assert ETIQUETAS == {"migrar": "0.1.1", "ops": "0.1.0"}
+    assert ETIQUETAS == {"migrar": "0.1.2", "ops": "0.1.0"}
     for familia, t in _tareas(plantilla).items():
         (c,) = t["ContainerDefinitions"]
         imagen = json.dumps(c["Image"])

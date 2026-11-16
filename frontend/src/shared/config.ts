@@ -15,6 +15,8 @@ export interface ConfigEjecucion {
   region: string;
   /** Vacío = mismo origen (CloudFront sirve la SPA y `/api`). */
   apiBaseUrl: string;
+  /** Registro sin código de invitación (solo ambientes de prueba): la pantalla no lo pide. */
+  registroAbierto: boolean;
 }
 
 export const RUTA_CONFIG = "/config.json";
@@ -32,6 +34,7 @@ export function validarConfig(crudo: unknown): ConfigEjecucion {
     userPoolClientId: texto(c.userPoolClientId),
     region: texto(c.region),
     apiBaseUrl: texto(c.apiBaseUrl),
+    registroAbierto: c.registroAbierto === true,
   };
   if (!config.userPoolId || !config.userPoolClientId) {
     throw new Error("La configuración de ejecución no trae userPoolId y userPoolClientId.");
@@ -56,6 +59,7 @@ export async function cargarConfig(
     userPoolClientId: entorno.VITE_COGNITO_CLIENT_ID,
     region: "",
     apiBaseUrl: "",
+    registroAbierto: false,
   };
   return validarConfig(alternativa);
 }

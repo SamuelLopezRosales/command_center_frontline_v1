@@ -39,7 +39,8 @@ from infra.constructs.retencion import politica_retencion
 GRUPO_SUBREDES_APLICACION = "aplicacion"
 # Etiqueta publicada de cada imagen (los repositorios son inmutables: un cambio exige otra).
 # migrar 0.1.1: roles.sql sin ALTER ROLE innecesario (T-047).
-ETIQUETAS: dict[str, str] = {"migrar": "0.1.1", "ops": "0.1.0"}
+# migrar 0.1.2: función identidad.empresa_unica() para el registro abierto.
+ETIQUETAS: dict[str, str] = {"migrar": "0.1.2", "ops": "0.1.0"}
 REPOSITORIOS = ("migrar", "ops")
 ROLES_BD = (
     "svc_dashboard",

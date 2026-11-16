@@ -15,7 +15,11 @@ import "./styles.css";
 async function crearAuth() {
   if (import.meta.env.DEV && import.meta.env.VITE_AUTH_LOCAL === "true") return crearAuthLocal();
   const config = await cargarConfig();
-  return crearAmplifyAuth({ userPoolId: config.userPoolId, userPoolClientId: config.userPoolClientId });
+  return crearAmplifyAuth({
+    userPoolId: config.userPoolId,
+    userPoolClientId: config.userPoolClientId,
+    registroAbierto: config.registroAbierto,
+  });
 }
 
 const cliente = new QueryClient({ defaultOptions: { queries: { retry: false, refetchOnWindowFocus: false } } });

@@ -17,6 +17,7 @@ PERFIL_TEST = "cc-test"
 ETIQUETAS_OBLIGATORIAS = ("proyecto", "ambiente", "responsable")
 _CUENTA = re.compile(r"^\d{12}$")
 _REGION = re.compile(r"^[a-z]{2}-[a-z]+-\d$")
+_DOMINIO = re.compile(r"^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$")
 _CORREO = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 # Patrones de llaves de acceso de AWS: el archivo de configuración nunca debe contenerlos.
 _LLAVE_AWS = re.compile(r"(?:AKIA|ASIA|AIDA|AROA)[0-9A-Z]{16}")
@@ -56,6 +57,10 @@ class Economia:
     reservar_concurrencia: bool = True
     # MFA de Cognito: ON (obligatorio, CC-REQ-002), OPTIONAL u OFF. Solo ON es válido en prod.
     mfa: str = "ON"
+    # Registro de usuarios: INVITACION (código de invitación, CC-REQ-008) o ABIERTO (sin código;
+    # solo correos de ``registro_dominios``, todos con el rol RH de la única empresa).
+    registro: str = "INVITACION"
+    registro_dominios: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -135,6 +140,8 @@ def _construir_ambiente(nombre: str, datos: dict[str, Any], proyecto: str) -> Am
         permite_borrado=bool(eco["permite_borrado"]),
         reservar_concurrencia=bool(eco.get("reservar_concurrencia", True)),
         mfa=str(eco.get("mfa", "ON")),
+        registro=str(eco.get("registro", "INVITACION")),
+        registro_dominios=tuple(str(d).strip().lower() for d in eco.get("registro_dominios", [])),
     )
     if economia.mfa not in ("ON", "OPTIONAL", "OFF"):
         raise ConfiguracionInvalida(f"{ctx}: 'mfa' debe ser ON, OPTIONAL u OFF")
@@ -142,6 +149,19 @@ def _construir_ambiente(nombre: str, datos: dict[str, Any], proyecto: str) -> Am
         raise ConfiguracionInvalida(
             f"{ctx}: un ambiente tipo prod exige MFA obligatorio (CC-REQ-002)"
         )
+    if economia.registro not in ("INVITACION", "ABIERTO"):
+        raise ConfiguracionInvalida(f"{ctx}: 'registro' debe ser INVITACION o ABIERTO")
+    if economia.registro == "ABIERTO":
+        if not economia.permite_borrado:
+            raise ConfiguracionInvalida(
+                f"{ctx}: un ambiente tipo prod exige registro por invitación (CC-REQ-008)"
+            )
+        if not economia.registro_dominios or not all(
+            _DOMINIO.match(d) for d in economia.registro_dominios
+        ):
+            raise ConfiguracionInvalida(
+                f"{ctx}: el registro abierto exige registro_dominios con dominios válidos"
+            )
     if economia.nat not in ("instancia", "gateway"):
         raise ConfiguracionInvalida(f"{ctx}: 'nat' debe ser 'instancia' o 'gateway'")
     return Ambiente(

@@ -63,7 +63,9 @@
         "retencion_respaldos_dias": 1,
         "permite_borrado": true,
         "reservar_concurrencia": false,
-        "mfa": "OFF"
+        "mfa": "OFF",
+        "registro": "ABIERTO",
+        "registro_dominios": ["honne.com"]
       },
       "dominio": null
     }

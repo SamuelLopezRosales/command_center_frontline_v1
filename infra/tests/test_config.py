@@ -143,3 +143,29 @@ def test_todo_ambiente_de_ambientes_json_es_un_valor_valido_de_cc_ambiente(monke
     for nombre in esquema.cargar():
         monkeypatch.setenv("CC_AMBIENTE", nombre)
         assert Configuracion().ambiente == nombre
+
+
+def test_registro_por_invitacion_por_defecto_y_abierto_solo_en_samuel():
+    assert esquema.obtener_ambiente("test").economia.registro == "INVITACION"
+    samuel = esquema.obtener_ambiente("samuel").economia
+    assert samuel.registro == "ABIERTO" and samuel.registro_dominios == ("honne.com",)
+
+
+def test_el_registro_abierto_exige_dominios_y_no_se_admite_en_prod():
+    datos = _base()
+    eco = datos["ambientes"]["test"]["economia"]
+    eco["registro"] = "ABIERTO"
+    with pytest.raises(ConfiguracionInvalida, match="registro_dominios"):
+        parsear(_texto(datos))
+    eco["registro_dominios"] = ["no es un dominio"]
+    with pytest.raises(ConfiguracionInvalida, match="registro_dominios"):
+        parsear(_texto(datos))
+    eco["registro_dominios"] = ["Honne.com"]
+    assert parsear(_texto(datos))["test"].economia.registro_dominios == ("honne.com",)
+    eco["permite_borrado"] = False  # tipo prod
+    eco["mfa"] = "ON"
+    with pytest.raises(ConfiguracionInvalida, match="invitación"):
+        parsear(_texto(datos))
+    eco["registro"] = "OTRO"
+    with pytest.raises(ConfiguracionInvalida, match="registro"):
+        parsear(_texto(datos))

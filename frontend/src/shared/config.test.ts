@@ -12,6 +12,7 @@ describe("configuración de ejecución", () => {
         userPoolClientId: "cliente",
         region: "us-east-1",
         apiBaseUrl: "https://d1.cloudfront.net",
+        registroAbierto: true,
       }),
     );
     const c = await cargarConfig(cargador, {});
@@ -21,6 +22,7 @@ describe("configuración de ejecución", () => {
       userPoolClientId: "cliente",
       region: "us-east-1",
       apiBaseUrl: "https://d1.cloudfront.net",
+      registroAbierto: true,
     });
   });
 
@@ -32,6 +34,7 @@ describe("configuración de ejecución", () => {
     });
     expect(c.userPoolId).toBe("us-east-1_dev");
     expect(c.apiBaseUrl).toBe("");
+    expect(c.registroAbierto).toBe(false); // sin archivo, el registro exige invitación
   });
 
   it("una respuesta HTML (servidor de desarrollo) no se toma como configuración", async () => {

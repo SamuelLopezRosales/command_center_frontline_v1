@@ -55,6 +55,30 @@ def _registrar(conn: Any, sub: str, correo: str, nombre: str, codigo: str) -> bo
     return True
 
 
+def _registrar_abierto(conn: Any, sub: str, correo: str, nombre: str) -> bool:
+    """Registro sin invitación: la empresa es la única empresa activa. Idempotente."""
+    if conn.execute("SELECT 1 FROM identidad.usuario_por_sub(%s)", (sub,)).fetchone():
+        return False
+    if not comun.dominio_permitido(correo):
+        raise comun.rechazar("dominio_no_permitido")
+    empresa_id = conn.execute("SELECT identidad.empresa_unica()").fetchone()[0]
+    if empresa_id is None:
+        raise comun.rechazar("sin_empresa_unica")
+    comun.fijar_empresa(conn, empresa_id)
+    usuario_id = conn.execute(
+        "INSERT INTO identidad.usuario (empresa_id, nombre, correo, cognito_sub, rol) "
+        "VALUES (%s, %s, %s, %s, 'RH') RETURNING id",
+        (empresa_id, nombre, correo, sub),
+    ).fetchone()[0]
+    conn.execute(
+        "INSERT INTO auditoria.bitacora "
+        "(empresa_id, usuario_id, accion, entidad, entidad_id, origen) "
+        "VALUES (%s, %s, 'USUARIO_REGISTRADO', 'usuario', %s, 'USUARIO')",
+        (empresa_id, usuario_id, usuario_id),
+    )
+    return True
+
+
 def _invalidar_codigo(event: dict[str, Any]) -> None:
     try:
         comun.cliente_cognito().admin_update_user_attributes(
@@ -76,6 +100,13 @@ def handler(event: dict[str, Any], context: Any = None) -> dict[str, Any]:
     sub = atributos.get("sub")
     correo = (atributos.get("email") or "").strip().lower()
     nombre = (atributos.get("name") or "").strip() or correo
+    if comun.registro_abierto():
+        if not sub or not correo:
+            raise comun.rechazar("datos_incompletos")
+        with comun.abrir_conexion() as conn, conn.transaction():
+            _registrar_abierto(conn, sub, correo, nombre)
+        return event
+
     codigo = (atributos.get(comun.ATRIBUTO_CODIGO) or "").strip()
     if not sub or not correo or not codigo or len(codigo) > comun.CODIGO_LONGITUD_MAX:
         raise comun.rechazar("datos_incompletos")

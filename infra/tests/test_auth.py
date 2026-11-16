@@ -206,3 +206,25 @@ def test_mfa_apagado_en_el_ambiente_samuel_y_obligatorio_en_los_demas():
     p = _pool(Template.from_stack(construir_stacks(app, amb, destino)["auth"]))
     assert p["MfaConfiguration"] == "OFF"
     assert "EnabledMfas" not in p and "SmsConfiguration" not in p
+
+
+def _entornos_de_triggers(plantilla) -> dict[str, dict]:
+    return {
+        f["FunctionName"]: f["Environment"]["Variables"]
+        for f in plantilla.find_resources("AWS::Lambda::Function").values()
+        for f in [f["Properties"]]
+    }
+
+
+def test_registro_abierto_solo_se_activa_en_los_triggers_de_registro_de_samuel(plantilla):
+    # `test`: por invitación
+    test = _entornos_de_triggers(plantilla)
+    assert test["cc-test-cognito-pre-signup"]["CC_REGISTRO"] == "INVITACION"
+    assert test["cc-test-cognito-post-confirmation"]["CC_REGISTRO_DOMINIOS"] == ""
+    assert "CC_REGISTRO" not in test["cc-test-cognito-pre-token"]
+    # `samuel`: abierto para los dominios configurados
+    app, amb, destino = crear_app("samuel", {"CDK_DEFAULT_ACCOUNT": "795359731321"})
+    samuel = _entornos_de_triggers(Template.from_stack(construir_stacks(app, amb, destino)["auth"]))
+    for f in ("cc-samuel-cognito-pre-signup", "cc-samuel-cognito-post-confirmation"):
+        assert samuel[f]["CC_REGISTRO"] == "ABIERTO"
+        assert samuel[f]["CC_REGISTRO_DOMINIOS"] == "honne.com"

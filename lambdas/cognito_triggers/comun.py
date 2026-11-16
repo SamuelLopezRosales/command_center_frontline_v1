@@ -34,6 +34,19 @@ class RegistroNoAutorizado(Exception):  # noqa: N818
         self.motivo = motivo  # solo para el registro interno, nunca para el usuario
 
 
+def registro_abierto() -> bool:
+    """``CC_REGISTRO=ABIERTO``: registro sin código de invitación (solo ambientes de prueba)."""
+    return os.environ.get("CC_REGISTRO", "INVITACION").strip().upper() == "ABIERTO"
+
+
+def dominio_permitido(correo: str) -> bool:
+    """El correo pertenece a uno de ``CC_REGISTRO_DOMINIOS`` (separados por comas). Sin
+    dominios configurados no se permite ninguno."""
+    permitidos = {d.strip().lower() for d in os.environ.get("CC_REGISTRO_DOMINIOS", "").split(",")}
+    permitidos.discard("")
+    return "@" in correo and correo.rsplit("@", 1)[1].strip().lower() in permitidos
+
+
 def hash_codigo(codigo: str) -> bytes:
     return hashlib.sha256(codigo.encode()).digest()
 
