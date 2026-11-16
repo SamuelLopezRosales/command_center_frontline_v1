@@ -1,0 +1,8 @@
+{
+  "version_minima_bootstrap": 21,
+  "ambientes": {
+    "test": {
+      "frase_aprobacion": "apruebo T-229"
+    }
+  }
+}

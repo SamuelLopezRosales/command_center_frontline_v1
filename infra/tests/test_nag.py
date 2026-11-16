@@ -86,7 +86,21 @@ def test_stacks_esperados(ensamblado):
         "CcMessaging-test.template.json",
         "CcAuth-test.template.json",
         "CcComputeBase-test.template.json",
+        "CcCompute-test.template.json",
+        "CcWorkersLambdas-test.template.json",
+        "CcApi-test.template.json",
+        "CcEdge-test.template.json",
+        "CcFrontend-test.template.json",
+        "CcObservability-test.template.json",
+        "CcBackup-test.template.json",
     } <= plantillas
+
+
+def test_en_test_no_se_sintetizan_ni_el_pipeline_ni_la_region_de_recuperacion(ensamblado):
+    """T-226: el pipeline necesita ``-c pipeline=true`` y ``us-east-2`` solo existe en ``prod``."""
+    _, out = ensamblado
+    nombres = {p.name for p in out.glob("*.template.json")}
+    assert not {n for n in nombres if "CcPipeline" in n or "CcBackupRecuperacion" in n}
 
 
 def test_reconocer_exige_motivo():

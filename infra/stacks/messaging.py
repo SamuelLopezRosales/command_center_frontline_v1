@@ -7,8 +7,11 @@
   ``notif-despacho`` y ``notif-respaldo``.
 - Tema SNS ``alertas-rh`` cifrado. Las suscripciones dependen del canal elegido (PQ-17) y no se
   crean aquí.
-- SES: identidad por correo y conjunto de configuración con eventos de rebote y queja hacia SNS.
-  La identidad de dominio con DKIM queda para cuando haya dominio (PQ-22).
+- SES: identidad por correo y conjunto de configuración con eventos de rebote y queja hacia el tema
+  ``ses-eventos``, al que se suscribe la cola ``notif-respaldo`` (la Lambda ``respaldo-correo``
+  desenvuelve el sobre de SNS, design.md §4.5). Es un tema aparte de ``alertas-rh``: ese lo leen
+  personas de RH y no debe recibir el JSON crudo de SES (T-224). La identidad de dominio con DKIM
+  queda para cuando haya dominio (PQ-22).
 
 Las alarmas de DLQ (CC-NFR-010) se crean en ``CcObservability``.
 
@@ -30,6 +33,7 @@ from aws_cdk import aws_kms as kms
 from aws_cdk import aws_scheduler as scheduler
 from aws_cdk import aws_ses as ses
 from aws_cdk import aws_sns as sns
+from aws_cdk import aws_sns_subscriptions as subs
 from aws_cdk import aws_sqs as sqs
 
 from constructs import Construct
@@ -195,9 +199,21 @@ class MessagingStack(cdk.Stack):
             sending_enabled=True,
             tls_policy=ses.ConfigurationSetTlsPolicy.REQUIRE,
         )
+        # Tema de los eventos de SES: lo consume la cola ``notif-respaldo`` (rebotes y quejas).
+        self.tema_ses = sns.Topic(
+            self,
+            "SesEventos",
+            topic_name=f"cc-{env}-ses-eventos",
+            display_name="Command Center: eventos de SES (rebotes y quejas)",
+            master_key=llave,
+            enforce_ssl=True,
+        )
+        self.tema_ses.add_subscription(
+            subs.SqsSubscription(self.colas["notif-respaldo"], raw_message_delivery=False)
+        )
         self.conjunto_ses.add_event_destination(
             "RebotesYQuejas",
-            destination=ses.EventDestination.sns_topic(self.tema_alertas),
+            destination=ses.EventDestination.sns_topic(self.tema_ses),
             events=[ses.EmailSendingEvent.BOUNCE, ses.EmailSendingEvent.COMPLAINT],
         )
         self.identidad_ses = ses.EmailIdentity(
@@ -211,5 +227,6 @@ class MessagingStack(cdk.Stack):
             cdk.CfnOutput(self, f"Url-{nombre}", value=cola.queue_url)
         cdk.CfnOutput(self, "BusEventos", value=self.bus.event_bus_name)
         cdk.CfnOutput(self, "TemaAlertasRh", value=self.tema_alertas.topic_arn)
+        cdk.CfnOutput(self, "TemaSesEventos", value=self.tema_ses.topic_arn)
         cdk.CfnOutput(self, "GrupoSchedulerEnvios", value=self.grupo_scheduler.name or "")
         cdk.CfnOutput(self, "RolSchedulerArn", value=self.rol_scheduler.role_arn)

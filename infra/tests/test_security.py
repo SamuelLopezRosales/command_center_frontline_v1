@@ -32,7 +32,7 @@ def test_llaves_borrables_en_test(plantilla):
         assert llave["Properties"]["PendingWindowInDays"] == 7
 
 
-def test_cinco_secretos_cifrados_con_kms_y_sin_valor_en_la_plantilla(plantilla):
+def test_seis_secretos_cifrados_con_kms_y_sin_valor_en_la_plantilla(plantilla):
     secretos = plantilla.find_resources("AWS::SecretsManager::Secret")
     nombres = {s["Properties"]["Name"] for s in secretos.values()}
     assert nombres == {
@@ -41,6 +41,7 @@ def test_cinco_secretos_cifrados_con_kms_y_sin_valor_en_la_plantilla(plantilla):
         "cc/test/hmac-codigo",
         "cc/test/internal-auth",
         "cc/test/cf-signing-key",
+        "cc/test/origin-verify",
     }
     for s in secretos.values():
         props = s["Properties"]
@@ -95,6 +96,7 @@ def test_llave_de_infraestructura_permite_a_eventbridge_ses_y_cloudwatch_solo_de
     assert set(s["Principal"]["Service"]) == {
         "events.amazonaws.com",
         "ses.amazonaws.com",
+        "sns.amazonaws.com",
         "cloudwatch.amazonaws.com",
     }
     assert sorted(s["Action"]) == ["kms:Decrypt", "kms:GenerateDataKey*"]
@@ -102,3 +104,27 @@ def test_llave_de_infraestructura_permite_a_eventbridge_ses_y_cloudwatch_solo_de
     assert "ServiciosDeAwsDeMensajeria" not in json.dumps(
         llaves["LlaveDatos"]["Properties"]["KeyPolicy"]
     )
+
+
+def test_llave_de_infraestructura_admite_a_cloudfront_y_cloudtrail(plantilla):
+    """T-225: OAC lee objetos cifrados y CloudTrail cifra sus archivos con la llave."""
+    claves = plantilla.find_resources("AWS::KMS::Key")
+    sentencias = [
+        s
+        for k in claves.values()
+        for s in k["Properties"]["KeyPolicy"]["Statement"]
+        if s.get("Sid", "").startswith(("CloudFront", "CloudTrail"))
+    ]
+    por_sid = {s["Sid"]: s for s in sentencias}
+    assert set(por_sid) == {
+        "CloudFrontLeeObjetosCifrados",
+        "CloudTrailCifraRegistros",
+        "CloudTrailDescribeLlave",
+    }
+    cf = por_sid["CloudFrontLeeObjetosCifrados"]
+    assert cf["Principal"] == {"Service": "cloudfront.amazonaws.com"}
+    assert cf["Action"] == "kms:Decrypt"
+    assert PERMITIDA in json.dumps(cf["Condition"])
+    ct = por_sid["CloudTrailCifraRegistros"]
+    assert ct["Action"] == "kms:GenerateDataKey*"
+    assert "trail/cc-test-*" in json.dumps(ct["Condition"])

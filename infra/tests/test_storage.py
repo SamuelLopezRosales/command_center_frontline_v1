@@ -194,3 +194,17 @@ def test_prod_cors_solo_desde_el_dominio_de_la_aplicacion(plantilla_prod):
     )
     (regla,) = cargas["Properties"]["CorsConfiguration"]["CorsRules"]
     assert regla["AllowedOrigins"] == ["https://app.ejemplo.com"]
+
+
+def test_buckets_con_nombre_fijo_para_importarlos_por_nombre(plantilla):
+    """T-224: ``CcCompute`` y ``CcEdge`` importan los buckets por nombre, sin referencias."""
+    from infra.stacks.storage import nombre_bucket
+
+    nombres = {
+        b["Properties"]["BucketName"] for b in plantilla.find_resources("AWS::S3::Bucket").values()
+    }
+    assert nombres == {
+        nombre_bucket("test", PERMITIDA, n)
+        for n in ("logs", "frontend", "plantillas", "constancias", "cargas")
+    }
+    assert nombre_bucket("test", PERMITIDA, "cargas") == f"cc-test-{PERMITIDA}-cargas"

@@ -775,7 +775,7 @@ Objetivo: WhatsApp con simulador de Meta, bot de verificación y solicitud, dash
     - (T-102, Implementar el historial de constancias (DSH-11)) pruebas de integración y de contrato: filtros por fechas, plantilla, colaborador y estado; búsqueda por folio o nombre con los índices; canal siempre `WHATSAPP`; paginación por cursor
   - Requiere aprobación: no
 
-- [ ] T-214. Prueba completa de solicitud de constancia con el simulador
+- [x] T-214. Prueba completa de solicitud de constancia con el simulador
   - Fase: 5
   - Agrupa: T-103, T-104
   - Requisitos: CC-REQ-071, CC-REQ-083, CC-REQ-086, CC-REQ-088
@@ -792,7 +792,7 @@ Objetivo: WhatsApp con simulador de Meta, bot de verificación y solicitud, dash
 
 Objetivo: Notificaciones masivas con embudo, programación, respaldo por correo y chat de RH. Todo en local (Docker, PostgreSQL y LocalStack); no toca AWS.
 
-- [ ] T-215. Servicio `notificaciones`: audiencias, `AudienciaQueryService`, INT-COL-06, embudo y revisión (NOT-01 a 06 y NOT-18)
+- [x] T-215. Servicio `notificaciones`: audiencias, `AudienciaQueryService`, INT-COL-06, embudo y revisión (NOT-01 a 06 y NOT-18)
   - Fase: 6
   - Agrupa: T-105, T-106, T-107
   - Requisitos: CC-REQ-028, CC-REQ-100, CC-REQ-101, CC-REQ-105, CC-REQ-106, CC-REQ-107
@@ -805,7 +805,7 @@ Objetivo: Notificaciones masivas con embudo, programación, respaldo por correo 
     - (T-107, Implementar el embudo y la revisión (NOT-18)) prueba de integración que reproduce el ejemplo de `cv1_09` (61, 56, 54, 54, con 5 sin consentimiento y 2 en BAJA); un solo motivo por colaborador en el orden consentimiento, estatus y celular; un renglón por colaborador seleccionado con `colaborador_nombre`, `planta_nombre` y `celular_ultimos4`; se guarda `criterios_snapshot_json` y los totales; repetir la revisión reemplaza los renglones pendientes
   - Requiere aprobación: no
 
-- [ ] T-216. Plantillas de mensaje, cliente de Meta, CRUD de notificaciones, indicadores, confirmación, horario y programación
+- [x] T-216. Plantillas de mensaje, cliente de Meta, CRUD de notificaciones, indicadores, confirmación, horario y programación
   - Fase: 6
   - Agrupa: T-108, T-109, T-110
   - Requisitos: CC-REQ-102, CC-REQ-103, CC-REQ-104, CC-REQ-108, CC-REQ-109, CC-REQ-110, CC-REQ-117, CC-REQ-119, CC-REQ-120, CC-REQ-121, CC-REQ-122
@@ -818,7 +818,7 @@ Objetivo: Notificaciones masivas con embudo, programación, respaldo por correo 
     - (T-110, Implementar la confirmación, el horario y la programación (NOT-19)) pruebas unitarias del horario (inclusive 08:00 a 20:00 en la zona de la empresa); pruebas de integración con LocalStack: fuera de horario programar da 422; enviar ahora fuera de horario da 409 hasta `confirmar_fuera_horario`, y se registra quién confirmó; sin destinatarios válidos da 422; se crea un schedule único con el nombre guardado; la bitácora lleva criterios y totales
   - Requiere aprobación: no
 
-- [ ] T-217. Lambdas `despachador`, `conciliador` y `respaldo-correo`, consumidores de eventos, máquina de estados, reintentar y cancelar
+- [x] T-217. Lambdas `despachador`, `conciliador` y `respaldo-correo`, consumidores de eventos, máquina de estados, reintentar y cancelar
   - Fase: 6
   - Agrupa: T-111, T-112, T-113, T-114, T-115
   - Requisitos: CC-REQ-103, CC-REQ-108, CC-REQ-109, CC-REQ-110, CC-REQ-111, CC-REQ-112, CC-REQ-113, CC-REQ-114, CC-REQ-115, CC-REQ-118
@@ -833,7 +833,7 @@ Objetivo: Notificaciones masivas con embudo, programación, respaldo por correo 
     - (T-115, Implementar reintentar, cancelar y las variables de plantilla (NOT-20, NOT-22 e INT-COL-05 ampliado)) pruebas de integración: reintentar solo toca `FALLIDO` de una notificación `CON_FALLAS`, respeta el horario y no incluye a quien tiene `celular_invalido`; nunca reenvía a quien ya recibió; cancelar solo desde BORRADOR o PROGRAMADA y elimina el schedule; `contactos:resolver` devuelve las variables solicitadas no sensibles por destinatario
   - Requiere aprobación: no
 
-- [ ] T-218. Chat de RH (WAP-01 a 05) y prueba completa de notificaciones con el simulador
+- [x] T-218. Chat de RH (WAP-01 a 05) y prueba completa de notificaciones con el simulador
   - Fase: 6
   - Agrupa: T-116, T-117, T-118
   - Requisitos: CC-REQ-104, CC-REQ-105, CC-REQ-108, CC-REQ-111, CC-REQ-113, CC-REQ-115, CC-REQ-116, CC-REQ-157
@@ -891,7 +891,7 @@ Objetivo: SPA de React con todas las pantallas de los diseños. Todo en local (D
     - (T-128, Implementar el historial de constancias y la página pública de verificación (`cv1_07`)) pruebas de componente: filtros, descarga y reenvío (solo con `FALLIDA`), la acción de descarga no se ofrece con `PENDIENTE`; ruta pública `/v/:codigo` sin sesión que muestra nombre, folio, fecha y estado; página `/d/:token` con botón de descarga y mensaje de enlace inválido
   - Requiere aprobación: no
 
-- [ ] T-222. Pantallas de notificaciones, plantillas de mensaje, embudo, detalle de envío, chat, usuarios e invitaciones (`cv1_08` a `cv1_10`)
+- [x] T-222. Pantallas de notificaciones, plantillas de mensaje, embudo, detalle de envío, chat, usuarios e invitaciones (`cv1_08` a `cv1_10`)
   - Fase: 7
   - Agrupa: T-129, T-130, T-131
   - Requisitos: CC-REQ-008, CC-REQ-010, CC-REQ-100, CC-REQ-101, CC-REQ-102, CC-REQ-103, CC-REQ-105, CC-REQ-107, CC-REQ-108, CC-REQ-109, CC-REQ-110, CC-REQ-115, CC-REQ-116, CC-REQ-117, CC-REQ-118, CC-REQ-119, CC-REQ-120, CC-REQ-121, CC-REQ-122
@@ -904,7 +904,7 @@ Objetivo: SPA de React con todas las pantallas de los diseños. Todo en local (D
     - (T-131, Implementar el chat de RH y la administración de usuarios e invitaciones) pruebas de componente: lista de conversaciones con la ventana y asignación; envío de texto solo con ventana abierta y de plantilla con ventana cerrada; listado de usuarios, desactivación e invitaciones con el código mostrado una sola vez
   - Requiere aprobación: no
 
-- [ ] T-223. Pruebas de la SPA: localización, accesibilidad, contratos y extremo a extremo con Playwright contra el stack local
+- [x] T-223. Pruebas de la SPA: localización, accesibilidad, contratos y extremo a extremo con Playwright contra el stack local
   - Fase: 7
   - Agrupa: T-132, T-133, T-134
   - Requisitos: CC-REQ-001, CC-REQ-020, CC-REQ-035, CC-REQ-066, CC-REQ-108, CC-NFR-012, CC-NFR-014
@@ -922,7 +922,7 @@ Objetivo: SPA de React con todas las pantallas de los diseños. Todo en local (D
 
 Objetivo: Infraestructura completa en CDK, despliegue replicable con un solo script y despliegue final a `cc-test`. T-224 a T-228 son locales. Solo T-229 y T-230 tocan AWS, cada una con una aprobación escrita.
 
-- [ ] T-224. CDK de cómputo: servicios de ECS, ALB con reglas por ruta, workers y Lambdas de mensajería
+- [x] T-224. CDK de cómputo: servicios de ECS, ALB con reglas por ruta, workers y Lambdas de mensajería
   - Fase: 8
   - Agrupa: T-135, T-136
   - Requisitos: CC-NFR-005, CC-NFR-007, CC-NFR-008, CC-NFR-016
@@ -935,7 +935,7 @@ Objetivo: Infraestructura completa en CDK, despliegue replicable con un solo scr
     - (T-136, Crear los workers y las Lambdas de mensajería en CDK) aserciones de CDK: `worker-pdf`, `worker-cargas` y `worker-whatsapp-entrada` con su escalado por cola (mínimo 0 tareas en `test` y 1 en `prod`); Lambdas `webhook-meta` (fuera de la VPC), `enviador`, `estados-entrega`, `despachador`, `conciliador` y `respaldo-correo` con memoria, tiempo, concurrencia reservada, DLQ, alias `live` y políticas de mínimo privilegio; concurrencia aprovisionada en 0 en `test`
   - Requiere aprobación: no
 
-- [ ] T-225. CDK de API, borde, SPA y observabilidad: `CcApi`, `CcEdge`, `CcFrontend` y `CcObservability`
+- [x] T-225. CDK de API, borde, SPA y observabilidad: `CcApi`, `CcEdge`, `CcFrontend` y `CcObservability`
   - Fase: 8
   - Agrupa: T-137, T-138, T-139
   - Requisitos: CC-REQ-088, CC-REQ-158, CC-NFR-008, CC-NFR-010, CC-NFR-012
@@ -948,7 +948,7 @@ Objetivo: Infraestructura completa en CDK, despliegue replicable con un solo scr
     - (T-139, Crear los stacks CcFrontend y CcObservability) aserciones de CDK: despliegue de la SPA con configuración de ejecución e invalidación; paneles de Operación, Colas, WhatsApp, Constancias y Base de datos; las alarmas de §15.2 con sus umbrales marcados como valores por confirmar; retención de logs de 30 días; CloudTrail con validación de integridad
   - Requiere aprobación: no
 
-- [ ] T-226. CDK de respaldo y pipeline, aserciones completas de infraestructura y revisión de IAM
+- [x] T-226. CDK de respaldo y pipeline, aserciones completas de infraestructura y revisión de IAM
   - Fase: 8
   - Agrupa: T-140, T-141
   - Requisitos: CC-NFR-005, CC-NFR-006, CC-NFR-008, CC-NFR-009, CC-NFR-013
@@ -961,7 +961,7 @@ Objetivo: Infraestructura completa en CDK, despliegue replicable con un solo scr
     - (T-141, Completar las aserciones de infraestructura y la revisión de IAM) pruebas que fallan si: alguna política contiene `Resource: "*"` fuera de las acciones que no admiten recurso; falta el cifrado en RDS, buckets o colas; falta DLQ; falta Object Lock en `constancias`; MFA no es obligatorio; falta una etiqueta; `CcEdge` no está en `us-east-1`; la guardia de cuenta no está activa; las aserciones de WAF, RDS Proxy, NAT Gateway y mínimo de tareas de workers son condicionales por ambiente (en `test` se verifica su ausencia o su valor económico, en `prod` su presencia)
   - Requiere aprobación: no
 
-- [ ] T-227. Despliegue replicable: `scripts/desplegar.ps1 -Ambiente <nombre>` y guía para otra cuenta de AWS
+- [x] T-227. Despliegue replicable: `scripts/desplegar.ps1 -Ambiente <nombre>` y guía para otra cuenta de AWS
   - Fase: 8
   - Agrupa: tarea nueva
   - Requisitos: CC-NFR-011, CC-NFR-013
@@ -975,7 +975,7 @@ Objetivo: Infraestructura completa en CDK, despliegue replicable con un solo scr
     - Guía `docs/despliegue.md` para otra cuenta: agregar el ambiente en `ambientes.json`, crear el perfil, hacer `cdk bootstrap`, ejecutar el script y destruir (lo hace la persona, regla 8). Incluye la revisión de `docs/ambientes.md` (antes T-010)
   - Requiere aprobación: no
 
-- [ ] T-228. Pruebas finales en local: carga con k6, seguridad, runbooks y brecha de retención y borrado
+- [x] T-228. Pruebas finales en local: carga con k6, seguridad, runbooks y brecha de retención y borrado
   - Fase: 8
   - Agrupa: T-142, T-143, T-144
   - Requisitos: CC-REQ-150, CC-REQ-153, CC-REQ-160, CC-REQ-162, CC-NFR-001, CC-NFR-002, CC-NFR-003, CC-NFR-004, CC-NFR-006, CC-NFR-008, CC-NFR-010, CC-NFR-015

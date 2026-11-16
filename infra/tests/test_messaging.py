@@ -142,11 +142,24 @@ def test_rol_de_scheduler_solo_escribe_en_las_dos_colas_de_envio(plantilla):
     assert "Colawasalida" not in recursos and "Colacolapdf" not in recursos
 
 
+def _tema(plantilla, nombre: str) -> tuple[str, dict]:
+    (par,) = (
+        (lid, t)
+        for lid, t in plantilla.find_resources("AWS::SNS::Topic").items()
+        if t["Properties"]["TopicName"] == nombre
+    )
+    return par
+
+
 def test_tema_alertas_cifrado_y_con_tls(plantilla):
-    (tema,) = plantilla.find_resources("AWS::SNS::Topic").values()
-    assert tema["Properties"]["TopicName"] == "cc-test-alertas-rh"
+    lid, tema = _tema(plantilla, "cc-test-alertas-rh")
     assert "KmsMasterKeyId" in tema["Properties"]
-    (politica,) = plantilla.find_resources("AWS::SNS::TopicPolicy").values()
+    politicas = [
+        p
+        for p in plantilla.find_resources("AWS::SNS::TopicPolicy").values()
+        if {"Ref": lid} in p["Properties"]["Topics"]
+    ]
+    (politica,) = politicas
     assert any(
         s["Effect"] == "Deny" and s["Condition"] == {"Bool": {"aws:SecureTransport": "false"}}
         for s in politica["Properties"]["PolicyDocument"]["Statement"]
@@ -165,14 +178,42 @@ def test_ses_identidad_por_correo_y_eventos_de_rebote_y_queja(plantilla):
     assert "SnsDestination" in cfg
 
 
+def test_ses_publica_en_su_propio_tema_y_no_en_alertas_rh(plantilla):
+    """Los eventos de SES (JSON crudo) van a ``ses-eventos``, no al tema que lee RH (T-224)."""
+    lid_ses, _ = _tema(plantilla, "cc-test-ses-eventos")
+    lid_rh, _ = _tema(plantilla, "cc-test-alertas-rh")
+    (dest,) = plantilla.find_resources("AWS::SES::ConfigurationSetEventDestination").values()
+    destino = dest["Properties"]["EventDestination"]["SnsDestination"]["TopicARN"]
+    assert destino == {"Ref": lid_ses} and destino != {"Ref": lid_rh}
+
+
 def test_ses_solo_publica_en_el_tema_desde_su_conjunto_de_configuracion(plantilla):
-    (politica,) = plantilla.find_resources("AWS::SNS::TopicPolicy").values()
+    lid, _ = _tema(plantilla, "cc-test-ses-eventos")
+    (politica,) = (
+        p
+        for p in plantilla.find_resources("AWS::SNS::TopicPolicy").values()
+        if {"Ref": lid} in p["Properties"]["Topics"]
+    )
     permitidas = [
         s for s in politica["Properties"]["PolicyDocument"]["Statement"] if s["Effect"] == "Allow"
     ]
     assert len(permitidas) == 1
     assert permitidas[0]["Principal"] == {"Service": "ses.amazonaws.com"}
     assert permitidas[0]["Condition"]["StringEquals"]["AWS:SourceAccount"] == PERMITIDA
+
+
+def test_notif_respaldo_esta_suscrita_al_tema_de_ses_con_el_sobre_de_sns(plantilla):
+    """``respaldo-correo`` desenvuelve el sobre de SNS (design.md §4.5): sin entrega cruda."""
+    lid, _ = _tema(plantilla, "cc-test-ses-eventos")
+    (sus,) = plantilla.find_resources("AWS::SNS::Subscription").values()
+    p = sus["Properties"]
+    assert p["Protocol"] == "sqs" and p["TopicArn"] == {"Ref": lid}
+    assert not p.get("RawMessageDelivery")
+    colas = {
+        lid_c: c["Properties"]["QueueName"]
+        for lid_c, c in plantilla.find_resources("AWS::SQS::Queue").items()
+    }
+    assert colas[p["Endpoint"]["Fn::GetAtt"][0]] == "cc-test-notif-respaldo"
 
 
 def test_las_colas_se_borran_con_cdk_destroy_en_test(plantilla):

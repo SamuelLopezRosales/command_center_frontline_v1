@@ -54,8 +54,9 @@ def verificar(
     ambiente_nombre: str = "test",
     entorno: Mapping[str, str] | None = None,
     ejecutor: Ejecutor = _ejecutor_real,
+    ruta_ambientes: Path | None = None,
 ) -> ResultadoGuardia:
-    amb = esquema.obtener_ambiente(ambiente_nombre)
+    amb = esquema.obtener_ambiente(ambiente_nombre, ruta_ambientes)
     perfil = amb.perfil
     entorno = entorno or {}
 

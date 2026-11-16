@@ -74,3 +74,20 @@ def test_lambda_llega_directo_a_rds_sin_proxy_en_test(plantilla):
     reglas = plantilla.find_resources("AWS::EC2::SecurityGroupIngress")
     descripciones = {r["Properties"].get("Description") for r in reglas.values()}
     assert "PostgreSQL desde Lambda (sin proxy)" in descripciones
+
+
+def test_http_interno_hacia_el_alb_solo_sin_dominio(plantilla):
+    """T-224: sin dominio (PQ-22) no hay certificado para el ALB interno; el listener es HTTP en
+    el 80 y solo lo alcanzan el VPC Link, ECS y Lambda (nunca internet)."""
+    reglas = [
+        r["Properties"]
+        for r in plantilla.find_resources("AWS::EC2::SecurityGroupIngress").values()
+        if r["Properties"].get("FromPort") == 80
+    ]
+    assert {r["Description"] for r in reglas} == {
+        "HTTP desde el VPC Link",
+        "HTTP interno desde ECS",
+        "HTTP interno desde Lambda",
+    }
+    for r in reglas:
+        assert "SourceSecurityGroupId" in r and "CidrIp" not in r

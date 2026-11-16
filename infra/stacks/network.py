@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import aws_cdk as cdk
 from aws_cdk import aws_ec2 as ec2
+from aws_cdk import aws_logs as logs
 
 from constructs import Construct
 from infra.config.esquema import Ambiente
@@ -110,6 +111,13 @@ class NetworkStack(cdk.Stack):
         self.sg_alb.add_ingress_rule(self.sg_vpclink, https, "Desde el VPC Link")
         self.sg_alb.add_ingress_rule(self.sg_ecs, https, "Llamadas internas desde ECS")
         self.sg_alb.add_ingress_rule(self.sg_lambda, https, "Llamadas internas desde Lambda")
+        if not ambiente.dominio:
+            # Sin dominio propio (PQ-22) no hay certificado para el ALB interno: el listener es
+            # HTTP en el puerto 80 y no sale de la VPC (T-224; docs/desviaciones.md).
+            http = ec2.Port.tcp(80)
+            self.sg_alb.add_ingress_rule(self.sg_vpclink, http, "HTTP desde el VPC Link")
+            self.sg_alb.add_ingress_rule(self.sg_ecs, http, "HTTP interno desde ECS")
+            self.sg_alb.add_ingress_rule(self.sg_lambda, http, "HTTP interno desde Lambda")
         self.sg_ecs.add_ingress_rule(self.sg_alb, ec2.Port.tcp(8000), "Desde el ALB")
         pg = ec2.Port.tcp(PUERTO_POSTGRES)
         self.sg_rds.add_ingress_rule(self.sg_ecs, pg, "PostgreSQL desde ECS")
@@ -119,7 +127,26 @@ class NetworkStack(cdk.Stack):
             # Sin RDS Proxy (cambio B), las Lambdas se conectan directo a la instancia.
             self.sg_rds.add_ingress_rule(self.sg_lambda, pg, "PostgreSQL desde Lambda (sin proxy)")
 
+        if ambiente.nombre == "prod":
+            self._registrar_flujos(ambiente)
         self._reconocer_reglas(ambiente, es_instancia)
+
+    def _registrar_flujos(self, ambiente: Ambiente) -> None:
+        """Registro de flujo de la VPC (AwsSolutions-VPC7): solo el tráfico rechazado, a CloudWatch
+        Logs con 30 días de retención. Es lo que permite investigar un bloqueo de red sin pagar el
+        registro de todo el tráfico."""
+        grupo = logs.LogGroup(
+            self,
+            "GrupoFlujosVpc",
+            log_group_name=f"/cc/{ambiente.nombre}/vpc-flujos",
+            retention=logs.RetentionDays.ONE_MONTH,
+            removal_policy=cdk.RemovalPolicy.RETAIN,
+        )
+        self.vpc.add_flow_log(
+            "FlujosRechazados",
+            destination=ec2.FlowLogDestination.to_cloud_watch_logs(grupo),
+            traffic_type=ec2.FlowLogTrafficType.REJECT,
+        )
 
     def _cifrar_disco_nat(self) -> None:
         """El constructo de instancia NAT no expone el disco: se fuerza el disco raíz cifrado."""

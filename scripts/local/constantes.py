@@ -72,6 +72,7 @@ PUERTOS_SERVICIOS = {
     "campos": 8103,
     "constancias": 8104,
     "whatsapp": 8105,
+    "notificaciones": 8106,
 }
 EMISOR = f"http://127.0.0.1:{PUERTO_PASARELA}"
 CLIENT_ID = "cc-local-spa"

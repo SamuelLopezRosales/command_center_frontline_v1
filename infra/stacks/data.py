@@ -195,6 +195,15 @@ class DataStack(cdk.Stack):
                 "Prototipo de 1 a 2 semanas con presupuesto de 50 USD: instancia en una sola "
                 "zona (tasks.md §0.4); producción usa Multi-AZ.",
             )
+        if es_prod:
+            reconocer(
+                self.instancia,
+                "AwsSolutions-IAM4[Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/"
+                "AmazonRDSEnhancedMonitoringRole]",
+                "El monitoreo ampliado de RDS (60 s, solo prod) exige este rol: la política "
+                "administrada de AWS es la única forma documentada de concederle a RDS el envío "
+                "de métricas a CloudWatch Logs; no hay una política propia equivalente.",
+            )
         if not es_prod:
             reconocer(
                 self.instancia,

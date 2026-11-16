@@ -1,0 +1,58 @@
+{
+  "version": "2026-11-15",
+  "aviso": "ESTIMACIONES con tarifas publicas de us-east-1 recordadas de memoria; no son la lista de precios de AWS ni una factura. Antes de aprobar un despliegue se contrastan con la calculadora de precios de AWS (T-229).",
+  "horas_mes": 730,
+  "dias_mes": 30.4167,
+  "tarifas": {
+    "rds_hora": {"db.t4g.micro": 0.016, "db.t4g.small": 0.032, "db.t4g.medium": 0.065, "db.t4g.large": 0.129},
+    "rds_vcpu": {"db.t4g.micro": 2, "db.t4g.small": 2, "db.t4g.medium": 2, "db.t4g.large": 2},
+    "rds_gb_mes": 0.115,
+    "rds_proxy_vcpu_hora": 0.015,
+    "nat_instancia_hora": 0.0084,
+    "nat_instancia_disco_gb_mes": 0.08,
+    "nat_gateway_hora": 0.045,
+    "ipv4_publica_hora": 0.005,
+    "fargate_vcpu_hora": 0.03238,
+    "fargate_gb_hora": 0.00356,
+    "alb_hora": 0.0225,
+    "alb_lcu_hora_minima": 0.008,
+    "secreto_mes": 0.4,
+    "kms_llave_mes": 1.0,
+    "alarma_mes": 0.1,
+    "waf_mes": 12.0,
+    "backup_gb_mes": 0.095,
+    "logs_gb": 0.5,
+    "ecr_gb_mes": 0.1,
+    "s3_otros_mes": 1.0
+  },
+  "inventario": {
+    "servicios_api": [
+      {"nombre": "dashboard", "vcpu": 0.5, "gb": 1.0},
+      {"nombre": "colaboradores", "vcpu": 0.5, "gb": 1.0},
+      {"nombre": "campos", "vcpu": 0.25, "gb": 0.5},
+      {"nombre": "constancias", "vcpu": 0.5, "gb": 1.0},
+      {"nombre": "notificaciones", "vcpu": 0.5, "gb": 1.0},
+      {"nombre": "whatsapp", "vcpu": 0.5, "gb": 1.0}
+    ],
+    "workers": [
+      {"nombre": "worker-pdf", "vcpu": 1.0, "gb": 2.0, "minimo_prod": 1},
+      {"nombre": "worker-cargas", "vcpu": 0.5, "gb": 1.0, "minimo_prod": 1},
+      {"nombre": "worker-whatsapp-entrada", "vcpu": 0.5, "gb": 1.0, "minimo_prod": 2}
+    ],
+    "secretos": 13,
+    "llaves_kms": 2,
+    "alarmas": 50,
+    "alarmas_por_servicio": 40,
+    "logs_gb_mes": 1.0,
+    "ecr_gb": 2.0,
+    "nat_disco_gb": 8,
+    "zonas_nat_prod": 2,
+    "rds_gb": {"test": 20, "prod": 100},
+    "backup_gb": {"test": 5, "prod": 100}
+  },
+  "supuestos": {
+    "worker_horas_uso_por_dia_test": 2,
+    "ventana_dias_por_defecto": 14,
+    "sin_costo_estimado": "API Gateway HTTP, CloudFront, Cognito (nivel Essentials dentro del nivel gratuito), Lambda, SQS, SNS, SES, EventBridge, CloudTrail (primer registro) y transferencia de datos: se suponen dentro del nivel gratuito o despreciables con el tráfico del prototipo"
+  }
+}

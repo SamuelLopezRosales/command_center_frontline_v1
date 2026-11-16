@@ -193,6 +193,17 @@ def sembrar_base(salida=print) -> dict[str, Any]:
                 (empresa_id, u["nombre"], u["correo"], u["sub"]),
             ).fetchone()[0]
             usuarios.append({**u, "empresa_id": empresa_id, "usuario_id": uid, "rol": "RH"})
+        # Una plantilla de mensaje ya APROBADA para poder armar una notificación en la SPA (en AWS
+        # la aprueba Meta; aquí no hay Meta real). Idempotente por (empresa, nombre).
+        conn.execute(
+            "INSERT INTO notificaciones.plantilla_mensaje (empresa_id, creada_por_usuario_id, "
+            "nombre, categoria, texto_con_variables, estado_meta, id_plantilla_meta, idioma) "
+            "VALUES (%s, %s, 'aviso_general', 'UTILITY', "
+            "'Hola {{1}}, tienes un aviso de Recursos Humanos. Consulta a tu RH.', "
+            "'APROBADA', 'meta-local-aviso-general', 'es_MX') "
+            "ON CONFLICT (empresa_id, nombre) DO NOTHING",
+            (empresa_id, usuarios[0]["usuario_id"]),
+        )
     c.ARCHIVO_USUARIOS.write_text(json.dumps(usuarios, indent=2), encoding="utf-8")
     return {"empresa_id": empresa_id, "usuarios": usuarios}
 

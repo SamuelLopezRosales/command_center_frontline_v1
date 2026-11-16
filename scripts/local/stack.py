@@ -24,13 +24,21 @@ import time
 from scripts.local import constantes as c
 
 PY = sys.executable
-SERVICIOS_API = ("dashboard", "colaboradores", "campos", "constancias", "whatsapp")
+SERVICIOS_API = (
+    "dashboard",
+    "colaboradores",
+    "campos",
+    "constancias",
+    "whatsapp",
+    "notificaciones",
+)
 ROL_DE = {
     "dashboard": "svc_dashboard",
     "colaboradores": "svc_colaboradores",
     "campos": "svc_campos",
     "constancias": "svc_constancias",
     "whatsapp": "svc_whatsapp",
+    "notificaciones": "svc_notificaciones",
 }
 # campos y colaboradores los consulta el contenedor del worker de PDF (host.docker.internal), por
 # lo que escuchan en todas las interfaces; el resto solo en 127.0.0.1.
@@ -170,6 +178,7 @@ def entorno_servicio(
         CC_CAMPOS_URL=_url("campos"),
         CC_COLABORADORES_URL=_url("colaboradores"),
         CC_CONSTANCIAS_URL=_url("constancias"),
+        CC_NOTIFICACIONES_URL=_url("notificaciones"),
         CC_COLA_CARGAS_URL=url_cola("cola-cargas"),
         CC_COLA_PDF_URL=url_cola("cola-pdf"),
         CC_COLA_WA_SALIDA_URL=url_cola("wa-salida.fifo"),

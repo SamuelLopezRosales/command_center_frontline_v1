@@ -34,6 +34,11 @@ SECRETOS: dict[str, tuple[str, str | None]] = {
         "Llave privada de firma de CloudFront; se carga en T-138 (§11.3)",
         '{"key_pair_id":"","private_key_pem":""}',
     ),
+    "origin-verify": (
+        "Encabezado secreto de origen: CloudFront lo agrega y el ALB lo exige en las rutas de "
+        "API Gateway (§11.4, T-225). Lo leen CloudFormation (referencia dinámica) y nadie más",
+        None,
+    ),
 }
 
 PARAMETROS: dict[str, str] = {
@@ -75,8 +80,9 @@ class SecurityStack(cdk.Stack):
         )
 
         # Servicios de AWS que usan la llave sin un rol propio: EventBridge escribe en las colas
-        # ``ev-*`` cifradas, SES publica rebotes y quejas en el tema SNS y CloudWatch publica sus
-        # alarmas. Limitado a esta cuenta para evitar el uso desde otras cuentas.
+        # ``ev-*`` cifradas, SES publica rebotes y quejas en el tema SNS, SNS entrega ese tema a la
+        # cola cifrada ``notif-respaldo`` (T-224) y CloudWatch publica sus alarmas. Limitado a esta
+        # cuenta para evitar el uso desde otras cuentas.
         self.llave_infra.add_to_resource_policy(
             iam.PolicyStatement(
                 sid="ServiciosDeAwsDeMensajeria",
@@ -84,11 +90,57 @@ class SecurityStack(cdk.Stack):
                 principals=[
                     iam.ServicePrincipal("events.amazonaws.com"),
                     iam.ServicePrincipal("ses.amazonaws.com"),
+                    iam.ServicePrincipal("sns.amazonaws.com"),
                     iam.ServicePrincipal("cloudwatch.amazonaws.com"),
                 ],
                 actions=["kms:Decrypt", "kms:GenerateDataKey*"],
                 resources=["*"],
                 conditions={"StringEquals": {"aws:SourceAccount": self.account}},
+            )
+        )
+
+        # T-225. CloudFront lee los buckets cifrados (SPA y constancias) con OAC: el servicio de
+        # CloudFront usa la llave sin un rol propio. La condición limita a las distribuciones de
+        # esta cuenta (el ARN exacto de la distribución crearía un ciclo CcSecurity-CcEdge).
+        self.llave_infra.add_to_resource_policy(
+            iam.PolicyStatement(
+                sid="CloudFrontLeeObjetosCifrados",
+                effect=iam.Effect.ALLOW,
+                principals=[iam.ServicePrincipal("cloudfront.amazonaws.com")],
+                actions=["kms:Decrypt"],
+                resources=["*"],
+                conditions={
+                    "StringLike": {
+                        "aws:SourceArn": f"arn:{self.partition}:cloudfront::{self.account}"
+                        ":distribution/*"
+                    }
+                },
+            )
+        )
+        # CloudTrail (CcObservability) cifra sus archivos con esta llave. Las dos sentencias son las
+        # que documenta CloudTrail; el contexto de cifrado limita a los trails ``cc-{env}-*``.
+        self.llave_infra.add_to_resource_policy(
+            iam.PolicyStatement(
+                sid="CloudTrailCifraRegistros",
+                effect=iam.Effect.ALLOW,
+                principals=[iam.ServicePrincipal("cloudtrail.amazonaws.com")],
+                actions=["kms:GenerateDataKey*"],
+                resources=["*"],
+                conditions={
+                    "StringLike": {
+                        "kms:EncryptionContext:aws:cloudtrail:arn": f"arn:{self.partition}:"
+                        f"cloudtrail:*:{self.account}:trail/cc-{env}-*"
+                    }
+                },
+            )
+        )
+        self.llave_infra.add_to_resource_policy(
+            iam.PolicyStatement(
+                sid="CloudTrailDescribeLlave",
+                effect=iam.Effect.ALLOW,
+                principals=[iam.ServicePrincipal("cloudtrail.amazonaws.com")],
+                actions=["kms:DescribeKey"],
+                resources=["*"],
             )
         )
 
