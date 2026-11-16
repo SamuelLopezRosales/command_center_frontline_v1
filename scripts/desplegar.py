@@ -995,6 +995,14 @@ class Desplegador:
                     config[clave] = previo[clave]
         except (OSError, ValueError):
             pass
+        # Docker busca sus plugins (buildx) en ``$DOCKER_CONFIG/cli-plugins``: con la carpeta
+        # temporal se perderían, así que se apunta a la carpeta de plugins original.
+        plugins = origen / "cli-plugins"
+        extras = [str(p) for p in config.get("cliPluginsExtraDirs", [])]  # type: ignore[union-attr]
+        if plugins.is_dir() and str(plugins) not in extras:
+            extras.append(str(plugins))
+        if extras:
+            config["cliPluginsExtraDirs"] = extras
         if (origen / "contexts").is_dir():
             shutil.copytree(origen / "contexts", carpeta / "contexts", dirs_exist_ok=True)
         (carpeta / "config.json").write_text(json.dumps(config), encoding="utf-8")

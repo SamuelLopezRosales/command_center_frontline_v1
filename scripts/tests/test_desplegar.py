@@ -822,3 +822,24 @@ def test_sin_reservar_concurrencia_una_cuota_de_10_no_bloquea():
     # con reserva (lo normal) la misma cuota sí bloquea
     desp2, _, _ = crear(Simulador(libre=10))
     assert desp2._cuota(False)[0].nivel == "ERROR"
+
+
+def test_la_carpeta_temporal_de_docker_conserva_los_plugins_y_el_contexto(tmp_path):
+    """Sin ``cli-plugins`` en la carpeta temporal, ``docker buildx`` deja de existir."""
+    import json as _json
+
+    origen = tmp_path / "docker"
+    (origen / "cli-plugins").mkdir(parents=True)
+    (origen / "contexts").mkdir()
+    (origen / "config.json").write_text(
+        _json.dumps({"currentContext": "desktop-linux", "credsStore": "desktop"}), encoding="utf-8"
+    )
+    desp, _, _ = crear(entorno={**ENTORNO, "DOCKER_CONFIG": str(origen)})
+    carpeta = desp._preparar_docker()
+    try:
+        config = _json.loads((carpeta / "config.json").read_text(encoding="utf-8"))
+        assert config["cliPluginsExtraDirs"] == [str(origen / "cli-plugins")]
+        assert config["currentContext"] == "desktop-linux"
+        assert "credsStore" not in config  # el almacén de credenciales no se hereda
+    finally:
+        desp._limpiar()
