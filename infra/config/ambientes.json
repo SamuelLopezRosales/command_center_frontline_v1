@@ -43,7 +43,7 @@
         "responsable": "Samuel Lopez"
       },
       "presupuesto": {
-        "monto_usd": 50,
+        "monto_usd": 70,
         "correo": "samuel.lopez@honne.com",
         "alertas": [
           {"tipo": "ACTUAL", "umbral_pct": 80},
@@ -61,7 +61,8 @@
         "tareas_por_servicio": 1,
         "concurrencia_aprovisionada_webhook": 0,
         "retencion_respaldos_dias": 1,
-        "permite_borrado": true
+        "permite_borrado": true,
+        "reservar_concurrencia": false
       },
       "dominio": null
     }

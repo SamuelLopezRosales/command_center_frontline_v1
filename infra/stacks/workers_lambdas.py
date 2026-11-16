@@ -438,7 +438,9 @@ class WorkersLambdasStack(cdk.Stack):
             code=_codigo(d.paquete),
             memory_size=d.memoria,
             timeout=cdk.Duration.seconds(d.timeout_s),
-            reserved_concurrent_executions=d.reservada,
+            reserved_concurrent_executions=(
+                d.reservada if self.eco.reservar_concurrencia else None
+            ),
             environment=self._entorno_lambda(d),
             # Sin reintentos asíncronos en el conciliador: dos ejecuciones solapadas serían un
             # error de diseño (reservada 1) y el siguiente ciclo ya repite el trabajo.
@@ -475,9 +477,14 @@ class WorkersLambdasStack(cdk.Stack):
                     # que contarían como recepciones hacia la DLQ (mínimo 2, lo que exige Lambda).
                     # En FIFO no se fija: la concurrencia la marcan los grupos de mensajes y el tope
                     # de la reservada (docs/desviaciones.md).
-                    max_concurrency=None if d.cola.endswith(".fifo") else max(2, d.reservada),
+                    max_concurrency=None if d.cola.endswith(".fifo") else self._max_concurrencia(d),
                 )
             )
+
+    def _max_concurrencia(self, d) -> int:
+        """Tope de ejecuciones del *poller* de SQS: la reservada de la función, o 2 (el mínimo que
+        exige Lambda) si el ambiente no reserva, para no agotar una cuota de cuenta pequeña."""
+        return max(2, d.reservada) if self.eco.reservar_concurrencia else 2
 
     def _regla_conciliador(self, env: str) -> None:
         self.regla_conciliador = events.Rule(

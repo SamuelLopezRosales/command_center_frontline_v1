@@ -52,6 +52,8 @@ class Economia:
     concurrencia_aprovisionada_webhook: int
     retencion_respaldos_dias: int
     permite_borrado: bool
+    # Falso en cuentas nuevas con cuota de Lambda de 10: sin reservas no se exige dejar 100 libres.
+    reservar_concurrencia: bool = True
 
 
 @dataclass(frozen=True)
@@ -129,6 +131,7 @@ def _construir_ambiente(nombre: str, datos: dict[str, Any], proyecto: str) -> Am
         concurrencia_aprovisionada_webhook=int(eco["concurrencia_aprovisionada_webhook"]),
         retencion_respaldos_dias=int(eco["retencion_respaldos_dias"]),
         permite_borrado=bool(eco["permite_borrado"]),
+        reservar_concurrencia=bool(eco.get("reservar_concurrencia", True)),
     )
     if economia.nat not in ("instancia", "gateway"):
         raise ConfiguracionInvalida(f"{ctx}: 'nat' debe ser 'instancia' o 'gateway'")

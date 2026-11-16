@@ -561,3 +561,21 @@ def test_en_prod_las_lambdas_usan_el_proxy(plantilla_prod):
 def test_sin_credenciales_en_la_plantilla(plantilla):
     t = texto(plantilla.to_json())
     assert "AKIA" not in t and "BEGIN PRIVATE KEY" not in t  # pragma: allowlist secret
+
+
+def test_sin_reservar_concurrencia_no_hay_reservas_y_los_pollers_usan_el_minimo():
+    """Cuentas nuevas con cuota de 10: el ambiente puede no reservar (``reservar_concurrencia``)."""
+    import dataclasses
+
+    app, amb, destino = crear_app("test", {"CDK_DEFAULT_ACCOUNT": PERMITIDA})
+    amb = dataclasses.replace(
+        amb, economia=dataclasses.replace(amb.economia, reservar_concurrencia=False)
+    )
+    stacks = construir_stacks(app, amb, destino)
+    funciones = _funciones(Template.from_stack(stacks["workers"]))
+    assert funciones and all("ReservedConcurrentExecutions" not in f for f in funciones.values())
+    fuentes = propiedades(Template.from_stack(stacks["workers"]), "AWS::Lambda::EventSourceMapping")
+    topes = [f["ScalingConfig"]["MaximumConcurrency"] for f in fuentes if "ScalingConfig" in f]
+    assert topes and set(topes) == {2}
+    auth = propiedades(Template.from_stack(stacks["auth"]), "AWS::Lambda::Function")
+    assert all("ReservedConcurrentExecutions" not in f for f in auth)

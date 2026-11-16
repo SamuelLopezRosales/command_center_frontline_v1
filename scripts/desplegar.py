@@ -654,6 +654,16 @@ class Desplegador:
             return [Hallazgo("ERROR", "cuota de concurrencia de Lambda", _primera_linea(err))]
         limite = int(datos["AccountLimit"]["ConcurrentExecutions"])
         libre = int(datos["AccountLimit"]["UnreservedConcurrentExecutions"])
+        if not self.amb.economia.reservar_concurrencia:
+            return [
+                Hallazgo(
+                    "OK",
+                    "cuota de concurrencia de Lambda",
+                    f"cuota {limite}: el ambiente no reserva concurrencia, no se exige margen. Las "
+                    f"funciones comparten esas {limite} ejecuciones; si hay estrangulamiento, "
+                    "solicite el aumento (L-B99A9384)",
+                )
+            ]
         reservada = concurrencia_reservada(self.raiz)
         # AWS exige dejar al menos 100 ejecuciones sin reservar.
         necesaria = 100 if ya_desplegado else reservada + 100

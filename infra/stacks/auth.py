@@ -167,7 +167,9 @@ class AuthStack(cdk.Stack):
                 code=codigo,
                 memory_size=256,
                 timeout=cdk.Duration.seconds(10),
-                reserved_concurrent_executions=CONCURRENCIA_RESERVADA,
+                reserved_concurrent_executions=(
+                    CONCURRENCIA_RESERVADA if ambiente.economia.reservar_concurrencia else None
+                ),
                 environment=entorno,
                 vpc=vpc,
                 vpc_subnets=subredes,

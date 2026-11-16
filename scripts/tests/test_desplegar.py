@@ -808,3 +808,17 @@ def test_costo_escala_con_los_dias_y_con_prod(ambientes_prod):
     assert any("NAT Gateway" in r.concepto for r in ep.rubros)
     assert any("WAF" in r.concepto for r in ep.rubros)
     assert any("RDS Proxy" in r.concepto for r in ep.rubros)
+
+
+def test_sin_reservar_concurrencia_una_cuota_de_10_no_bloquea():
+    import dataclasses
+
+    desp, _, _ = crear(Simulador(libre=10))
+    desp.amb = dataclasses.replace(
+        desp.amb, economia=dataclasses.replace(desp.amb.economia, reservar_concurrencia=False)
+    )
+    [hallazgo] = desp._cuota(False)
+    assert hallazgo.nivel == "OK" and "no reserva concurrencia" in hallazgo.detalle
+    # con reserva (lo normal) la misma cuota sí bloquea
+    desp2, _, _ = crear(Simulador(libre=10))
+    assert desp2._cuota(False)[0].nivel == "ERROR"
