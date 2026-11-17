@@ -12,6 +12,11 @@ Sustituye a Meta mientras no hay cuenta vinculada:
   ``POST /{id}`` (edita), ``GET /{waba}/message_templates?name=`` (consulta). ``aprobar`` y
   ``rechazar`` cambian el estado en el simulador, como lo haría la revisión de Meta; el aviso por
   webhook se arma con ``cambio_de_plantilla``. Los errores de ``siguientes`` también aplican.
+- **Consultas de conexión (integraciones/Meta):** ``GET /{v}/{phone_number_id}`` (nombre verificado,
+  número y calidad), ``GET /{v}/{waba_id}`` (nombre) y ``GET /{v}/{waba_id}/subscribed_apps``
+  (``apps_suscritas``). Un id desconocido responde el error 100 de Graph; ``fallos_consulta``
+  fuerza un error por consulta (``"numero"``, ``"waba"``, ``"webhook"``): ``(estado, código)`` o
+  ``"tiempo"`` para un tiempo agotado.
 
 Corre dentro del proceso de prueba: no necesita puertos ni red.
 """
@@ -51,6 +56,16 @@ class SimuladorMeta:
         self.enviados: list[dict[str, Any]] = []
         self.por_destino: dict[str, tuple[int, int]] = {}  # destino -> error permanente
         self.siguientes: list[tuple[int, int]] = []  # errores de los próximos envíos
+        # Consultas de conexión (probar integración): datos del número y de la cuenta.
+        self.nombre_verificado = "Empresa de Prueba"
+        self.numero_mostrado = "+52 1 55 0000 0000"
+        self.calidad = "GREEN"
+        self.nombre_waba = "Cuenta de Prueba"
+        self.apps_suscritas: list[dict[str, Any]] = [
+            {"whatsapp_business_api_data": {"id": "APP-1", "name": "Command Center"}}
+        ]
+        self.fallos_consulta: dict[str, tuple[int, int] | str] = {}
+        self.consultas: list[str] = []  # rutas consultadas, en orden
         self._n = 0
 
     # ------------------------------------------------------------------ secretos y eventos
@@ -213,6 +228,8 @@ class SimuladorMeta:
                     error[0], json={"error": {"code": error[1], "message": "sim"}}
                 )
             return self._responder_plantillas(peticion)
+        if peticion.method == "GET":
+            return self._responder_consultas(peticion)
         cuerpo = json.loads(peticion.content)
         if f"/{self.phone_number_id}/messages" not in peticion.url.path:
             return httpx.Response(404, json={"error": {"code": 100, "message": "ruta"}})
@@ -223,6 +240,41 @@ class SimuladorMeta:
         wamid = f"wamid.OUT{self._n}"
         self.enviados.append({**cuerpo, "wamid": wamid})
         return httpx.Response(200, json={"messages": [{"id": wamid}]})
+
+    def _responder_consultas(self, peticion: httpx.Request) -> httpx.Response:
+        ruta = peticion.url.path.rstrip("/")
+        self.consultas.append(ruta)
+        partes = ruta.split("/")[2:]  # sin "" ni la versión
+        if len(partes) == 1 and partes[0] == self.phone_number_id:
+            clave = "numero"
+        elif len(partes) == 1 and partes[0] == self.waba_id:
+            clave = "waba"
+        elif len(partes) == 2 and partes[0] == self.waba_id and partes[1] == "subscribed_apps":
+            clave = "webhook"
+        else:
+            return httpx.Response(
+                400, json={"error": {"code": 100, "message": "Unsupported get request"}}
+            )
+        fallo = self.fallos_consulta.get(clave)
+        if fallo == "tiempo":
+            raise httpx.ReadTimeout("simulado", request=peticion)
+        if fallo:
+            return httpx.Response(
+                fallo[0], json={"error": {"code": fallo[1], "message": "simulado"}}
+            )
+        if clave == "numero":
+            return httpx.Response(
+                200,
+                json={
+                    "id": self.phone_number_id,
+                    "display_phone_number": self.numero_mostrado,
+                    "verified_name": self.nombre_verificado,
+                    "quality_rating": self.calidad,
+                },
+            )
+        if clave == "waba":
+            return httpx.Response(200, json={"id": self.waba_id, "name": self.nombre_waba})
+        return httpx.Response(200, json={"data": self.apps_suscritas})
 
     def cliente_http(self) -> httpx.Client:
         return httpx.Client(transport=httpx.MockTransport(self._responder))

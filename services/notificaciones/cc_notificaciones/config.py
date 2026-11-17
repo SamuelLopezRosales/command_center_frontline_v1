@@ -30,9 +30,17 @@ class ConfigNotificaciones(Configuracion):
     # ``waba_id`` (cuenta de WhatsApp Business) además de las claves que usa `whatsapp`. Nunca se
     # lee de variables de entorno; sin ``meta_secreto_id`` solo en local se usa un sustituto.
     meta_secreto_id: str | None = None
+    # ``meta_api_base`` es el servidor al que se envía el token: es configuración del despliegue y
+    # NO se puede cambiar desde la API ni la pantalla de integraciones (eso mandaría el token a
+    # cualquier servidor). ``meta_api_version`` es el respaldo si el secreto no trae
+    # ``api_version``.
     meta_api_base: str = "https://graph.facebook.com"
-    meta_api_version: str = "v21.0"  # se fija al vincular la cuenta (PQ-07)
+    meta_api_version: str = "v21.0"
     meta_timeout_s: float = 10.0
+    meta_sonda_timeout_s: float = 5.0  # "Probar conexión": tres consultas, cada una con este tope
+    # Solo local: con ``CC_META_SECRETO_ID`` fijo (para guardar credenciales en LocalStack), las
+    # plantillas siguen usando el sustituto sin red en lugar de llamar a Meta.
+    meta_plantillas_stub: bool = False
 
     # Programación (EventBridge Scheduler) y despacho (design.md §4.5, §6.3). El destino del
     # schedule único es la cola ``notif-despacho``; el rol lo asume Scheduler para publicar en ella.

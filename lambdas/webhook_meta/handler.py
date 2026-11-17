@@ -30,14 +30,34 @@ _cache: dict[str, Any] = {"valor": None, "hasta": 0.0}
 
 
 def secretos_meta(cfg) -> dict[str, str]:
-    """Secreto ``cc/{env}/meta`` con caché de 5 minutos (tolera la rotación)."""
+    """Secreto ``cc/{env}/meta`` con caché de 5 minutos (tolera la rotación).
+
+    Lo escribe el módulo de integraciones de `notificaciones` (pantalla "Conexión con Meta"): un
+    App Secret o un token nuevo surten efecto aquí en 5 minutos como máximo, sin esperar un
+    arranque en frío. El JSON puede traer claves de más (``api_version``, ``actualizado_en``...);
+    solo se leen las que se usan. Un valor que no sea un objeto JSON cuenta como secreto vacío.
+    """
     if _cache["valor"] is None or time.monotonic() > _cache["hasta"]:
         import boto3
 
         r = boto3.client("secretsmanager").get_secret_value(SecretId=cfg.meta_secreto_id)
-        _cache["valor"] = json.loads(r["SecretString"])
+        try:
+            datos = json.loads(r["SecretString"])
+        except (ValueError, KeyError, TypeError):
+            datos = {}
+        _cache["valor"] = datos if isinstance(datos, dict) else {}
         _cache["hasta"] = time.monotonic() + _CACHE_SEGUNDOS
     return _cache["valor"]
+
+
+def phone_number_id_efectivo(secretos: dict[str, str], cfg) -> str:
+    """El secreto manda si trae el valor; ``CC_META_PHONE_NUMBER_ID`` es el respaldo."""
+    return secretos.get("phone_number_id") or cfg.meta_phone_number_id or ""
+
+
+def api_version_efectiva(secretos: dict[str, str], cfg) -> str:
+    """El secreto manda si trae ``api_version``; ``CC_META_API_VERSION`` es el respaldo."""
+    return secretos.get("api_version") or cfg.meta_api_version
 
 
 def _respuesta(status: int, cuerpo: str = "") -> dict[str, Any]:
@@ -52,7 +72,7 @@ def _firma_valida(cuerpo: bytes, cabecera: str | None, app_secret: str) -> bool:
     if not cabecera or not cabecera.startswith("sha256="):
         return False
     esperada = hmac.new(app_secret.encode(), cuerpo, hashlib.sha256).hexdigest()
-    return hmac.compare_digest(esperada, cabecera.removeprefix("sha256="))
+    return hmac.compare_digest(esperada.encode(), cabecera.removeprefix("sha256=").encode())
 
 
 def _cabecera(evento: dict[str, Any], nombre: str) -> str | None:
@@ -128,19 +148,24 @@ def manejar(evento: dict[str, Any], *, sqs, secretos: dict[str, str], cfg) -> di
     metodo = (http.get("method") or evento.get("httpMethod") or "").upper()
     if metodo == "GET":
         q = evento.get("queryStringParameters") or {}
-        if q.get("hub.mode") == "subscribe" and hmac.compare_digest(
-            q.get("hub.verify_token", ""), secretos["verify_token"]
+        esperado = secretos.get("verify_token") or ""  # sin token guardado nadie se suscribe
+        if (
+            esperado
+            and q.get("hub.mode") == "subscribe"
+            and hmac.compare_digest(q.get("hub.verify_token", "").encode(), esperado.encode())
         ):
             return _respuesta(200, q.get("hub.challenge", ""))
         return _respuesta(403)
     if metodo != "POST":
         return _respuesta(405)
 
+    app_secret = secretos.get("app_secret") or ""
+    if not app_secret:  # sin App Secret no hay firma que valer: una llave vacía firmaría cualquiera
+        metrica("webhook_sin_app_secret")
+        return _respuesta(403)
     crudo = evento.get("body") or ""
     cuerpo_bytes = base64.b64decode(crudo) if evento.get("isBase64Encoded") else crudo.encode()
-    if not _firma_valida(
-        cuerpo_bytes, _cabecera(evento, "x-hub-signature-256"), secretos["app_secret"]
-    ):
+    if not _firma_valida(cuerpo_bytes, _cabecera(evento, "x-hub-signature-256"), app_secret):
         metrica("webhook_firma_invalida")
         return _respuesta(403)
     try:
@@ -148,7 +173,7 @@ def manejar(evento: dict[str, Any], *, sqs, secretos: dict[str, str], cfg) -> di
     except ValueError:
         return _respuesta(400)
 
-    phone_number_id = cfg.meta_phone_number_id or secretos.get("phone_number_id", "")
+    phone_number_id = phone_number_id_efectivo(secretos, cfg)
     entrantes, estados, ignorados = extraer(cuerpo, phone_number_id)
     if ignorados:
         metrica("webhook_phone_number_id_ignorado", ignorados)

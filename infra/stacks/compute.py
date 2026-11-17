@@ -147,6 +147,12 @@ REGLAS_ALB: tuple[ReglaAlb, ...] = (
         ("/api/v1/audiencias*", "/api/v1/plantillas-mensaje*", "/api/v1/notificaciones*"),
         "Audiencias, plantillas de mensaje y notificaciones",
     ),
+    ReglaAlb(
+        65,
+        "notificaciones",
+        ("/api/v1/integraciones*",),
+        "Integraciones: conexión con Meta (credenciales de WhatsApp Cloud API)",
+    ),
     ReglaAlb(70, "whatsapp", ("/api/v1/conversaciones*",), "Chat de RH"),
     # Rutas internas (token de servicio). La más específica va primero.
     ReglaAlb(

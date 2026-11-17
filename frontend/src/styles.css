@@ -27,6 +27,8 @@ a { color: var(--azul); }
 button, input, select, textarea { font: inherit; }
 
 .btn { border: 1px solid var(--borde); background: var(--blanco); color: var(--navy); padding: 9px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+/* Un enlace con aspecto de botón (<Link className="btn">) nunca se subraya, en ningún estado. */
+.btn, .btn:hover, .btn:focus, .btn:focus-visible, .btn:active, .btn:visited { text-decoration: none; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn[aria-busy="true"]:disabled { opacity: 0.85; cursor: progress; }
 .btn .spinner { display: inline-block; width: 1em; height: 1em; margin-right: 8px; vertical-align: -0.15em; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: girar 0.7s linear infinite; }
@@ -76,7 +78,8 @@ table.tabla td { padding: 12px 24px; border-top: 1px solid var(--borde); }
 .lateral .logo { padding: 14px 14px; border-bottom: 1px solid #ffffff22; }
 .lateral .logo img { display: block; width: 100%; max-width: 160px; height: auto; margin: 0 auto; background: var(--blanco); border-radius: 6px; padding: 8px 10px; }
 .lateral .perfil { display: flex; gap: 10px; padding: 16px 18px; border-bottom: 1px solid #ffffff22; align-items: center; }
-.lateral .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--naranja); display: grid; place-items: center; font-weight: 700; font-size: 12px; }
+/* Círculo perfecto: tamaño fijo e igual, sin compresión en la fila flex aunque el nombre sea largo. */
+.lateral .avatar { width: 40px; height: 40px; min-width: 40px; flex-shrink: 0; aspect-ratio: 1 / 1; border-radius: 50%; background: var(--naranja); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; line-height: 1; }
 .lateral .perfil small { color: #ffffff99; display: block; }
 .lateral nav { padding: 14px 12px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
 .lateral nav a { color: #fff; text-decoration: none; padding: 10px 16px; border-radius: 6px; font-size: 14px; border-left: 3px solid transparent; }

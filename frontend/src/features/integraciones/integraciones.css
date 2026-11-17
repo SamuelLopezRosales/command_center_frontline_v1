@@ -1,0 +1,38 @@
+/* Conexión con Meta (WhatsApp Cloud API). Prefijo: int-. */
+.int { max-width: 860px; }
+.int-seccion { margin-bottom: 20px; }
+.int-seccion h2 { margin-top: 0; }
+.int-seccion h3 { font-size: 14px; margin: 16px 0 6px; }
+.int-suave { color: var(--suave); font-size: 13px; }
+.int-ok { color: var(--verde); font-size: 13px; }
+.int-falla { color: var(--rojo); font-size: 13px; }
+.int-separado { margin-top: 12px; }
+.int-fila { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.int-fila input { flex: 1 1 240px; min-width: 0; }
+.int-etiqueta { font-weight: 600; }
+.int-enmascarado { font-family: ui-monospace, Consolas, monospace; background: #f3f4f6; padding: 8px 12px; border-radius: 6px; }
+.int-ayuda { color: var(--suave); font-size: 12px; }
+.int-ayuda p { margin: 2px 0; }
+.int-ayuda summary { cursor: pointer; color: var(--azul); font-weight: 600; margin-top: 4px; }
+.int-ayuda ul { margin: 6px 0 0; padding-left: 20px; }
+.int-acciones { display: flex; justify-content: flex-end; margin-top: 8px; }
+.int-lista { margin: 0 0 10px; padding-left: 20px; }
+.int-codigo-etiqueta { margin: 12px 0 4px; font-size: 12px; font-weight: 700; color: var(--suave); text-transform: uppercase; letter-spacing: 0.06em; }
+.int-codigo { display: block; flex: 1 1 240px; font-size: 14px; background: #f3f4f6; padding: 10px 14px; border-radius: 6px; word-break: break-all; user-select: all; }
+.int-renglones { list-style: none; margin: 12px 0; padding: 0; display: grid; gap: 8px; }
+.int-renglon { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border-radius: 6px; border: 1px solid var(--borde); }
+.int-renglon p { margin: 2px 0 0; }
+.int-detalle { font-size: 13px; }
+.int-icono { font-weight: 700; width: 18px; text-align: center; }
+.int-renglon-ok { background: var(--verde-fondo); }
+.int-renglon-ok .int-icono, .int-renglon-ok .int-veredicto { color: var(--verde); }
+.int-renglon-falla { background: var(--rojo-fondo); }
+.int-renglon-falla .int-icono, .int-renglon-falla .int-veredicto { color: var(--rojo); }
+.int-renglon-pendiente { background: var(--ambar-fondo); }
+.int-renglon-pendiente .int-icono, .int-renglon-pendiente .int-veredicto { color: var(--ambar); }
+.int-numero { display: grid; grid-template-columns: max-content 1fr; gap: 4px 16px; margin: 12px 0; font-size: 13px; }
+.int-numero dt { color: var(--suave); font-weight: 600; }
+.int-numero dd { margin: 0; }
+.int-fondo { position: fixed; inset: 0; background: #14213f99; display: grid; place-items: center; z-index: 20; padding: 16px; }
+.int-dialogo { background: var(--blanco); border-radius: 10px; padding: 24px; width: 520px; max-width: 100%; outline: none; }
+.int-dialogo-acciones { display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; }

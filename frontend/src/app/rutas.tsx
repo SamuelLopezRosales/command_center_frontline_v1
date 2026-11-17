@@ -6,6 +6,7 @@ import { RutasChat } from "@/features/chat/RutasChat";
 import { RutasColaboradores } from "@/features/colaboradores/RutasColaboradores";
 import { RutasConstancias } from "@/features/constancias/RutasConstancias";
 import { Dashboard } from "@/features/dashboard/Dashboard";
+import { RutasIntegraciones } from "@/features/integraciones/RutasIntegraciones";
 import { RutasNotificaciones } from "@/features/notificaciones/RutasNotificaciones";
 import { RutasOrganizaciones } from "@/features/organizaciones/RutasOrganizaciones";
 import { RutasPublicas } from "@/features/publico/RutasPublicas";
@@ -29,6 +30,7 @@ function Protegida({ children }: { children: ReactNode }) {
  * T-220: dashboard, colaboradores, campos, cargas, organizaciones.
  * T-221: constancias y las páginas públicas /v/:codigo y /d/:token (sin sesión).
  * T-222: notificaciones, chat y usuarios.
+ * Integraciones: conexión con Meta (permiso integraciones:administrar).
  */
 export function Rutas() {
   return (
@@ -54,6 +56,7 @@ export function Rutas() {
         <Route path="notificaciones/*" element={<RutasNotificaciones />} />
         <Route path="chat/*" element={<RutasChat />} />
         <Route path="usuarios/*" element={<RutasUsuarios />} />
+        <Route path="integraciones/*" element={<RutasIntegraciones />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

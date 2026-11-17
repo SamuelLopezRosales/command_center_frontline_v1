@@ -240,7 +240,8 @@ proyecto. El script lo avisa en su salida. Si no se quiere ni eso, use `-SoloSyn
 4. **Llave pública de CloudFront**: en `prod`, `infra/config/cloudfront-{ambiente}.pub.pem` (pública) antes
    del despliegue; después cargar la llave privada en el secreto `cc/{ambiente}/cf-signing-key`
    (procedimiento de la desviación 24 de `docs/desviaciones.md`). En `test` se usa una llave inerte.
-5. **Secretos de Meta** (después de la vinculación, PQ-07): se cargan a mano en Secrets Manager.
+5. **Credenciales de Meta** (después de la vinculación, PQ-07): ya no se cargan a mano. Se capturan en
+   Command Center (módulo Integraciones, "Conexión con Meta") siguiendo `docs/meta-configuracion.md`.
 6. **Pipeline (solo si se crea)**: autorizar la conexión de GitHub `cc-{ambiente}-github` en la consola
    (docs/ambientes.md, sección 5.1). Este script no despliega el pipeline.
 7. **Cuota de Lambda** si la verificación previa la detuvo (sección 3.5).

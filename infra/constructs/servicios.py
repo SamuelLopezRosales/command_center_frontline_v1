@@ -196,6 +196,29 @@ def sentencia_secretos(r: Recursos, secretos: list[str], llave_infra_arn: str) -
     ]
 
 
+def sentencias_escritura_meta(r: Recursos, llave_infra_arn: str) -> list:
+    """Única excepción a "los servicios solo leen secretos": la API de `notificaciones` guarda las
+    credenciales de Meta que captura la pantalla de Integraciones (``PutSecretValue`` más
+    ``DescribeSecret`` sobre ese secreto, con su ARN, y las acciones de KMS que exige escribir un
+    secreto cifrado con la llave de infraestructura). Ningún otro servicio ni worker las recibe."""
+    return [
+        sentencia(
+            ["secretsmanager:PutSecretValue", "secretsmanager:DescribeSecret"],
+            [r.arn_secreto("meta")],
+            sid="EscribirSecretoMeta",
+        ),
+        # Solo a través de Secrets Manager (``kms:ViaService``): no sirve para cifrar otra cosa.
+        sentencia(
+            ["kms:GenerateDataKey", "kms:Encrypt", "kms:Decrypt"],
+            [llave_infra_arn],
+            condiciones={
+                "StringEquals": {"kms:ViaService": f"secretsmanager.{r.stack.region}.amazonaws.com"}
+            },
+            sid="CifrarSecretoMeta",
+        ),
+    ]
+
+
 def sentencias_consumo(r: Recursos, cola: str, llave_infra_arn: str) -> list:
     """Consumir una cola (worker): recibir, borrar y extender la visibilidad del mensaje."""
     return [
@@ -252,6 +275,8 @@ def sentencias_servicio(
             )
         )
     s.extend(_sentencias_propias(ctx, servicio))
+    if servicio == "notificaciones" and not worker:
+        s += sentencias_escritura_meta(ctx.recursos, llave)
     # Las colas, el tema y los buckets están cifrados con la llave de infraestructura: quien
     # escribe en ellos necesita ``GenerateDataKey``. ``dashboard`` y ``campos`` solo leen secretos
     # (``Decrypt``) y publican en el bus, que no está cifrado con KMS.

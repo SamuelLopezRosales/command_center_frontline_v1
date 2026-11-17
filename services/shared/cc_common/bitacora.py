@@ -68,6 +68,8 @@ ACCIONES = frozenset(
         "NOTIFICACION_CANCELADA",
         "MENSAJE_CHAT",
         "INTENTO_WHATSAPP",
+        "META_CONFIGURADA",
+        "META_PROBADA",
     }
 )
 

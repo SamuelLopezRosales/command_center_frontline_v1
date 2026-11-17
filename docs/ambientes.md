@@ -62,6 +62,7 @@ Es donde se hace el despliegue final de T-229 y T-230 (el ambiente `test` y su c
 | Llaves de KMS, días de espera de borrado | 7 (el mínimo de KMS) | 30 | Limpieza |
 | Dominio | Ninguno: dominio de CloudFront y endpoint predeterminado de API Gateway con encabezado secreto de origen (PQ-22) | Dominio propio | Sin dominio para el prototipo |
 | WhatsApp | Simulador de Meta | Cuenta real (PQ-07) | Vinculación pendiente |
+| Credenciales de Meta | Se capturan en Command Center (Integraciones); `notificaciones` escribe `cc/test/meta` | Igual, en `cc/prod/meta` | Ver `docs/meta-configuracion.md` y la desviación de Integraciones en `docs/desviaciones.md` |
 | AWS Backup (`CcBackup`, T-226) | Bóveda y plan diario de RDS con retención de 1 día, sin copia, sin bloqueo y borrable | Retención de 35 días, copia diaria a `us-east-2`, bóveda con bloqueo en modo de gobierno y política que niega borrar puntos de recuperación | Costo y limpieza |
 | Región de recuperación `us-east-2` (`CcBackupRecuperacion`, T-226) | **No se crea**: la región no está inicializada con `cdk bootstrap` | Llave, bóveda y réplica de `constancias` con Object Lock | Sin bootstrap en esa región; queda definida y probada con un `prod` sintético |
 | Réplica de `constancias` a `us-east-2` | No | Sí (sin marcas de borrado) | Igual que la fila anterior |

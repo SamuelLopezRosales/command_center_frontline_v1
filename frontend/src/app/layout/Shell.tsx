@@ -3,13 +3,14 @@ import logoHonne from "@/assets/imagen-honne.png";
 import { es } from "@/shared/i18n/es";
 import { useSesion } from "@/shared/sesion/SesionProvider";
 
-const ENLACES = [
+const ENLACES: { a: string; texto: string; fin?: boolean; permiso?: string }[] = [
   { a: "/", texto: es.nav.dashboard, fin: true },
   { a: "/colaboradores", texto: es.nav.colaboradores },
   { a: "/constancias", texto: es.nav.constancias },
   { a: "/notificaciones", texto: es.nav.notificaciones },
   { a: "/chat", texto: es.nav.chat },
   { a: "/usuarios", texto: es.nav.usuarios },
+  { a: "/integraciones/meta", texto: es.nav.meta, permiso: "integraciones:administrar" },
 ];
 
 function iniciales(nombre: string): string {
@@ -22,7 +23,7 @@ function iniciales(nombre: string): string {
 }
 
 export function Shell() {
-  const { usuario, cerrarSesion } = useSesion();
+  const { usuario, cerrarSesion, tiene } = useSesion();
   return (
     <div className="shell">
       <aside className="lateral">
@@ -39,7 +40,7 @@ export function Shell() {
           </div>
         )}
         <nav aria-label="Principal">
-          {ENLACES.map((e) => (
+          {ENLACES.filter((e) => !e.permiso || tiene(e.permiso)).map((e) => (
             <NavLink key={e.a} to={e.a} end={e.fin} className={({ isActive }) => (isActive ? "activo" : undefined)}>
               {e.texto}
             </NavLink>

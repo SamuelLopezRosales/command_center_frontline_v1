@@ -70,7 +70,16 @@ class Reloj:
 
 
 def construir_app(
-    motor, campos=None, colaboradores=None, *, meta=None, scheduler=None, reloj=None, **cfg
+    motor,
+    campos=None,
+    colaboradores=None,
+    *,
+    meta=None,
+    scheduler=None,
+    reloj=None,
+    almacen_meta=None,
+    transporte_sonda_meta=None,
+    **cfg,
 ):
     from cc_common.auth import VerificadorToken
     from cc_notificaciones.clientes import StubCampos, StubColaboradores
@@ -84,6 +93,8 @@ def construir_app(
         campos=campos or StubCampos(),
         colaboradores=colaboradores or StubColaboradores(),
         meta=meta,
+        almacen_meta=almacen_meta,
+        transporte_sonda_meta=transporte_sonda_meta,
         scheduler=scheduler,
         reloj=reloj,
         secreto_interno=lambda: SECRETO_INTERNO,

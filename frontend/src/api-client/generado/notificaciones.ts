@@ -54,6 +54,58 @@ export interface paths {
         patch: operations["actualizar_api_v1_audiencias__audiencia_id__patch"];
         trace?: never;
     };
+    "/api/v1/integraciones/meta": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Estado de la conexión con Meta (sin valores secretos) */
+        get: operations["estado_api_v1_integraciones_meta_get"];
+        /** Guardar credenciales de Meta (solo cambia lo enviado) */
+        put: operations["guardar_api_v1_integraciones_meta_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/integraciones/meta/probar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Probar la conexión con la Graph API usando lo guardado */
+        post: operations["probar_api_v1_integraciones_meta_probar_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/integraciones/meta/verify-token:generar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Generar y guardar un token de verificación nuevo (se devuelve una sola vez) */
+        post: operations["generar_token_api_v1_integraciones_meta_verify_token_generar_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/notificaciones": {
         parameters: {
             query?: never;
@@ -321,6 +373,42 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /**
+         * ActualizarMeta
+         * @description Solo cambia lo enviado: un campo omitido no se toca. Cadena vacía o ``null`` es 422.
+         */
+        ActualizarMeta: {
+            /**
+             * Access Token
+             * @description Token de acceso permanente.
+             */
+            access_token?: string | null;
+            /**
+             * Api Version
+             * @description Versión de la Graph API, v21.0.
+             */
+            api_version?: string | null;
+            /**
+             * App Secret
+             * @description App Secret de la app de Meta.
+             */
+            app_secret?: string | null;
+            /**
+             * Phone Number Id
+             * @description Phone number ID (no es el número de teléfono).
+             */
+            phone_number_id?: string | null;
+            /**
+             * Verify Token
+             * @description Token de verificación del webhook (lo puede generar el sistema).
+             */
+            verify_token?: string | null;
+            /**
+             * Waba Id
+             * @description ID de la cuenta de WhatsApp Business.
+             */
+            waba_id?: string | null;
+        };
         /** AudienciaActualizar */
         AudienciaActualizar: {
             /** Activa */
@@ -454,6 +542,27 @@ export interface components {
             con_consentimiento: number;
             /** Seleccionados */
             seleccionados: number;
+        };
+        /** EstadoMetaDto */
+        EstadoMetaDto: {
+            access_token: components["schemas"]["SecretoDto"];
+            /** Actualizado En */
+            actualizado_en: string | null;
+            /** Actualizado Por Usuario Id */
+            actualizado_por_usuario_id: number | null;
+            /** Api Version */
+            api_version: string;
+            app_secret: components["schemas"]["SecretoDto"];
+            /**
+             * Configurada
+             * @description Verdadero si están guardados los cinco datos.
+             */
+            configurada: boolean;
+            /** Phone Number Id */
+            phone_number_id: string | null;
+            verify_token: components["schemas"]["VerifyTokenDto"];
+            /** Waba Id */
+            waba_id: string | null;
         };
         /** ExcluidosPorMotivo */
         ExcluidosPorMotivo: {
@@ -629,6 +738,15 @@ export interface components {
             /** Zona Horaria */
             zona_horaria: string;
         };
+        /** NumeroDto */
+        NumeroDto: {
+            /** Calidad */
+            calidad: string | null;
+            /** Nombre Verificado */
+            nombre_verificado: string | null;
+            /** Numero Mostrado */
+            numero_mostrado: string | null;
+        };
         /** PaginaAudiencias */
         PaginaAudiencias: {
             /** Items */
@@ -758,6 +876,19 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /** PruebaMetaDto */
+        PruebaMetaDto: {
+            numero: components["schemas"]["NumeroDto"] | null;
+            /**
+             * Ok
+             * @description Token, número y WABA válidos. El webhook se informa aparte.
+             */
+            ok: boolean;
+            /** Resultados */
+            resultados: components["schemas"]["ResultadoPruebaDto"][];
+            /** Webhook Suscrito */
+            webhook_suscrito: boolean | null;
+        };
         /** Reintentar */
         Reintentar: {
             /**
@@ -765,6 +896,18 @@ export interface components {
              * @default false
              */
             confirmar_fuera_horario: boolean;
+        };
+        /** ResultadoPruebaDto */
+        ResultadoPruebaDto: {
+            /**
+             * Clave
+             * @enum {string}
+             */
+            clave: "token" | "numero" | "waba" | "webhook";
+            /** Detalle */
+            detalle: string;
+            /** Ok */
+            ok: boolean;
         };
         /** Revision */
         Revision: {
@@ -779,6 +922,24 @@ export interface components {
             total_excluidos: number;
             /** Total Seleccionados */
             total_seleccionados: number;
+        };
+        /** SecretoDto */
+        SecretoDto: {
+            /** Configurado */
+            configurado: boolean;
+            /**
+             * Ultimos4
+             * @description Últimos 4 caracteres; nulo si no hay valor o mide menos de 12 caracteres.
+             */
+            ultimos4: string | null;
+        };
+        /** TokenGeneradoDto */
+        TokenGeneradoDto: {
+            /**
+             * Verify Token
+             * @description Se devuelve solo en esta respuesta; el GET no lo trae.
+             */
+            verify_token: string;
         };
         /** Total */
         Total: {
@@ -809,6 +970,11 @@ export interface components {
             origen: "COLABORADOR" | "FIJO";
             /** Valor */
             valor?: string | null;
+        };
+        /** VerifyTokenDto */
+        VerifyTokenDto: {
+            /** Configurado */
+            configurado: boolean;
         };
     };
     responses: never;
@@ -1012,6 +1178,132 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AudienciaDto"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    estado_api_v1_integraciones_meta_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EstadoMetaDto"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    guardar_api_v1_integraciones_meta_put: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActualizarMeta"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EstadoMetaDto"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    probar_api_v1_integraciones_meta_probar_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PruebaMetaDto"];
+                };
+            };
+            /** @description META_NO_CONFIGURADA: faltan credenciales guardadas. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    generar_token_api_v1_integraciones_meta_verify_token_generar_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TokenGeneradoDto"];
                 };
             };
             /** @description Validation Error */

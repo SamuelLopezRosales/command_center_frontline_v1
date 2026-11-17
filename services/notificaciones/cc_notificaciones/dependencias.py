@@ -67,7 +67,7 @@ def meta(request: Request) -> Any:
     estado = request.app.state
     if estado.meta is None:
         cfg = estado.config
-        if cfg.meta_secreto_id:
+        if cfg.meta_secreto_id and not (cfg.es_local and cfg.meta_plantillas_stub):
             from cc_notificaciones.meta import MetaPlantillasHttp, cargador_credenciales
 
             estado.meta = MetaPlantillasHttp(
@@ -83,6 +83,27 @@ def meta(request: Request) -> Any:
         else:
             raise ErrorInterno("SERVICIO_NO_CONFIGURADO", "Servicio no configurado.")
     return estado.meta
+
+
+def almacen_meta(request: Request) -> Any:
+    """Almacén de las credenciales de Meta: el secreto ``cc/{env}/meta`` (``CC_META_SECRETO_ID``).
+    Sin él, solo en local se usa un sustituto en memoria."""
+    estado = request.app.state
+    if estado.almacen_meta is None:
+        cfg = estado.config
+        if cfg.meta_secreto_id:
+            from cc_notificaciones.integracion_meta import AlmacenSecretsManager
+
+            estado.almacen_meta = AlmacenSecretsManager(
+                cfg.meta_secreto_id, cfg.region, endpoint=cfg.aws_endpoint
+            )
+        elif cfg.es_local:
+            from cc_notificaciones.integracion_meta import AlmacenMemoria
+
+            estado.almacen_meta = AlmacenMemoria()
+        else:
+            raise ErrorInterno("SERVICIO_NO_CONFIGURADO", "Servicio no configurado.")
+    return estado.almacen_meta
 
 
 def programador(request: Request) -> Any:

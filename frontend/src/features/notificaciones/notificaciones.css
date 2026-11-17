@@ -113,3 +113,4 @@
   .not-indicadores { grid-template-columns: repeat(2, 1fr); }
   .not-criterio-fila { grid-template-columns: 1fr 1fr; }
 }
+.not-acciones a.btn { text-decoration: none; display: inline-block; }

@@ -37,6 +37,9 @@ URLS = {
         ("/api/v1/usuarios/yo", "dashboard"),
         ("/api/v1/sesion/iniciar", "dashboard"),
         ("/api/v1/bitacora", "dashboard"),
+        ("/api/v1/integraciones/meta", "notificaciones"),
+        ("/api/v1/integraciones/meta/verify-token:generar", "notificaciones"),
+        ("/api/v1/integraciones/meta/probar", "notificaciones"),
     ],
 )
 def test_tabla_de_rutas(ruta, servicio):

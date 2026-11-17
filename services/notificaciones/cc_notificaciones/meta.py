@@ -40,6 +40,7 @@ class ErrorMeta(Exception):  # noqa: N818
 class CredencialesMeta:
     access_token: str = field(repr=False)
     waba_id: str
+    api_version: str | None = None  # del secreto; si falta, manda ``CC_META_API_VERSION``
 
 
 @dataclass(frozen=True)
@@ -83,17 +84,26 @@ class MetaPlantillasHttp:
         transporte: httpx.AsyncBaseTransport | None = None,
     ) -> None:
         self._credenciales = credenciales
-        self._base = f"{base.rstrip('/')}/{version}"
+        self._base = base.rstrip("/")
+        self._version = version
         self._http = httpx.AsyncClient(timeout=timeout_s, transport=transporte)
+
+    def invalidar_cache(self) -> None:
+        """Olvida las credenciales guardadas: la siguiente llamada vuelve a leer el secreto (se usa
+        al guardar desde la pantalla de integraciones; otros procesos esperan a su vencimiento)."""
+        invalidar = getattr(self._credenciales, "invalidar", None)
+        if callable(invalidar):
+            invalidar()
 
     async def _llamar(
         self, metodo: str, ruta: str, *, json_: Any = None, params: dict[str, str] | None = None
     ) -> dict[str, Any]:
         try:
             cred = await self._credenciales()
+            version = cred.api_version or self._version
             r = await self._http.request(
                 metodo,
-                f"{self._base}/{ruta.format(waba=cred.waba_id)}",
+                f"{self._base}/{version}/{ruta.format(waba=cred.waba_id)}",
                 json=json_,
                 params=params,
                 headers={"Authorization": f"Bearer {cred.access_token}"},
@@ -197,7 +207,9 @@ class StubPlantillasMeta:
 def cargador_credenciales(
     secreto_id: str | None, region: str, *, cliente: Any | None = None, ttl_s: float = 300.0
 ) -> Callable[[], Awaitable[CredencialesMeta]]:
-    """Lee ``cc/{env}/meta`` (JSON con ``access_token`` y ``waba_id``) y lo guarda ``ttl_s``."""
+    """Lee ``cc/{env}/meta`` (JSON con ``access_token`` y ``waba_id``; ``api_version`` opcional) y
+    lo guarda ``ttl_s`` (5 minutos). Un valor vacío o ausente es "sin credenciales". La función
+    devuelta tiene ``invalidar()`` para olvidar lo guardado."""
     estado: dict[str, Any] = {"cred": None, "hasta": 0.0}
 
     async def leer() -> CredencialesMeta:
@@ -209,9 +221,25 @@ def cargador_credenciales(
             from cc_common.recursos import leer_secreto
 
             crudo = await asyncio.to_thread(leer_secreto, secreto_id, region, cliente)
-            datos = json.loads(crudo)
-            estado["cred"] = CredencialesMeta(str(datos["access_token"]), str(datos["waba_id"]))
+            try:
+                datos = json.loads(crudo)
+            except ValueError:
+                datos = None
+            if not isinstance(datos, dict):
+                raise ErrorMeta("META_SIN_CREDENCIALES")
+            token, waba = datos.get("access_token"), datos.get("waba_id")
+            if not (isinstance(token, str) and token and isinstance(waba, str) and waba):
+                raise ErrorMeta("META_SIN_CREDENCIALES")
+            version = datos.get("api_version")
+            estado["cred"] = CredencialesMeta(
+                token, waba, version if isinstance(version, str) and version else None
+            )
             estado["hasta"] = time.monotonic() + ttl_s
         return estado["cred"]
 
+    def invalidar() -> None:
+        estado["cred"] = None
+        estado["hasta"] = 0.0
+
+    leer.invalidar = invalidar  # type: ignore[attr-defined]
     return leer

@@ -79,6 +79,12 @@ dashboard muestra una alerta), la plantilla publicada «Constancia laboral» y 3
 - **Descarga de constancias** (`Descargar` en el historial, `POST /api/v1/constancias/{id}/descarga`): el servicio exige
   una URL firmada de CloudFront y no hay CloudFront local; responde 500. El PDF sí se genera y queda en el bucket
   `cc-local-constancias` de LocalStack (con Object Lock).
+- **Integraciones / Conexión con Meta**: el secreto `cc/local/meta` se crea vacío (`{}`) en LocalStack al
+  aprovisionar y **no se reescribe** al reprovisionar. La API de `notificaciones` lo lee y lo escribe
+  (`CC_META_SECRETO_ID`) y la pasarela enruta `/api/v1/integraciones` a ese servicio. Guardar, generar el token de
+  verificación y ver el estado funcionan igual que en AWS. "Probar conexión" llama a `graph.facebook.com`
+  de verdad: con credenciales de ejemplo responde "token no válido" (es lo esperado); las plantillas siguen
+  con el sustituto sin red (`CC_META_PLANTILLAS_STUB`).
 - **Meta / WhatsApp real**: no hay webhook ni Lambda enviador. Los mensajes de entrega se quedan en la cola
   `wa-salida.fifo` y el estado de entrega queda en «Pendiente». El worker de entrada corre pero nadie le escribe.
   Las Lambdas no se levantan.

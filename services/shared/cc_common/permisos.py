@@ -26,6 +26,7 @@ class Permiso(StrEnum):
     NOTIFICACIONES_EDITAR = "notificaciones:editar"
     NOTIFICACIONES_ENVIAR = "notificaciones:enviar"
     CHAT_RESPONDER = "chat:responder"
+    INTEGRACIONES_ADMINISTRAR = "integraciones:administrar"
 
 
 ROL_PERMISOS: dict[str, frozenset[Permiso]] = {

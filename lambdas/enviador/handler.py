@@ -287,14 +287,18 @@ def lambda_handler(evento, _contexto):  # pragma: no cover - requiere AWS
     from cc_whatsapp.contactos import ContactosHttp
     from cc_whatsapp.meta import ClienteMeta
     from cc_whatsapp.recursos import secreto_interno
-    from webhook_meta.handler import secretos_meta
+    from webhook_meta.handler import (
+        api_version_efectiva,
+        phone_number_id_efectivo,
+        secretos_meta,
+    )
 
     cfg = ConfigWhatsapp()
     s = secretos_meta(cfg)
     meta = ClienteMeta(
         base=cfg.meta_api_base,
-        version=cfg.meta_api_version,
-        phone_number_id=cfg.meta_phone_number_id or s["phone_number_id"],
+        version=api_version_efectiva(s, cfg),
+        phone_number_id=phone_number_id_efectivo(s, cfg),
         token=s["access_token"],
         timeout_s=cfg.meta_timeout_s,
     )

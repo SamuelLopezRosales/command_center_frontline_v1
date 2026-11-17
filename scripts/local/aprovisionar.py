@@ -142,6 +142,22 @@ def preparar_localstack(secretos: dict[str, Any], salida=print) -> None:
                 raise
             sm.put_secret_value(SecretId=nombre, SecretString=secretos[clave])
 
+    crear_secreto_meta(sm, salida)
+
+
+def crear_secreto_meta(sm, salida=print) -> bool:
+    """Crea ``cc/local/meta`` vacío (``{}``: "no configurada"); si ya existe no lo toca."""
+    from botocore.exceptions import ClientError
+
+    try:
+        sm.create_secret(Name=c.SECRETO_META, SecretString="{}")
+    except ClientError as exc:
+        if exc.response["Error"]["Code"] != "ResourceExistsException":
+            raise
+        return False
+    salida(f"secreto creado: {c.SECRETO_META} (vacío: se llena en Integraciones)")
+    return True
+
 
 def _falta_bus(events) -> bool:
     return not any(b["Name"] == c.BUS for b in events.list_event_buses().get("EventBuses", []))

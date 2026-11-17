@@ -4,7 +4,9 @@ import { useId, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { z } from "zod";
+import { CLAVE_ESTADO, leerEstadoMeta } from "@/features/integraciones/api";
 import { aplicarErroresDeCampo } from "@/shared/errores";
+import { useSesion } from "@/shared/sesion/SesionProvider";
 import { Campo } from "@/shared/ui/Campo";
 import { apiPlantillasMensaje, CLAVES, type PlantillaMensaje } from "../api";
 import { Dialogo, InsigniaMeta, mensajeError } from "../comun";
@@ -99,6 +101,10 @@ function NuevaPlantilla({ alCerrar, alCrear }: { alCerrar: () => void; alCrear: 
 export function PlantillasMensaje() {
   const qc = useQueryClient();
   const plantillas = useQuery({ queryKey: CLAVES.plantillas, queryFn: () => apiPlantillasMensaje.listar() });
+  const { tiene } = useSesion();
+  const puedeVerMeta = tiene("integraciones:administrar");
+  // Solo quien administra la integración la consulta; si falla, simplemente no hay aviso.
+  const meta = useQuery({ queryKey: CLAVE_ESTADO, queryFn: leerEstadoMeta, enabled: puedeVerMeta });
   const [creando, setCreando] = useState(false);
   const [aviso, setAviso] = useState<{ tipo: "ok" | "error"; texto: string } | null>(null);
 
@@ -125,10 +131,24 @@ export function PlantillasMensaje() {
             <Link to="/notificaciones">{t.migas.notificaciones}</Link> / {t.migas.plantillas}
           </nav>
         </div>
-        <button type="button" className="btn btn-primario" onClick={() => setCreando(true)}>
-          {t.plantillas.nueva}
-        </button>
+        <div className="not-acciones">
+          {puedeVerMeta && (
+            <Link className="btn btn-contorno" to="/integraciones/meta">
+              {t.plantillas.conexionMeta}
+            </Link>
+          )}
+          <button type="button" className="btn btn-primario" onClick={() => setCreando(true)}>
+            {t.plantillas.nueva}
+          </button>
+        </div>
       </div>
+
+      {puedeVerMeta && meta.data && !meta.data.configurada && (
+        <p className="alerta-info" role="note">
+          {t.plantillas.metaSinConfigurar}{" "}
+          <Link to="/integraciones/meta">{t.plantillas.conexionMeta}</Link>
+        </p>
+      )}
 
       {aviso && (
         <p className={aviso.tipo === "ok" ? "alerta-info" : "alerta-error"} role={aviso.tipo === "ok" ? "status" : "alert"}>

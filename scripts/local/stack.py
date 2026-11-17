@@ -175,6 +175,10 @@ def entorno_servicio(
         CC_EVENTOS_ACTIVOS="true",
         CC_HMAC_CELULAR_SECRETO_ID=c.SECRETOS_AWS["hmac_celular"],
         CC_CODIGO_HMAC_SECRETO_ID=c.SECRETOS_AWS["whatsapp_hmac"],
+        # Integraciones/Meta guarda las credenciales en LocalStack; las plantillas siguen con el
+        # sustituto sin red (no hay Meta real en local).
+        CC_META_SECRETO_ID=c.SECRETO_META,
+        CC_META_PLANTILLAS_STUB="true",
         CC_CAMPOS_URL=_url("campos"),
         CC_COLABORADORES_URL=_url("colaboradores"),
         CC_CONSTANCIAS_URL=_url("constancias"),

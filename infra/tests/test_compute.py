@@ -282,6 +282,9 @@ def test_historial_va_a_dashboard_con_mayor_prioridad_que_constancias(plantilla)
         ("/api/v1/plantillas-mensaje", "notificaciones"),  # no choca con /plantillas/*
         ("/api/v1/plantillas-mensaje/4", "notificaciones"),
         ("/api/v1/conversaciones/9/mensajes", "whatsapp"),
+        ("/api/v1/integraciones/meta", "notificaciones"),
+        ("/api/v1/integraciones/meta/verify-token:generar", "notificaciones"),
+        ("/api/v1/integraciones/meta/probar", "notificaciones"),
         ("/api/v1/audiencias/previsualizar", "notificaciones"),
         ("/api/v1/notificaciones/indicadores", "notificaciones"),
         ("/api/v1/colaboradores/12", "colaboradores"),
@@ -388,27 +391,61 @@ EXPECTATIVAS = {
     # servicio: (acciones que SÍ tiene, acciones que NO debe tener)
     "dashboard": (
         {"cognito-idp:AdminDisableUser", "cognito-idp:AdminUserGlobalSignOut"},
-        {"s3:GetObject", "sqs:SendMessage", "events:PutEvents", "kms:GenerateDataKey"},
+        {
+            "s3:GetObject",
+            "sqs:SendMessage",
+            "events:PutEvents",
+            "kms:GenerateDataKey",
+            "secretsmanager:PutSecretValue",
+        },
     ),
     "colaboradores": (
         {"s3:GetObject", "s3:PutObject", "s3:DeleteObject", "sqs:SendMessage", "events:PutEvents"},
-        {"scheduler:CreateSchedule", "sns:Publish", "cognito-idp:AdminDisableUser"},
+        {
+            "scheduler:CreateSchedule",
+            "sns:Publish",
+            "cognito-idp:AdminDisableUser",
+            "secretsmanager:PutSecretValue",
+        },
     ),
     "campos": (
         {"events:PutEvents"},
-        {"s3:GetObject", "sqs:SendMessage", "kms:GenerateDataKey", "sns:Publish"},
+        {
+            "s3:GetObject",
+            "sqs:SendMessage",
+            "kms:GenerateDataKey",
+            "sns:Publish",
+            "secretsmanager:PutSecretValue",
+        },
     ),
     "constancias": (
         {"s3:GetObject", "s3:PutObject", "s3:PutObjectRetention", "sqs:SendMessage"},
-        {"s3:DeleteObject", "scheduler:CreateSchedule", "sns:Publish"},
+        {
+            "s3:DeleteObject",
+            "scheduler:CreateSchedule",
+            "sns:Publish",
+            "secretsmanager:PutSecretValue",
+        },
     ),
     "notificaciones": (
-        {"scheduler:CreateSchedule", "scheduler:DeleteSchedule", "iam:PassRole", "sqs:SendMessage"},
+        {
+            "scheduler:CreateSchedule",
+            "scheduler:DeleteSchedule",
+            "iam:PassRole",
+            "sqs:SendMessage",
+            "secretsmanager:PutSecretValue",
+            "secretsmanager:DescribeSecret",
+        },
         {"s3:GetObject", "sns:Publish"},
     ),
     "whatsapp": (
         {"sns:Publish", "sqs:SendMessage", "events:PutEvents", "kms:Decrypt"},
-        {"s3:GetObject", "scheduler:CreateSchedule", "iam:PassRole"},
+        {
+            "s3:GetObject",
+            "scheduler:CreateSchedule",
+            "iam:PassRole",
+            "secretsmanager:PutSecretValue",
+        },
     ),
 }
 
@@ -458,6 +495,32 @@ def test_notificaciones_solo_pasa_el_rol_de_scheduler_y_solo_a_scheduler(plantil
         if "scheduler:CreateSchedule" in acciones(s)
     )
     assert "schedule/cc-test-envios/*" in texto(sch["Resource"])
+
+
+def test_notificaciones_escribe_solo_el_secreto_de_meta_con_kms(plantilla):
+    """Integraciones/Meta: ``PutSecretValue`` y ``DescribeSecret`` sobre ESE secreto (ARN con el
+    sufijo de Secrets Manager, sin ``*`` solo) y las acciones de KMS para cifrarlo."""
+    sentencias = _sentencias(plantilla, "notificaciones")
+    (escritura,) = (s for s in sentencias if "secretsmanager:PutSecretValue" in acciones(s))
+    assert sorted(acciones(escritura)) == [
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:PutSecretValue",
+    ]
+    recursos_escritura = texto(escritura["Resource"])
+    assert recursos_escritura.endswith(':secret:cc/test/meta-??????"]]}')
+    assert not isinstance(escritura["Resource"], list)  # un solo ARN, sin comodín suelto
+    assert "Condition" not in escritura
+    (kms,) = (s for s in sentencias if "kms:Encrypt" in acciones(s))
+    assert sorted(acciones(kms)) == ["kms:Decrypt", "kms:Encrypt", "kms:GenerateDataKey"]
+    assert kms["Condition"] == {
+        "StringEquals": {"kms:ViaService": "secretsmanager.us-east-1.amazonaws.com"}
+    }
+    assert "LlaveDatos" not in texto(kms["Resource"])
+    # La lectura (con kms:Decrypt) sigue donde estaba: ``GetSecretValue`` de sus secretos.
+    leidos = texto(
+        [s["Resource"] for s in sentencias if "secretsmanager:GetSecretValue" in acciones(s)]
+    )
+    assert "cc/test/meta-??????" in leidos
 
 
 def test_consumidores_de_eventos_leen_solo_su_cola_ev(plantilla):

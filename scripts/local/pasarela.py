@@ -55,6 +55,7 @@ RUTAS: tuple[tuple[str, str], ...] = (
     ("/api/v1/audiencias", "notificaciones"),
     ("/api/v1/plantillas-mensaje", "notificaciones"),
     ("/api/v1/notificaciones", "notificaciones"),
+    ("/api/v1/integraciones", "notificaciones"),
     ("/api/v1/conversaciones", "whatsapp"),
     ("/api/v1/dashboard", "dashboard"),
     ("/api/v1/usuarios", "dashboard"),

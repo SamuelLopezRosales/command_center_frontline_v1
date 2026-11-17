@@ -262,6 +262,40 @@ def test_data_lee_secretos_solo_con_proxy_y_descifra(global_test, global_prod):
     assert not roles_sin_decrypt(global_prod.json_de("data"))
 
 
+def test_solo_el_rol_de_notificaciones_puede_escribir_secretos(todas):
+    """Ningún otro rol (servicio, worker, Lambda, pipeline...) escribe secretos; la API de
+    `notificaciones` solo puede escribir ``cc/{env}/meta`` (pantalla de Integraciones)."""
+    escritores: list[tuple[str, str, str]] = []
+    for amb, stack, plantilla in todas:
+        for rol, sentencias in sentencias_por_rol(plantilla).items():
+            for s in sentencias:
+                if any(
+                    a.startswith("secretsmanager:")
+                    and a.split(":")[1].startswith(
+                        (
+                            "Put",
+                            "Update",
+                            "Create",
+                            "Delete",
+                            "Rotate",
+                            "Replicate",
+                            "Restore",
+                            "Tag",
+                            "Untag",
+                        )
+                    )
+                    for a in acciones_de(s)
+                ):
+                    escritores.append((amb, stack, rol))
+                    recursos = [json.dumps(r) for r in recursos_de_sentencia(s)]
+                    assert recursos and all(
+                        f":secret:cc/{amb}/meta-??????" in r and "*" not in r for r in recursos
+                    ), (amb, stack, rol, recursos)
+    assert escritores, "debe existir el rol de notificaciones con permiso de escritura"
+    assert {(a, s) for a, s, _ in escritores} == {("test", "compute"), ("prod", "compute")}
+    assert all("notificaciones" in rol.lower() for _, _, rol in escritores), escritores
+
+
 def test_el_detector_de_decrypt_falla_si_falta():
     plantilla = {
         "Resources": {

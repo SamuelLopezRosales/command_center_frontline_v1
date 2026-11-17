@@ -36,6 +36,8 @@ def crear_app(
     campos: Any | None = None,
     colaboradores: Any | None = None,
     meta: Any | None = None,
+    almacen_meta: Any | None = None,
+    transporte_sonda_meta: Any | None = None,
     scheduler: Any | None = None,
     reloj: Callable[[], datetime] | None = None,
     secreto_interno: Callable[[], str] | None = None,
@@ -82,6 +84,8 @@ def crear_app(
     app.state.campos = campos
     app.state.colaboradores = colaboradores
     app.state.meta = meta
+    app.state.almacen_meta = almacen_meta
+    app.state.transporte_sonda_meta = transporte_sonda_meta
     app.state.scheduler = scheduler
     app.state.reloj = reloj or (lambda: datetime.now(UTC))
     app.state.secreto_interno = secreto_interno or _secreto_interno_de(cfg)

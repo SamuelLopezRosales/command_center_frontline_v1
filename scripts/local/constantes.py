@@ -62,6 +62,9 @@ SECRETOS_AWS = {
     "hmac_celular": "cc/local/hmac-celular",
     "whatsapp_hmac": "cc/local/whatsapp-hmac",
 }
+# Credenciales de Meta (módulo Integraciones): se crea vacío (``{}``, "no configurada") y NO se
+# reescribe al reprovisionar, para no borrar lo que se haya capturado desde la pantalla.
+SECRETO_META = "cc/local/meta"  # pragma: allowlist secret
 
 # --- Procesos ---
 PUERTO_PASARELA = 8000

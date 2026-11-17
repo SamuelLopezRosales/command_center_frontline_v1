@@ -1,6 +1,86 @@
 {
   "components": {
     "schemas": {
+      "ActualizarMeta": {
+        "additionalProperties": false,
+        "description": "Solo cambia lo enviado: un campo omitido no se toca. Cadena vacía o ``null`` es 422.",
+        "properties": {
+          "access_token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Token de acceso permanente.",
+            "title": "Access Token"
+          },
+          "api_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Versión de la Graph API, v21.0.",
+            "title": "Api Version"
+          },
+          "app_secret": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "App Secret de la app de Meta.",
+            "title": "App Secret"
+          },
+          "phone_number_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Phone number ID (no es el número de teléfono).",
+            "title": "Phone Number Id"
+          },
+          "verify_token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Token de verificación del webhook (lo puede generar el sistema).",
+            "title": "Verify Token"
+          },
+          "waba_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "ID de la cuenta de WhatsApp Business.",
+            "title": "Waba Id"
+          }
+        },
+        "title": "ActualizarMeta",
+        "type": "object"
+      },
       "AudienciaActualizar": {
         "additionalProperties": false,
         "properties": {
@@ -389,6 +469,86 @@
           "celular_valido"
         ],
         "title": "EmbudoDto",
+        "type": "object"
+      },
+      "EstadoMetaDto": {
+        "properties": {
+          "access_token": {
+            "$ref": "#/components/schemas/SecretoDto"
+          },
+          "actualizado_en": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actualizado En"
+          },
+          "actualizado_por_usuario_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actualizado Por Usuario Id"
+          },
+          "api_version": {
+            "title": "Api Version",
+            "type": "string"
+          },
+          "app_secret": {
+            "$ref": "#/components/schemas/SecretoDto"
+          },
+          "configurada": {
+            "description": "Verdadero si están guardados los cinco datos.",
+            "title": "Configurada",
+            "type": "boolean"
+          },
+          "phone_number_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone Number Id"
+          },
+          "verify_token": {
+            "$ref": "#/components/schemas/VerifyTokenDto"
+          },
+          "waba_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Waba Id"
+          }
+        },
+        "required": [
+          "configurada",
+          "waba_id",
+          "phone_number_id",
+          "api_version",
+          "access_token",
+          "app_secret",
+          "verify_token",
+          "actualizado_en",
+          "actualizado_por_usuario_id"
+        ],
+        "title": "EstadoMetaDto",
         "type": "object"
       },
       "ExcluidosPorMotivo": {
@@ -977,6 +1137,50 @@
         "title": "NotificacionDto",
         "type": "object"
       },
+      "NumeroDto": {
+        "properties": {
+          "calidad": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Calidad"
+          },
+          "nombre_verificado": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nombre Verificado"
+          },
+          "numero_mostrado": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Numero Mostrado"
+          }
+        },
+        "required": [
+          "nombre_verificado",
+          "numero_mostrado",
+          "calidad"
+        ],
+        "title": "NumeroDto",
+        "type": "object"
+      },
       "PaginaAudiencias": {
         "properties": {
           "items": {
@@ -1383,6 +1587,51 @@
         "title": "Previsualizar",
         "type": "object"
       },
+      "PruebaMetaDto": {
+        "properties": {
+          "numero": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NumeroDto"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ok": {
+            "description": "Token, número y WABA válidos. El webhook se informa aparte.",
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "resultados": {
+            "items": {
+              "$ref": "#/components/schemas/ResultadoPruebaDto"
+            },
+            "title": "Resultados",
+            "type": "array"
+          },
+          "webhook_suscrito": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Webhook Suscrito"
+          }
+        },
+        "required": [
+          "ok",
+          "resultados",
+          "numero",
+          "webhook_suscrito"
+        ],
+        "title": "PruebaMetaDto",
+        "type": "object"
+      },
       "Reintentar": {
         "additionalProperties": false,
         "properties": {
@@ -1393,6 +1642,35 @@
           }
         },
         "title": "Reintentar",
+        "type": "object"
+      },
+      "ResultadoPruebaDto": {
+        "properties": {
+          "clave": {
+            "enum": [
+              "token",
+              "numero",
+              "waba",
+              "webhook"
+            ],
+            "title": "Clave",
+            "type": "string"
+          },
+          "detalle": {
+            "title": "Detalle",
+            "type": "string"
+          },
+          "ok": {
+            "title": "Ok",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "clave",
+          "ok",
+          "detalle"
+        ],
+        "title": "ResultadoPruebaDto",
         "type": "object"
       },
       "Revision": {
@@ -1425,6 +1703,46 @@
           "revisada_en"
         ],
         "title": "Revision",
+        "type": "object"
+      },
+      "SecretoDto": {
+        "properties": {
+          "configurado": {
+            "title": "Configurado",
+            "type": "boolean"
+          },
+          "ultimos4": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Últimos 4 caracteres; nulo si no hay valor o mide menos de 12 caracteres.",
+            "title": "Ultimos4"
+          }
+        },
+        "required": [
+          "configurado",
+          "ultimos4"
+        ],
+        "title": "SecretoDto",
+        "type": "object"
+      },
+      "TokenGeneradoDto": {
+        "properties": {
+          "verify_token": {
+            "description": "Se devuelve solo en esta respuesta; el GET no lo trae.",
+            "title": "Verify Token",
+            "type": "string"
+          }
+        },
+        "required": [
+          "verify_token"
+        ],
+        "title": "TokenGeneradoDto",
         "type": "object"
       },
       "Total": {
@@ -1522,6 +1840,19 @@
           "origen"
         ],
         "title": "VariableAsignada",
+        "type": "object"
+      },
+      "VerifyTokenDto": {
+        "properties": {
+          "configurado": {
+            "title": "Configurado",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "configurado"
+        ],
+        "title": "VerifyTokenDto",
         "type": "object"
       }
     }
@@ -1917,6 +2248,203 @@
         "summary": "Edición (NOT-04)",
         "tags": [
           "audiencias"
+        ]
+      }
+    },
+    "/api/v1/integraciones/meta": {
+      "get": {
+        "operationId": "estado_api_v1_integraciones_meta_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EstadoMetaDto"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Estado de la conexión con Meta (sin valores secretos)",
+        "tags": [
+          "integraciones"
+        ]
+      },
+      "put": {
+        "operationId": "guardar_api_v1_integraciones_meta_put",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActualizarMeta"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EstadoMetaDto"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Guardar credenciales de Meta (solo cambia lo enviado)",
+        "tags": [
+          "integraciones"
+        ]
+      }
+    },
+    "/api/v1/integraciones/meta/probar": {
+      "post": {
+        "operationId": "probar_api_v1_integraciones_meta_probar_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PruebaMetaDto"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "META_NO_CONFIGURADA: faltan credenciales guardadas."
+          }
+        },
+        "summary": "Probar la conexión con la Graph API usando lo guardado",
+        "tags": [
+          "integraciones"
+        ]
+      }
+    },
+    "/api/v1/integraciones/meta/verify-token:generar": {
+      "post": {
+        "operationId": "generar_token_api_v1_integraciones_meta_verify_token_generar_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenGeneradoDto"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Generar y guardar un token de verificación nuevo (se devuelve una sola vez)",
+        "tags": [
+          "integraciones"
         ]
       }
     },

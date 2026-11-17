@@ -62,6 +62,8 @@ export const t = {
 
   // Plantillas de mensaje (catálogo)
   plantillas: {
+    conexionMeta: "Conexión con Meta",
+    metaSinConfigurar: "La conexión con Meta no está configurada: las plantillas no se podrán enviar a revisión ni sincronizar hasta capturar las credenciales.",
     titulo: "Plantillas de mensaje",
     subtitulo: "Mensajes aprobados por Meta que puedes usar en tus notificaciones",
     nueva: "+ Nueva plantilla",
