@@ -13,7 +13,13 @@ mkdirSync(salida, { recursive: true });
 let desactualizados = 0;
 for (const f of readdirSync(contratos).filter((x) => x.endsWith(".json"))) {
   const ast = await openapiTS(pathToFileURL(join(contratos, f)));
-  const texto = "// Generado por scripts/generar-api.mjs. No editar.\n" + astToString(ast);
+  // Sin espacios al final de línea y con un solo salto final: así coincide con lo que dejan los
+  // hooks de limpieza de pre-commit y la verificación no depende de ellos.
+  const texto = ("// Generado por scripts/generar-api.mjs. No editar.\n" + astToString(ast))
+    .split("\n")
+    .map((linea) => linea.replace(/[ \t]+$/, ""))
+    .join("\n")
+    .replace(/\n*$/, "\n");
   const destino = join(salida, f.replace(".json", ".ts"));
   if (verificar) {
     if (!existsSync(destino) || readFileSync(destino, "utf8") !== texto) {
