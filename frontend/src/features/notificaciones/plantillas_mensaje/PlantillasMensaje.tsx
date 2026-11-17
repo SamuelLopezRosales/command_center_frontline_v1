@@ -11,6 +11,8 @@ import { Campo } from "@/shared/ui/Campo";
 import { apiPlantillasMensaje, CLAVES, type PlantillaMensaje } from "../api";
 import { Dialogo, InsigniaMeta, mensajeError } from "../comun";
 import { t } from "../textos";
+import { ImportarDesdeMeta } from "./ImportarDesdeMeta";
+import { tImportar } from "./textos";
 import "../notificaciones.css";
 
 const esquema = z.object({
@@ -106,6 +108,7 @@ export function PlantillasMensaje() {
   // Solo quien administra la integración la consulta; si falla, simplemente no hay aviso.
   const meta = useQuery({ queryKey: CLAVE_ESTADO, queryFn: leerEstadoMeta, enabled: puedeVerMeta });
   const [creando, setCreando] = useState(false);
+  const [importando, setImportando] = useState(false);
   const [aviso, setAviso] = useState<{ tipo: "ok" | "error"; texto: string } | null>(null);
 
   async function accion(fn: () => Promise<unknown>, exito: string) {
@@ -137,6 +140,9 @@ export function PlantillasMensaje() {
               {t.plantillas.conexionMeta}
             </Link>
           )}
+          <button type="button" className="btn btn-contorno" onClick={() => setImportando(true)}>
+            {tImportar.boton}
+          </button>
           <button type="button" className="btn btn-primario" onClick={() => setCreando(true)}>
             {t.plantillas.nueva}
           </button>
@@ -231,6 +237,15 @@ export function PlantillasMensaje() {
         </div>
       )}
 
+      {importando && (
+        <ImportarDesdeMeta
+          alCerrar={() => setImportando(false)}
+          alImportar={(n) => {
+            setAviso({ tipo: "ok", texto: tImportar.resumen.importadas(n) });
+            void qc.invalidateQueries({ queryKey: CLAVES.plantillas });
+          }}
+        />
+      )}
       {creando && (
         <NuevaPlantilla
           alCerrar={() => setCreando(false)}

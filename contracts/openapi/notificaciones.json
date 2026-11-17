@@ -613,6 +613,25 @@
         "title": "HitoLineaTiempo",
         "type": "object"
       },
+      "ImportarEntrada": {
+        "additionalProperties": false,
+        "properties": {
+          "plantillas": {
+            "items": {
+              "$ref": "#/components/schemas/PlantillaAImportar"
+            },
+            "maxItems": 50,
+            "minItems": 1,
+            "title": "Plantillas",
+            "type": "array"
+          }
+        },
+        "required": [
+          "plantillas"
+        ],
+        "title": "ImportarEntrada",
+        "type": "object"
+      },
       "Indicadores": {
         "properties": {
           "conteos": {
@@ -658,6 +677,28 @@
           "conteos"
         ],
         "title": "Indicadores",
+        "type": "object"
+      },
+      "ListadoDeMeta": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/PlantillaDeMeta"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "truncado": {
+            "description": "Meta tiene más plantillas de las que se trajeron (500).",
+            "title": "Truncado",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "items",
+          "truncado"
+        ],
+        "title": "ListadoDeMeta",
         "type": "object"
       },
       "NotificacionActualizar": {
@@ -1293,6 +1334,29 @@
         "title": "PaginaPlantillas",
         "type": "object"
       },
+      "PlantillaAImportar": {
+        "additionalProperties": false,
+        "properties": {
+          "idioma": {
+            "maxLength": 10,
+            "minLength": 2,
+            "title": "Idioma",
+            "type": "string"
+          },
+          "nombre": {
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Nombre",
+            "type": "string"
+          }
+        },
+        "required": [
+          "nombre",
+          "idioma"
+        ],
+        "title": "PlantillaAImportar",
+        "type": "object"
+      },
       "PlantillaActualizar": {
         "additionalProperties": false,
         "properties": {
@@ -1417,6 +1481,105 @@
           "texto_con_variables"
         ],
         "title": "PlantillaCrear",
+        "type": "object"
+      },
+      "PlantillaDeMeta": {
+        "properties": {
+          "advertencias": {
+            "description": "Cosas que se toleran pero conviene saber.",
+            "items": {
+              "type": "string"
+            },
+            "title": "Advertencias",
+            "type": "array"
+          },
+          "categoria": {
+            "description": "UTILITY, MARKETING, AUTHENTICATION u otra de Meta.",
+            "title": "Categoria",
+            "type": "string"
+          },
+          "codigo_incompatible": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "TIENE_ENCABEZADO, TIENE_BOTONES, VARIABLES_CON_NOMBRE, ESTADO_NO_APROBADO...",
+            "title": "Codigo Incompatible"
+          },
+          "compatible": {
+            "description": "Se puede importar y usar tal cual.",
+            "title": "Compatible",
+            "type": "boolean"
+          },
+          "estado_meta": {
+            "description": "Estado en Meta: APPROVED, PENDING, REJECTED, PAUSED...",
+            "title": "Estado Meta",
+            "type": "string"
+          },
+          "id_plantilla_meta": {
+            "title": "Id Plantilla Meta",
+            "type": "string"
+          },
+          "idioma": {
+            "title": "Idioma",
+            "type": "string"
+          },
+          "motivo_incompatible": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "El motivo, en español.",
+            "title": "Motivo Incompatible"
+          },
+          "nombre": {
+            "title": "Nombre",
+            "type": "string"
+          },
+          "nombre_en_uso": {
+            "description": "Ya existe una plantilla local con ese nombre y otro id: no se podría importar.",
+            "title": "Nombre En Uso",
+            "type": "boolean"
+          },
+          "num_variables": {
+            "title": "Num Variables",
+            "type": "integer"
+          },
+          "texto": {
+            "description": "Texto del cuerpo con las variables {{1}}, {{2}}...",
+            "title": "Texto",
+            "type": "string"
+          },
+          "ya_importada": {
+            "description": "Ya hay una plantilla local con ese id de Meta.",
+            "title": "Ya Importada",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "nombre",
+          "idioma",
+          "categoria",
+          "estado_meta",
+          "id_plantilla_meta",
+          "texto",
+          "num_variables",
+          "compatible",
+          "codigo_incompatible",
+          "motivo_incompatible",
+          "advertencias",
+          "ya_importada",
+          "nombre_en_uso"
+        ],
+        "title": "PlantillaDeMeta",
         "type": "object"
       },
       "PlantillaDto": {
@@ -1642,6 +1805,89 @@
           }
         },
         "title": "Reintentar",
+        "type": "object"
+      },
+      "ResultadoImportacion": {
+        "properties": {
+          "codigo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Código del motivo (NO_ENCONTRADA_EN_META, TIENE_BOTONES...).",
+            "title": "Codigo"
+          },
+          "idioma": {
+            "title": "Idioma",
+            "type": "string"
+          },
+          "motivo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Por qué se omitió (en español); nulo en los demás.",
+            "title": "Motivo"
+          },
+          "nombre": {
+            "title": "Nombre",
+            "type": "string"
+          },
+          "plantilla_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "La plantilla local, si se importó o ya existía.",
+            "title": "Plantilla Id"
+          },
+          "resultado": {
+            "enum": [
+              "IMPORTADA",
+              "YA_EXISTIA",
+              "OMITIDA"
+            ],
+            "title": "Resultado",
+            "type": "string"
+          }
+        },
+        "required": [
+          "nombre",
+          "idioma",
+          "resultado",
+          "motivo",
+          "codigo",
+          "plantilla_id"
+        ],
+        "title": "ResultadoImportacion",
+        "type": "object"
+      },
+      "ResultadoImportar": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ResultadoImportacion"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "ResultadoImportar",
         "type": "object"
       },
       "ResultadoPruebaDto": {
@@ -3411,6 +3657,106 @@
           }
         },
         "summary": "Alta (NOT-08)",
+        "tags": [
+          "plantillas-mensaje"
+        ]
+      }
+    },
+    "/api/v1/plantillas-mensaje/importar": {
+      "post": {
+        "operationId": "importar_api_v1_plantillas_mensaje_importar_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportarEntrada"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultadoImportar"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "META_NO_CONFIGURADA: faltan las credenciales de Meta."
+          },
+          "502": {
+            "description": "ERROR_PROVEEDOR_META: Meta no pudo atender la consulta."
+          }
+        },
+        "summary": "Importar plantillas ya aprobadas en Meta (una transacción por plantilla)",
+        "tags": [
+          "plantillas-mensaje"
+        ]
+      }
+    },
+    "/api/v1/plantillas-mensaje/meta": {
+      "get": {
+        "operationId": "listar_de_meta_api_v1_plantillas_mensaje_meta_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListadoDeMeta"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "META_NO_CONFIGURADA: faltan las credenciales de Meta."
+          },
+          "502": {
+            "description": "ERROR_PROVEEDOR_META: Meta no pudo atender la consulta."
+          }
+        },
+        "summary": "Plantillas que existen en Meta y si se pueden importar",
         "tags": [
           "plantillas-mensaje"
         ]

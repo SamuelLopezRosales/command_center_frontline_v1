@@ -18,6 +18,15 @@ Sustituye a Meta mientras no hay cuenta vinculada:
   fuerza un error por consulta (``"numero"``, ``"waba"``, ``"webhook"``): ``(estado, código)`` o
   ``"tiempo"`` para un tiempo agotado.
 
+- **Listado de plantillas (importar aprobadas):** ``GET /{waba}/message_templates`` con ``fields``
+  que incluya ``components`` responde como Graph (``id``, ``name``, ``language``, ``category``,
+  ``status``, ``components``, ``parameter_format``), filtra por ``name`` y ``language``, y **pagina**
+  con ``limit`` y ``after`` (``paging.cursors.after`` y ``paging.next`` solo si hay más). El catálogo
+  es ``catalogo_meta`` (``cargar_catalogo_ejemplo`` lo llena con una plantilla de bienvenida
+  compatible y otras con botones, encabezado, variable con nombre, rechazada y pausada) más las
+  creadas por ``POST``. ``listados`` guarda los parámetros de cada consulta. La consulta de
+  sincronización (con ``name`` y sin ``components``) no cambia.
+
 Corre dentro del proceso de prueba: no necesita puertos ni red.
 """
 
@@ -66,6 +75,9 @@ class SimuladorMeta:
         ]
         self.fallos_consulta: dict[str, tuple[int, int] | str] = {}
         self.consultas: list[str] = []  # rutas consultadas, en orden
+        # Plantillas "ya existentes" en la cuenta, en el formato de Graph (listado de plantillas).
+        self.catalogo_meta: list[dict[str, Any]] = []
+        self.listados: list[dict[str, str]] = []  # parámetros de cada listado, en orden
         self._n = 0
 
     # ------------------------------------------------------------------ secretos y eventos
@@ -173,6 +185,112 @@ class SimuladorMeta:
         self.plantillas[nombre]["status"] = "APPROVED"
         self.plantillas[nombre]["rejected_reason"] = "NONE"
 
+    def agregar_catalogo(
+        self,
+        nombre: str,
+        *,
+        id_: str | None = None,
+        idioma: str = "es_MX",
+        categoria: str = "UTILITY",
+        estado: str = "APPROVED",
+        cuerpo: str | None = "Hola {{1}}, bienvenido a {{2}}.",
+        ejemplo: list[str] | None = None,
+        componentes: list[dict[str, Any]] | None = None,
+        formato: str | None = "POSITIONAL",
+    ) -> dict[str, Any]:
+        """Agrega al catálogo una plantilla como la devuelve Graph. ``componentes`` se suma al
+        ``BODY`` (``cuerpo`` en ``None`` lo omite)."""
+        self._n += 1
+        todos: list[dict[str, Any]] = []
+        if cuerpo is not None:
+            c: dict[str, Any] = {"type": "BODY", "text": cuerpo}
+            if ejemplo:
+                c["example"] = {"body_text": [ejemplo]}
+            todos.append(c)
+        todos.extend(componentes or [])
+        p: dict[str, Any] = {
+            "id": id_ or f"CAT{self._n}", "name": nombre, "language": idioma,
+            "category": categoria, "status": estado, "components": todos,
+        }  # fmt: skip
+        if formato:
+            p["parameter_format"] = formato
+        self.catalogo_meta.append(p)
+        return p
+
+    def cargar_catalogo_ejemplo(self) -> None:
+        """Una compatible (con pie de página) y una por cada motivo típico de no compatibilidad."""
+        self.agregar_catalogo(
+            "bienvenida_colaborador", id_="800000000000001",
+            cuerpo="Hola {{1}}, te damos la bienvenida a {{2}}. Tu primer día es el {{3}}.",
+            ejemplo=["Ana", "Planta Apodaca", "lunes"],
+            componentes=[{"type": "FOOTER", "text": "Recursos Humanos"}],
+        )  # fmt: skip
+        self.agregar_catalogo(
+            "bienvenida_con_boton", id_="800000000000002", cuerpo="Bienvenido {{1}}.",
+            ejemplo=["Ana"],
+            componentes=[{"type": "BUTTONS", "buttons": [{"type": "URL", "text": "Guía"}]}],
+        )  # fmt: skip
+        self.agregar_catalogo(
+            "bienvenida_con_imagen", id_="800000000000003", categoria="MARKETING",
+            cuerpo="Bienvenido a la familia.",
+            componentes=[{"type": "HEADER", "format": "IMAGE"}],
+        )  # fmt: skip
+        self.agregar_catalogo(
+            "bienvenida_nombrada", id_="800000000000004", cuerpo="Hola {{nombre}}.",
+            formato="NAMED",
+        )  # fmt: skip
+        self.agregar_catalogo(
+            "bienvenida_rechazada", id_="800000000000005", categoria="MARKETING",
+            estado="REJECTED", cuerpo="Hola {{1}}.", ejemplo=["Ana"],
+        )  # fmt: skip
+        self.agregar_catalogo(
+            "bienvenida_pausada", id_="800000000000006", estado="PAUSED",
+            cuerpo="Hola {{1}}.", ejemplo=["Ana"],
+        )  # fmt: skip
+
+    def _catalogo_completo(self) -> list[dict[str, Any]]:
+        """El catálogo más lo creado por ``POST`` (en formato de Graph)."""
+        creadas = []
+        for p in self.plantillas.values():
+            cuerpo: dict[str, Any] = {"type": "BODY", "text": p["texto"]}
+            if p.get("ejemplo"):
+                cuerpo["example"] = p["ejemplo"]
+            creadas.append(
+                {
+                    "id": p["id"],
+                    "name": p["name"],
+                    "language": p["language"],
+                    "category": p["category"],
+                    "status": p["status"],
+                    "components": [cuerpo],
+                    "parameter_format": "POSITIONAL",
+                }  # fmt: skip
+            )
+        return [*self.catalogo_meta, *creadas]
+
+    def _listar_catalogo(self, peticion: httpx.Request) -> httpx.Response:
+        params = dict(peticion.url.params)
+        self.listados.append(params)
+        datos = [
+            p
+            for p in self._catalogo_completo()
+            if params.get("name") in (None, p["name"])
+            and params.get("language") in (None, p["language"])
+        ]
+        limite = max(1, int(params.get("limit", "25")))
+        inicio = int(params.get("after", "0"))
+        pagina = datos[inicio : inicio + limite]
+        cuerpo: dict[str, Any] = {"data": pagina}
+        if pagina:
+            cursores = {"before": str(inicio), "after": str(inicio + len(pagina))}
+            cuerpo["paging"] = {"cursors": cursores}
+            if inicio + limite < len(datos):  # como Graph: ``next`` solo si hay más
+                cuerpo["paging"]["next"] = (
+                    f"https://graph.facebook.com/v21.0/{self.waba_id}/message_templates"
+                    f"?limit={limite}&after={cursores['after']}"
+                )
+        return httpx.Response(200, json=cuerpo)
+
     def rechazar(self, nombre: str, motivo: str = "INVALID_FORMAT") -> None:
         self.plantillas[nombre]["status"] = "REJECTED"
         self.plantillas[nombre]["rejected_reason"] = motivo
@@ -181,6 +299,8 @@ class SimuladorMeta:
         ruta = peticion.url.path
         if ruta.endswith(f"/{self.waba_id}/message_templates"):
             if peticion.method == "GET":
+                if "components" in peticion.url.params.get("fields", ""):
+                    return self._listar_catalogo(peticion)
                 nombre = peticion.url.params.get("name")
                 datos = [p for p in self.plantillas.values() if nombre in (None, p["name"])]
                 return httpx.Response(200, json={"data": datos})

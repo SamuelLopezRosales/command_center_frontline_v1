@@ -15,6 +15,11 @@ es propia.
   traducción a los estados propios la hace ``servicios/plantillas.py``.
 - Los códigos y la forma exacta de editar una plantilla rechazada se confirman al vincular la
   cuenta (PQ-07).
+- ``listar`` (importar plantillas ya aprobadas) es solo lectura y pagina con el cursor
+  ``paging.cursors.after``. **Nunca sigue la URL ``paging.next``**: Graph la arma con su propio
+  servidor y a veces con el token dentro; el servidor al que se manda el token es solo
+  ``CC_META_API_BASE``. Trae a lo más ``MAX_PLANTILLAS_LISTADO`` (500) plantillas por consulta; si
+  hay más, el resultado va marcado como ``truncado``.
 """
 
 from __future__ import annotations
@@ -50,6 +55,32 @@ class PlantillaMeta:
     motivo_rechazo: str | None = None
 
 
+# Tope de plantillas que trae un listado (5 páginas de 100). Una cuenta con más se marca truncada.
+MAX_PLANTILLAS_LISTADO = 500
+PAGINA_LISTADO = 100
+CAMPOS_LISTADO = "id,name,language,category,status,components,parameter_format"
+
+
+@dataclass(frozen=True)
+class PlantillaListada:
+    """Una plantilla tal como la devuelve Meta (sin interpretar): ``estado`` y ``categoria`` en
+    mayúsculas; ``componentes`` es la lista cruda de Meta (solo se lee, nunca se registra)."""
+
+    id: str
+    nombre: str
+    idioma: str
+    categoria: str
+    estado: str
+    componentes: tuple[dict[str, Any], ...] = ()
+    formato_parametros: str | None = None
+
+
+@dataclass(frozen=True)
+class ListadoMeta:
+    items: tuple[PlantillaListada, ...]
+    truncado: bool = False
+
+
 class ClientePlantillasMeta(Protocol):
     async def crear(
         self, *, nombre: str, categoria: str, idioma: str, texto: str, ejemplos: list[str]
@@ -58,6 +89,38 @@ class ClientePlantillasMeta(Protocol):
     async def actualizar(self, id_meta: str, *, texto: str, ejemplos: list[str]) -> None: ...
 
     async def consultar(self, *, nombre: str, idioma: str) -> PlantillaMeta | None: ...
+
+    async def listar(self, *, maximo: int = MAX_PLANTILLAS_LISTADO) -> ListadoMeta: ...
+
+    async def obtener(self, *, nombre: str, idioma: str) -> PlantillaListada | None: ...
+
+
+def _texto(valor: Any) -> str | None:
+    return valor.strip() if isinstance(valor, str) and valor.strip() else None
+
+
+def interpretar_plantilla(t: Any) -> PlantillaListada | None:
+    """Una entrada de ``data`` de Meta como ``PlantillaListada``; ``None`` si no trae id, nombre o
+    idioma (una respuesta rara no rompe el listado: esa entrada se descarta)."""
+    if not isinstance(t, dict):
+        return None
+    crudo_id = t.get("id")
+    id_ = str(crudo_id).strip() if isinstance(crudo_id, str | int) else ""
+    nombre, idioma = _texto(t.get("name")), _texto(t.get("language"))
+    if not id_ or not nombre or not idioma:
+        return None
+    componentes = t.get("components")
+    return PlantillaListada(
+        id=id_,
+        nombre=nombre,
+        idioma=idioma,
+        categoria=str(t.get("category") or "").upper(),
+        estado=str(t.get("status") or "").upper(),
+        componentes=tuple(c for c in componentes if isinstance(c, dict))
+        if isinstance(componentes, list)
+        else (),
+        formato_parametros=_texto(t.get("parameter_format")),
+    )
 
 
 def componente_cuerpo(texto: str, ejemplos: list[str]) -> dict[str, Any]:
@@ -71,6 +134,89 @@ def _motivo(valor: Any) -> str | None:
     if not isinstance(valor, str) or not valor.strip() or valor.strip().upper() == "NONE":
         return None
     return valor.strip()[:500]
+
+
+def _cuerpo_ejemplo(texto: str, *ejemplos: str) -> dict[str, Any]:
+    c: dict[str, Any] = {"type": "BODY", "text": texto}
+    if ejemplos:
+        c["example"] = {"body_text": [list(ejemplos)]}
+    return c
+
+
+# Datos de ejemplo del sustituto sin red (solo local): una compatible y una por cada motivo típico.
+PLANTILLAS_EJEMPLO_STUB: tuple[PlantillaListada, ...] = (
+    PlantillaListada(
+        "900000000000001",
+        "bienvenida_colaborador",
+        "es_MX",
+        "UTILITY",
+        "APPROVED",
+        (
+            _cuerpo_ejemplo(
+                "Hola {{1}}, te damos la bienvenida a {{2}}. Tu primer día es el {{3}}.",
+                "Ana",
+                "Planta Apodaca",
+                "lunes 17 de noviembre",
+            ),
+            {"type": "FOOTER", "text": "Recursos Humanos"},
+        ),
+        "POSITIONAL",
+    ),
+    PlantillaListada(
+        "900000000000002",
+        "bienvenida_con_boton",
+        "es_MX",
+        "UTILITY",
+        "APPROVED",
+        (
+            _cuerpo_ejemplo("Bienvenido {{1}}. Conoce tu primer día.", "Ana"),
+            {
+                "type": "BUTTONS",
+                "buttons": [{"type": "URL", "text": "Ver guía", "url": "https://x"}],
+            },
+        ),
+        "POSITIONAL",
+    ),
+    PlantillaListada(
+        "900000000000003",
+        "bienvenida_con_imagen",
+        "es_MX",
+        "MARKETING",
+        "APPROVED",
+        (
+            {"type": "HEADER", "format": "IMAGE", "example": {"header_handle": ["h"]}},
+            _cuerpo_ejemplo("Bienvenido a la familia."),
+        ),
+        "POSITIONAL",
+    ),
+    PlantillaListada(
+        "900000000000004",
+        "bienvenida_nombrada",
+        "es_MX",
+        "UTILITY",
+        "APPROVED",
+        (_cuerpo_ejemplo("Hola {{nombre}}, bienvenido."),),
+        "NAMED",
+    ),
+    PlantillaListada(
+        "900000000000005",
+        "bienvenida_rechazada",
+        "es_MX",
+        "MARKETING",
+        "REJECTED",
+        (_cuerpo_ejemplo("Hola {{1}}, ¡bienvenido!", "Ana"),),
+        "POSITIONAL",
+    ),
+    PlantillaListada(
+        "900000000000006",
+        "bienvenida_pausada",
+        "es_MX",
+        "UTILITY",
+        "PAUSED",
+        (_cuerpo_ejemplo("Hola {{1}}, ya eres parte del equipo.", "Ana"),),
+        "POSITIONAL",
+    ),
+)
 
 
 class MetaPlantillasHttp:
@@ -172,6 +318,56 @@ class MetaPlantillasHttp:
                 )
         return None
 
+    async def listar(self, *, maximo: int = MAX_PLANTILLAS_LISTADO) -> ListadoMeta:
+        """Lee todas las páginas de ``/{waba}/message_templates`` (solo lectura). Sigue
+        ``paging.cursors.after`` mientras Meta diga que hay ``paging.next``; no usa esa URL."""
+        items: list[PlantillaListada] = []
+        vistos: set[str] = set()
+        cursor: str | None = None
+        for _ in range(maximo // PAGINA_LISTADO + 2):  # tope de páginas: nunca un ciclo infinito
+            params = {"fields": CAMPOS_LISTADO, "limit": str(PAGINA_LISTADO)}
+            if cursor:
+                params["after"] = cursor
+            d = await self._llamar("GET", "{waba}/message_templates", params=params)
+            if not isinstance(d.get("data"), list):  # no es un listado: no se toma por "vacío"
+                raise ErrorMeta("META_RESPUESTA_INVALIDA")
+            for crudo in d["data"]:
+                t = interpretar_plantilla(crudo)
+                if t is not None and t.id not in vistos:
+                    vistos.add(t.id)
+                    items.append(t)
+            paging = d.get("paging")
+            paging = paging if isinstance(paging, dict) else {}
+            cursores = paging.get("cursors")
+            siguiente = _texto(cursores.get("after")) if isinstance(cursores, dict) else None
+            hay_mas = bool(paging.get("next")) and siguiente is not None and siguiente != cursor
+            if len(items) > maximo:
+                return ListadoMeta(tuple(items[:maximo]), truncado=True)
+            if not hay_mas:
+                return ListadoMeta(tuple(items))
+            cursor = siguiente
+        return ListadoMeta(tuple(items[:maximo]), truncado=True)
+
+    async def obtener(self, *, nombre: str, idioma: str) -> PlantillaListada | None:
+        """Una plantilla por nombre e idioma exactos (solo lectura)."""
+        d = await self._llamar(
+            "GET",
+            "{waba}/message_templates",
+            params={
+                "name": nombre,
+                "language": idioma,
+                "fields": CAMPOS_LISTADO,
+                "limit": str(PAGINA_LISTADO),
+            },
+        )
+        if not isinstance(d.get("data"), list):
+            raise ErrorMeta("META_RESPUESTA_INVALIDA")
+        for crudo in d["data"]:
+            t = interpretar_plantilla(crudo)
+            if t is not None and t.nombre == nombre and t.idioma == idioma:
+                return t
+        return None
+
 
 class StubPlantillasMeta:
     """Sustituto sin red (pruebas y local sin cuenta): acepta todo y deja las plantillas en
@@ -182,6 +378,10 @@ class StubPlantillasMeta:
         self.actualizadas: list[str] = []
         self.estados: dict[str, PlantillaMeta] = {}
         self.error: ErrorMeta | None = None
+        # Lo que "tiene" Meta para el listado (importar plantillas aprobadas): datos de ejemplo
+        # coherentes para ver la pantalla en local; las pruebas lo reemplazan.
+        self.catalogo: list[PlantillaListada] = list(PLANTILLAS_EJEMPLO_STUB)
+        self.listados = 0
 
     async def crear(
         self, *, nombre: str, categoria: str, idioma: str, texto: str, ejemplos: list[str]
@@ -202,6 +402,17 @@ class StubPlantillasMeta:
         if self.error:
             raise self.error
         return self.estados.get(nombre)
+
+    async def listar(self, *, maximo: int = MAX_PLANTILLAS_LISTADO) -> ListadoMeta:
+        if self.error:
+            raise self.error
+        self.listados += 1
+        return ListadoMeta(tuple(self.catalogo[:maximo]), truncado=len(self.catalogo) > maximo)
+
+    async def obtener(self, *, nombre: str, idioma: str) -> PlantillaListada | None:
+        if self.error:
+            raise self.error
+        return next((t for t in self.catalogo if t.nombre == nombre and t.idioma == idioma), None)
 
 
 def cargador_credenciales(

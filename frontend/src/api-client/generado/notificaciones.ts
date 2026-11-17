@@ -279,6 +279,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/plantillas-mensaje/importar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Importar plantillas ya aprobadas en Meta (una transacción por plantilla) */
+        post: operations["importar_api_v1_plantillas_mensaje_importar_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/plantillas-mensaje/meta": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Plantillas que existen en Meta y si se pueden importar */
+        get: operations["listar_de_meta_api_v1_plantillas_mensaje_meta_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/plantillas-mensaje/{plantilla_id}": {
         parameters: {
             query?: never;
@@ -591,6 +625,11 @@ export interface components {
              */
             evento: "CREADA" | "REVISADA" | "CONFIRMADA" | "PROGRAMADA_PARA" | "ENVIADA";
         };
+        /** ImportarEntrada */
+        ImportarEntrada: {
+            /** Plantillas */
+            plantillas: components["schemas"]["PlantillaAImportar"][];
+        };
         /** Indicadores */
         Indicadores: {
             conteos: components["schemas"]["ConteoPestanas"];
@@ -608,6 +647,16 @@ export interface components {
             porcentaje_entregadas: number;
             /** Porcentaje Leidas */
             porcentaje_leidas: number;
+        };
+        /** ListadoDeMeta */
+        ListadoDeMeta: {
+            /** Items */
+            items: components["schemas"]["PlantillaDeMeta"][];
+            /**
+             * Truncado
+             * @description Meta tiene más plantillas de las que se trajeron (500).
+             */
+            truncado: boolean;
         };
         /** NotificacionActualizar */
         NotificacionActualizar: {
@@ -776,6 +825,13 @@ export interface components {
             /** Siguiente */
             siguiente?: string | null;
         };
+        /** PlantillaAImportar */
+        PlantillaAImportar: {
+            /** Idioma */
+            idioma: string;
+            /** Nombre */
+            nombre: string;
+        };
         /** PlantillaActualizar */
         PlantillaActualizar: {
             /** Categoria */
@@ -810,6 +866,62 @@ export interface components {
             nombre: string;
             /** Texto Con Variables */
             texto_con_variables: string;
+        };
+        /** PlantillaDeMeta */
+        PlantillaDeMeta: {
+            /**
+             * Advertencias
+             * @description Cosas que se toleran pero conviene saber.
+             */
+            advertencias: string[];
+            /**
+             * Categoria
+             * @description UTILITY, MARKETING, AUTHENTICATION u otra de Meta.
+             */
+            categoria: string;
+            /**
+             * Codigo Incompatible
+             * @description TIENE_ENCABEZADO, TIENE_BOTONES, VARIABLES_CON_NOMBRE, ESTADO_NO_APROBADO...
+             */
+            codigo_incompatible: string | null;
+            /**
+             * Compatible
+             * @description Se puede importar y usar tal cual.
+             */
+            compatible: boolean;
+            /**
+             * Estado Meta
+             * @description Estado en Meta: APPROVED, PENDING, REJECTED, PAUSED...
+             */
+            estado_meta: string;
+            /** Id Plantilla Meta */
+            id_plantilla_meta: string;
+            /** Idioma */
+            idioma: string;
+            /**
+             * Motivo Incompatible
+             * @description El motivo, en español.
+             */
+            motivo_incompatible: string | null;
+            /** Nombre */
+            nombre: string;
+            /**
+             * Nombre En Uso
+             * @description Ya existe una plantilla local con ese nombre y otro id: no se podría importar.
+             */
+            nombre_en_uso: boolean;
+            /** Num Variables */
+            num_variables: number;
+            /**
+             * Texto
+             * @description Texto del cuerpo con las variables {{1}}, {{2}}...
+             */
+            texto: string;
+            /**
+             * Ya Importada
+             * @description Ya hay una plantilla local con ese id de Meta.
+             */
+            ya_importada: boolean;
         };
         /** PlantillaDto */
         PlantillaDto: {
@@ -896,6 +1008,38 @@ export interface components {
              * @default false
              */
             confirmar_fuera_horario: boolean;
+        };
+        /** ResultadoImportacion */
+        ResultadoImportacion: {
+            /**
+             * Codigo
+             * @description Código del motivo (NO_ENCONTRADA_EN_META, TIENE_BOTONES...).
+             */
+            codigo: string | null;
+            /** Idioma */
+            idioma: string;
+            /**
+             * Motivo
+             * @description Por qué se omitió (en español); nulo en los demás.
+             */
+            motivo: string | null;
+            /** Nombre */
+            nombre: string;
+            /**
+             * Plantilla Id
+             * @description La plantilla local, si se importó o ya existía.
+             */
+            plantilla_id: number | null;
+            /**
+             * Resultado
+             * @enum {string}
+             */
+            resultado: "IMPORTADA" | "YA_EXISTIA" | "OMITIDA";
+        };
+        /** ResultadoImportar */
+        ResultadoImportar: {
+            /** Items */
+            items: components["schemas"]["ResultadoImportacion"][];
         };
         /** ResultadoPruebaDto */
         ResultadoPruebaDto: {
@@ -1770,6 +1914,82 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
                 };
+            };
+        };
+    };
+    importar_api_v1_plantillas_mensaje_importar_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImportarEntrada"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResultadoImportar"];
+                };
+            };
+            /** @description META_NO_CONFIGURADA: faltan las credenciales de Meta. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description ERROR_PROVEEDOR_META: Meta no pudo atender la consulta. */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listar_de_meta_api_v1_plantillas_mensaje_meta_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListadoDeMeta"];
+                };
+            };
+            /** @description META_NO_CONFIGURADA: faltan las credenciales de Meta. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description ERROR_PROVEEDOR_META: Meta no pudo atender la consulta. */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

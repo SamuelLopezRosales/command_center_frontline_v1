@@ -186,5 +186,103 @@ generarlo (espere ese tiempo). Si el token es correcto y aun así falla, pruebe 
   app): solo que hay alguna suscrita a la cuenta.
 - Dos guardados simultáneos se serializan con un candado de PostgreSQL; el secreto se reescribe solo con las
   claves conocidas.
-- Preparado para la **importación de plantillas ya aprobadas** (tarea posterior): reutilizará estas mismas
-  credenciales y el `WABA ID` guardado (`cargador_credenciales` ya los entrega al cliente de plantillas).
+- La **importación de plantillas ya aprobadas** (sección 9) reutiliza estas mismas credenciales y el `WABA ID`
+  guardado (`cargador_credenciales`).
+
+## 9. Importar plantillas aprobadas
+
+Sirve para **asociar a Command Center las plantillas que ya están aprobadas en su cuenta de Meta**, sin volver
+a mandarlas a revisión. Está en **Notificaciones → Plantillas de mensaje → «Importar desde Meta»** (permiso
+`notificaciones:editar`) y necesita la conexión con Meta guardada y probada (secciones 1 a 3).
+
+### 9.1 Cómo se usa
+
+1. Pulse **«Importar desde Meta»**. El diálogo consulta a Meta (solo lectura) y lista todas las plantillas de la
+   cuenta con su texto (las variables se ven como `{{1}}`, `{{2}}`), idioma, categoría y estado.
+2. Cada plantilla muestra una insignia: **Compatible**, **No compatible: motivo** o **Ya importada**. Solo las
+   compatibles y no importadas tienen casilla; **«Seleccionar todas las compatibles»** marca las que se puedan.
+3. Pulse **«Importar seleccionadas»**. El resumen dice, por plantilla, si quedó **importada**, **ya existía** o fue
+   **omitida** (con el motivo). La lista de plantillas locales se actualiza sola.
+
+Las plantillas importadas quedan en estado **Aprobada** y se pueden usar de inmediato al crear una notificación.
+**No se editan** (como cualquier plantilla aprobada): para cambiar el texto hay que crear otra en Meta.
+
+### 9.2 Qué se importa y qué no
+
+Command Center solo maneja **un cuerpo de texto con variables numeradas consecutivas** (`{{1}}`, `{{2}}`…). Una
+plantilla es **compatible** si cumple todo lo siguiente:
+
+| Condición | Si no se cumple (motivo mostrado) |
+|---|---|
+| Aprobada en Meta (`APPROVED`) | Las que están en revisión, rechazadas, **pausadas** o **deshabilitadas** se listan pero no se importan (`ESTADO_NO_APROBADO`, con su estado) |
+| Nombre solo con minúsculas, números y guion bajo | `NOMBRE_INVALIDO` |
+| Categoría Utilidad, Marketing o Autenticación | `CATEGORIA_NO_SOPORTADA` |
+| En el **idioma de envío** (`es_MX`) | `IDIOMA_NO_ENVIABLE` (ver 9.4) |
+| Sin **encabezado** (imagen, video, documento ni texto) | `TIENE_ENCABEZADO` |
+| Sin **botones** (respuesta rápida, URL, teléfono, código OTP) | `TIENE_BOTONES` |
+| Que no sea carrusel ni lleve otro componente especial | `TIENE_CARRUSEL`, `COMPONENTE_NO_SOPORTADO` |
+| Un cuerpo de texto de hasta 1024 caracteres | `SIN_CUERPO_TEXTO`, `TEXTO_DEMASIADO_LARGO` |
+| Variables **numeradas**, consecutivas desde 1 y hasta 20 | `VARIABLES_CON_NOMBRE` (por ejemplo `{{nombre}}`), `VARIABLES_NO_CONSECUTIVAS`, `VARIABLES_INVALIDAS`, `DEMASIADAS_VARIABLES` |
+
+Un **pie de página** (footer) de texto sin variables **sí se tolera**: Meta lo agrega al enviar el mensaje, pero
+Command Center no lo muestra en la vista previa ni lo manda como parámetro; la pantalla lo avisa.
+
+**Plantillas con botones o encabezado.** No se pueden importar hoy: el envío de Command Center solo manda el
+cuerpo con sus variables, y una plantilla con encabezado variable o botones con parámetros exigiría esos
+componentes en cada envío. Opciones: crear en Meta una versión de solo texto (sin encabezado ni botones) y
+reimportar, o crearla desde Command Center (**«+ Nueva plantilla»**) y enviarla a revisión.
+
+### 9.3 Cómo funciona por dentro (y cómo reimportar)
+
+- El servidor identifica cada plantilla por **nombre e idioma** y **vuelve a consultar a Meta**: la fila local se
+  crea con los datos de Meta (nombre, categoría, texto, idioma, `id_plantilla_meta`, ejemplos del cuerpo si
+  vienen), nunca con lo que mande el navegador.
+- Cada plantilla se procesa **por separado** (no es "todo o nada"): una omitida no impide importar las demás.
+- **Es seguro repetir la importación:** si ya hay una fila con el mismo `id_plantilla_meta` el resultado es
+  **Ya existía** y no se cambia nada. Para **reimportar** una plantilla (por ejemplo después de borrarla de
+  Command Center) basta con volver a abrir el diálogo y elegirla. Importar de nuevo **no actualiza** el texto de
+  una plantilla ya importada: si Meta la modificó, bórrela localmente (o renómbrela) y reimporte.
+- La consulta trae **hasta 500 plantillas** (cinco páginas de 100). Si la cuenta tiene más, el diálogo avisa que
+  la lista está truncada; el servidor consulta por separado las que se pidan por nombre e idioma y no hayan
+  entrado en esas 500.
+- Cada alta queda en la bitácora como `PLANTILLA_MENSAJE_IMPORTADA` (solo el id de la plantilla local y el
+  estado; sin texto ni credenciales).
+- Errores: sin credenciales guardadas responde **422 `META_NO_CONFIGURADA`** (el diálogo remite a «Conexión con
+  Meta»); un fallo de Meta (token vencido, permisos, tasa, caída, tiempo agotado) responde **502
+  `ERROR_PROVEEDOR_META`** con un mensaje en español, nunca un 500 y nunca con el token ni el texto de Meta.
+
+### 9.4 Limitaciones conocidas
+
+- **Nombre repetido en varios idiomas.** Meta permite el mismo nombre en varios idiomas (`aviso` en `es_MX` y en
+  `en_US`), pero la tabla local es única por **(empresa, nombre)**. Si el nombre ya existe localmente con otro
+  identificador o idioma, la plantilla se **omite** (`NOMBRE_EN_USO`, y la lista lo marca). No se cambió la
+  restricción ni se hizo migración. Renombre o elimine la local, o use nombres distintos por idioma en Meta.
+- **Idioma de envío.** El enviador y el chat de RH mandan **siempre** el idioma configurado (`es_MX`), sin leer el
+  idioma de la fila. Una plantilla en otro idioma (`es`, `es_ES`, `en_US`…) se importaría pero **Meta rechazaría
+  su envío** ("la plantilla no existe en ese idioma"); por eso hoy se marca no compatible (`IDIOMA_NO_ENVIABLE`).
+  Si las suyas están en `es`, hay que crear la versión `es_MX` en Meta o cambiar el envío para que use el idioma
+  de la plantilla (tarea pendiente: despachador, enviador y chat). El valor `es_MX` es `CC_PLANTILLA_IDIOMA_ENVIO`
+  en `notificaciones` y debe coincidir con `plantilla_idioma` de `whatsapp`.
+- **Plantillas que Meta pausa o deshabilita después.** El estado local solo cambia desde "En revisión" (eventos
+  `wa.plantilla_estado` y «Sincronizar estado»). Una plantilla **ya aprobada** (importada o no) que Meta pasa a
+  `PAUSED` o `DISABLED` por baja calidad **sigue "Aprobada" en Command Center**, y sus envíos fallarán en Meta.
+  El evento ignorado queda en el log del servicio (`evento de plantilla sin efecto (estado de Meta PAUSED)`,
+  sin nombre ni texto). Si empiezan a fallar los envíos de una plantilla, revise su estado en Meta; reflejar esos
+  estados en la pantalla es un cambio de diseño pendiente.
+- **Ejemplos.** Si Meta no devuelve los ejemplos del cuerpo, la fila se guarda sin ejemplos (no afecta el envío,
+  solo la edición de un borrador duplicado a partir de ella).
+
+### 9.5 Referencia técnica
+
+- `GET /api/v1/plantillas-mensaje/meta` y `POST /api/v1/plantillas-mensaje/importar` (máximo 50 plantillas por
+  solicitud), servicio `notificaciones`, permiso `notificaciones:editar`; contrato en
+  `contracts/openapi/notificaciones.json`. Ambas llevan `Cache-Control: no-store`.
+- Meta: `GET /{version}/{waba_id}/message_templates?fields=id,name,language,category,status,components,parameter_format&limit=100`,
+  paginando con `paging.cursors.after`. **No se sigue** la URL `paging.next` (Meta la arma con su servidor y a
+  veces con el token): solo se usa `CC_META_API_BASE`.
+- Código: `cc_notificaciones/meta.py` (`listar`, `obtener`), `servicios/plantillas_meta.py` (compatibilidad e
+  importación), `api/plantillas_meta.py`. En local, con `CC_META_PLANTILLAS_STUB`, el listado devuelve datos de
+  ejemplo (una de bienvenida compatible y otras con botones, encabezado, variable con nombre, rechazada y
+  pausada) para ver la pantalla sin Meta.
+- No hay cambios de permisos de IAM, ALB ni migraciones: se usa la lectura que ya tenía el servicio sobre
+  `cc/{env}/meta` y las reglas de `/api/v1/plantillas-mensaje*`.

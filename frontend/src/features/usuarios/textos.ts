@@ -100,6 +100,7 @@ export const ACCIONES_BITACORA: Record<string, string> = {
   PLANTILLA_CREADA: "Plantilla creada",
   PLANTILLA_MODIFICADA: "Plantilla modificada",
   PLANTILLA_PUBLICADA: "Plantilla publicada",
+  PLANTILLA_MENSAJE_IMPORTADA: "Plantilla de mensaje importada de Meta",
   PLANTILLA_ELIMINADA: "Plantilla eliminada",
   CONSTANCIA_GENERADA: "Constancia generada",
   CONSTANCIA_ENTREGADA: "Constancia entregada",

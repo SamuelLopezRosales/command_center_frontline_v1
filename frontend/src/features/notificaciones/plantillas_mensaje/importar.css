@@ -1,0 +1,20 @@
+/* Importar plantillas desde Meta. Prefijo: imp-. */
+.imp-fondo { position: fixed; inset: 0; background: #14213f99; display: grid; place-items: center; z-index: 20; padding: 16px; }
+.imp-dialogo { background: var(--blanco); border-radius: 10px; padding: 24px; width: 980px; max-width: 100%; max-height: 92vh; overflow: auto; outline: none; display: flex; flex-direction: column; gap: 12px; }
+.imp-dialogo h2 { margin: 0; }
+.imp-intro { margin: 0; color: var(--suave); font-size: 13px; }
+.imp-barra { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.imp-todas { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; font-size: 13px; }
+.imp-contador { color: var(--suave); font-size: 13px; }
+.imp-tabla-caja { overflow: auto; border: 1px solid var(--borde); border-radius: 8px; }
+.imp-tabla { width: 100%; border-collapse: collapse; font-size: 13px; }
+.imp-tabla th { text-align: left; padding: 8px 10px; background: #f3f4f6; position: sticky; top: 0; }
+.imp-tabla td { padding: 8px 10px; border-top: 1px solid var(--borde); vertical-align: top; }
+.imp-nombre { font-weight: 700; word-break: break-all; }
+.imp-texto { margin: 4px 0 0; color: var(--suave); white-space: pre-wrap; overflow-wrap: anywhere; }
+.imp-aviso { margin: 4px 0 0; color: var(--ambar); font-size: 12px; }
+.imp-insignias { display: flex; gap: 6px; flex-wrap: wrap; align-items: flex-start; }
+.imp-insignias .insignia { white-space: normal; text-align: left; }
+.imp-acciones { display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
+.imp-estado { margin: 0; }
+.imp-resumen-totales { margin: 0; font-weight: 600; }

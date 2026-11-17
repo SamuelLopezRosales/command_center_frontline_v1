@@ -25,11 +25,11 @@ real se prueba con el marcador `pdf`. Los secretos se muestran como `***` y los 
 
 | Paso | Tiempo (s) |
 |---|---|
-| colaborador escribe: constancia | 1.83 |
-| colaborador escribe: *** **** | 2.46 |
-| Meta reporta delivered | 1.06 |
-| Meta reporta sent | 0.62 |
-| Meta reporta read | 1.10 |
+| colaborador escribe: constancia | 2.05 |
+| colaborador escribe: *** **** | 2.65 |
+| Meta reporta delivered | 1.01 |
+| Meta reporta sent | 0.59 |
+| Meta reporta read | 0.99 |
 
 Trabajo hecho por pieza en el bombeo (acumulado):
 
@@ -46,7 +46,7 @@ Trabajo hecho por pieza en el bombeo (acumulado):
 - Solicitud 1: `ENTREGADA` (motivo: ninguno).
 - Constancia 1: folio `CG-2026-0001`, entrega `ENTREGADA`.
 - Objeto en S3 (bucket de constancias con Object Lock, modo GOVERNANCE): `constancias/1/2026/CG-2026-0001.pdf`.
-- Huella SHA-256 del PDF: `940d7c06b31361cf…`.
+- Huella SHA-256 del PDF: `0f31fe770cd908dd…`.
 - Enlace de un solo uso: la primera descarga redirige (302) y la segunda responde 410 `ENLACE_NO_VIGENTE`.
 - Mensajes de la constancia (tabla `mensaje_whatsapp`):
   - TEXTO, estado `LEIDO`, intentos 1, error ninguno.

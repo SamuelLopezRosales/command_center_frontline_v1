@@ -385,7 +385,12 @@ async def aplicar_evento(motor, evento: dict[str, Any]) -> int:
     nombre = evento.get("nombre")
     nuevo = ESTADO_DE_META.get(str(evento.get("estado_meta") or "").upper())
     if nuevo is None or not isinstance(nombre, str) or not nombre:
-        log.info("evento de plantilla sin efecto")
+        # Un estado que no cierra la revisión (PAUSED, DISABLED, FLAGGED...) no cambia el estado
+        # local: una plantilla ya APROBADA seguiría "aprobada" aunque Meta la pause o la
+        # deshabilite y sus envíos fallarían en Meta (ver docs/meta-configuracion.md). Se deja
+        # constancia en el log solo con el estado (sin nombre ni texto).
+        estado = re.sub(r"[^A-Z_]", "", str(evento.get("estado_meta") or "").upper())[:30]
+        log.warning("evento de plantilla sin efecto (estado de Meta %s)", estado or "desconocido")
         return 0
     motivo = _motivo_de_rechazo(evento.get("motivo_rechazo")) if nuevo == "RECHAZADA" else None
 

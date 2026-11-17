@@ -42,18 +42,18 @@ plantillas como `<nombre>` (los de los pasos son ficticios) y no se incluye ning
 
 | Paso | Tiempo (s) |
 |---|---|
-| Meta aprueba la plantilla aviso_cita | 1.49 |
-| Scheduler dispara el despacho | 2.40 |
-| Meta reporta sent | 0.91 |
-| Meta reporta delivered | 1.61 |
-| Meta reporta delivered | 1.73 |
-| Meta reporta read | 1.45 |
-| colaborador escribe: Gracias, ahí estaré | 1.48 |
-| RH responde por el chat | 1.62 |
-| Meta reporta delivered | 1.53 |
-| RH envía una plantilla con la ventana cerrada | 1.65 |
-| respaldo por correo a las 24 horas | 1.06 |
-| el mismo respaldo se repite | 0.89 |
+| Meta aprueba la plantilla aviso_cita | 1.55 |
+| Scheduler dispara el despacho | 2.41 |
+| Meta reporta sent | 0.88 |
+| Meta reporta delivered | 1.56 |
+| Meta reporta delivered | 1.55 |
+| Meta reporta read | 1.55 |
+| colaborador escribe: Gracias, ahí estaré | 1.47 |
+| RH responde por el chat | 1.57 |
+| Meta reporta delivered | 1.49 |
+| RH envía una plantilla con la ventana cerrada | 1.60 |
+| respaldo por correo a las 24 horas | 0.94 |
+| el mismo respaldo se repite | 0.90 |
 
 Trabajo hecho por pieza en el bombeo (acumulado):
 

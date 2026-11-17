@@ -160,3 +160,72 @@ async def en_revision_por_nombre(conn: AsyncConnection, nombre: str) -> list[tup
         {"n": nombre},
     )
     return [(int(i), int(e)) for i, e in r.all()]
+
+
+async def identificadores(conn: AsyncConnection) -> list[dict[str, Any]]:
+    """``id_plantilla_meta``, ``nombre`` e ``idioma`` de las plantillas de la empresa (la RLS acota
+    a la empresa de la conexión). Sirve para marcar qué del listado de Meta ya está asociado."""
+    r = await conn.execute(
+        text("SELECT id, nombre, idioma, id_plantilla_meta FROM notificaciones.plantilla_mensaje")
+    )
+    return [dict(f) for f in r.mappings().all()]
+
+
+async def buscar_por_id_meta(conn: AsyncConnection, id_meta: str) -> int | None:
+    r = await conn.execute(
+        text(
+            "SELECT id FROM notificaciones.plantilla_mensaje WHERE id_plantilla_meta = :m "
+            "ORDER BY id LIMIT 1"
+        ),
+        {"m": id_meta},
+    )
+    return r.scalar_one_or_none()
+
+
+async def buscar_por_nombre(conn: AsyncConnection, nombre: str) -> dict[str, Any] | None:
+    r = await conn.execute(
+        text(
+            "SELECT id, idioma, id_plantilla_meta FROM notificaciones.plantilla_mensaje "
+            "WHERE nombre = :n"
+        ),
+        {"n": nombre},
+    )
+    f = r.mappings().first()
+    return dict(f) if f else None
+
+
+async def importar_aprobada(
+    conn: AsyncConnection,
+    *,
+    empresa_id: int,
+    usuario_id: int,
+    nombre: str,
+    categoria: str,
+    idioma: str,
+    texto: str,
+    ejemplos: list[str],
+    id_meta: str,
+) -> int | None:
+    """Inserta una plantilla que ya está APROBADA en Meta. ``ON CONFLICT DO NOTHING`` sobre
+    ``(empresa_id, nombre)``: devuelve ``None`` si el nombre ya existía (otra importación
+    simultánea o una plantilla local), sin abortar la transacción."""
+    r = await conn.execute(
+        text(
+            "INSERT INTO notificaciones.plantilla_mensaje "
+            "(empresa_id, creada_por_usuario_id, nombre, categoria, idioma, texto_con_variables, "
+            "estado_meta, id_plantilla_meta, ejemplos_json) "
+            "VALUES (:e, :u, :n, :c, :i, :t, 'APROBADA', :m, CAST(:j AS jsonb)) "
+            "ON CONFLICT (empresa_id, nombre) DO NOTHING RETURNING id"
+        ),
+        {
+            "e": empresa_id,
+            "u": usuario_id,
+            "n": nombre,
+            "c": categoria,
+            "i": idioma,
+            "t": texto,
+            "m": id_meta,
+            "j": json.dumps(ejemplos, ensure_ascii=False),
+        },
+    )
+    return r.scalar_one_or_none()

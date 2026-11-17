@@ -70,6 +70,7 @@ ACCIONES = frozenset(
         "INTENTO_WHATSAPP",
         "META_CONFIGURADA",
         "META_PROBADA",
+        "PLANTILLA_MENSAJE_IMPORTADA",
     }
 )
 
