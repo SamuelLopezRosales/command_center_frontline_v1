@@ -46,3 +46,6 @@ build/
 
 # Stack local de desarrollo (scripts/local.ps1): PIDs, registros, llaves y secretos de prueba
 .local/
+
+# Archivos de bloqueo de Office (cuando un .xlsx esta abierto)
+~$*
