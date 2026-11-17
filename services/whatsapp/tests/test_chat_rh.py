@@ -324,6 +324,98 @@ async def test_plantilla_inexistente_o_de_otra_empresa_o_con_variables_mal(mundo
     assert salidas(mundo) == []
 
 
+async def test_plantilla_con_nombre_se_envia_por_nombre_con_el_idioma_de_la_plantilla(mundo, h):
+    c = mundo["http"]
+    mundo["notificaciones"].plantillas[(mundo["empresa"], 5)] = {
+        **plantilla(
+            texto="Hello {{guest_name}}, we expect you at {{place}}. Bye {{guest_name}}.",
+            nombre="vida_checkout_notice",
+        ),
+        "idioma": "en",
+    }
+    conv = crear_conversacion(mundo, mundo["colaborador"], hace="40 hours")
+    r = await c.post(
+        f"{BASE}/{conv}/mensajes/plantilla",
+        json={
+            "plantilla_mensaje_id": 5,
+            "variables_nombradas": {"place": " Lobby ", "guest_name": "Juan"},
+        },
+        headers=h,
+    )
+    assert r.status_code == 202, r.text
+    [m] = salidas(mundo)
+    assert m["plantilla"] == "vida_checkout_notice" and m["idioma"] == "en"
+    # valores en el orden de aparición en el texto, con la lista paralela de nombres
+    assert m["variables_nombres"] == ["guest_name", "place"]
+    assert m["variables"] == ["Juan", "Lobby"] and m["proposito"] == "CHAT"
+    [(blob,)] = sql(mundo, "SELECT contenido_cifrado FROM whatsapp.mensaje_whatsapp")
+    assert b"Juan" not in bytes(blob)  # el texto guardado va cifrado
+    msgs = (await c.get(f"{BASE}/{conv}/mensajes", headers=h)).json()["items"]
+    assert msgs[0]["contenido"] == "Hello Juan, we expect you at Lobby. Bye Juan."
+
+
+async def test_plantilla_posicional_lleva_idioma_y_no_lleva_nombres(mundo, h):
+    conv = crear_conversacion(mundo, mundo["colaborador"], hace="40 hours")
+    r = await mundo["http"].post(
+        f"{BASE}/{conv}/mensajes/plantilla",
+        json={"plantilla_mensaje_id": 5, "variables": ["Ana", "lunes"]}, headers=h,
+    )  # fmt: skip
+    assert r.status_code == 202, r.text
+    [m] = salidas(mundo)
+    assert m["idioma"] == "es_MX" and "variables_nombres" not in m
+
+
+async def test_plantilla_sin_variables_en_otro_idioma(mundo, h):
+    mundo["notificaciones"].plantillas[(mundo["empresa"], 5)] = {
+        **plantilla(texto="Hello World", nombre="hello_world"),
+        "idioma": "en_US",
+    }
+    conv = crear_conversacion(mundo, mundo["colaborador"], hace="40 hours")
+    r = await mundo["http"].post(
+        f"{BASE}/{conv}/mensajes/plantilla", json={"plantilla_mensaje_id": 5}, headers=h
+    )
+    assert r.status_code == 202, r.text
+    [m] = salidas(mundo)
+    assert m["idioma"] == "en_US" and m["variables"] == [] and "variables_nombres" not in m
+
+
+@pytest.mark.parametrize(
+    ("cuerpo", "esperados"),
+    [
+        ({"variables": ["Juan"]}, {("variables", "NO_APLICA"),
+                                    ("variables_nombradas.guest_name", "VARIABLE_FALTANTE")}),
+        ({"variables_nombradas": {}}, {("variables_nombradas.guest_name", "VARIABLE_FALTANTE")}),
+        ({"variables_nombradas": {"guest_name": "Juan", "otra": "x"}},
+         {("variables_nombradas.otra", "VARIABLE_NO_EXISTE")}),
+        ({"variables_nombradas": {"guest_name": "  "}},
+         {("variables_nombradas.guest_name", "VALOR_INVALIDO")}),
+        ({"variables_nombradas": {"guest_name": "dos\nlineas"}},
+         {("variables_nombradas.guest_name", "VALOR_INVALIDO")}),
+    ],
+)  # fmt: skip
+async def test_plantilla_con_nombre_valida_por_campo(mundo, h, cuerpo, esperados):
+    mundo["notificaciones"].plantillas[(mundo["empresa"], 5)] = plantilla(
+        texto="Hola {{guest_name}}.", nombre="vida_x"
+    )
+    conv = crear_conversacion(mundo, mundo["colaborador"], hace="40 hours")
+    r = await mundo["http"].post(
+        f"{BASE}/{conv}/mensajes/plantilla", json={"plantilla_mensaje_id": 5, **cuerpo}, headers=h
+    )
+    assert r.status_code == 422 and r.json()["codigo"] == "VARIABLES_INVALIDAS", r.text
+    assert {(e["campo"], e["codigo"]) for e in r.json()["errores"]} == esperados
+    assert "Juan" not in r.text and salidas(mundo) == []
+
+
+async def test_nombradas_a_una_plantilla_posicional_se_rechaza(mundo, h):
+    conv = crear_conversacion(mundo, mundo["colaborador"], hace="40 hours")
+    r = await mundo["http"].post(
+        f"{BASE}/{conv}/mensajes/plantilla",
+        json={"plantilla_mensaje_id": 5, "variables_nombradas": {"a": "x", "b": "y"}}, headers=h,
+    )  # fmt: skip
+    assert r.status_code == 422 and r.json()["codigo"] == "VARIABLES_INVALIDAS"
+    assert salidas(mundo) == []
+
+
 # ------------------------------------------------------------------ WAP-05
 
 

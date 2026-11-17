@@ -31,6 +31,7 @@ from dataclasses import dataclass, field
 from typing import Any, Protocol
 
 import httpx
+from cc_common import plantillas_meta as pm
 
 
 class ErrorMeta(Exception):  # noqa: N818
@@ -124,10 +125,27 @@ def interpretar_plantilla(t: Any) -> PlantillaListada | None:
 
 
 def componente_cuerpo(texto: str, ejemplos: list[str]) -> dict[str, Any]:
+    """El componente BODY para crear o editar. Con variables con nombre, los ejemplos van en
+    ``body_text_named_params`` (``[{param_name, example}]``, en el orden de aparición); con
+    variables numeradas, en ``body_text``."""
     cuerpo: dict[str, Any] = {"type": "BODY", "text": texto}
     if ejemplos:
-        cuerpo["example"] = {"body_text": [list(ejemplos)]}
+        nombres = pm.nombres_para_envio(texto)
+        if nombres is not None and len(nombres) == len(ejemplos):
+            cuerpo["example"] = {
+                "body_text_named_params": [
+                    {"param_name": n, "example": e} for n, e in zip(nombres, ejemplos, strict=True)
+                ]
+            }
+        else:
+            cuerpo["example"] = {"body_text": [list(ejemplos)]}
     return cuerpo
+
+
+def formato_parametros(texto: str) -> str | None:
+    """``"NAMED"`` si el texto usa variables con nombre; ``None`` (posicional, el valor por
+    defecto de Meta) en otro caso."""
+    return "NAMED" if pm.nombres_para_envio(texto) is not None else None
 
 
 def _motivo(valor: Any) -> str | None:
@@ -141,6 +159,22 @@ def _cuerpo_ejemplo(texto: str, *ejemplos: str) -> dict[str, Any]:
     if ejemplos:
         c["example"] = {"body_text": [list(ejemplos)]}
     return c
+
+
+def _cuerpo_nombrado(texto: str, **ejemplos: str) -> dict[str, Any]:
+    c: dict[str, Any] = {"type": "BODY", "text": texto}
+    if ejemplos:
+        c["example"] = {
+            "body_text_named_params": [{"param_name": n, "example": e} for n, e in ejemplos.items()]
+        }
+    return c
+
+
+def _botones(*textos: str) -> dict[str, Any]:
+    return {
+        "type": "BUTTONS",
+        "buttons": [{"type": "QUICK_REPLY", "text": t} for t in textos],
+    }
 
 
 # Datos de ejemplo del sustituto sin red (solo local): una compatible y una por cada motivo típico.
@@ -172,7 +206,7 @@ PLANTILLAS_EJEMPLO_STUB: tuple[PlantillaListada, ...] = (
             _cuerpo_ejemplo("Bienvenido {{1}}. Conoce tu primer día.", "Ana"),
             {
                 "type": "BUTTONS",
-                "buttons": [{"type": "URL", "text": "Ver guía", "url": "https://x"}],
+                "buttons": [{"type": "URL", "text": "Ver guía", "url": "https://x/{{1}}"}],
             },
         ),
         "POSITIONAL",
@@ -191,11 +225,11 @@ PLANTILLAS_EJEMPLO_STUB: tuple[PlantillaListada, ...] = (
     ),
     PlantillaListada(
         "900000000000004",
-        "bienvenida_nombrada",
+        "bienvenida_mezclada",
         "es_MX",
         "UTILITY",
         "APPROVED",
-        (_cuerpo_ejemplo("Hola {{nombre}}, bienvenido."),),
+        (_cuerpo_ejemplo("Hola {{1}}, {{nombre}}, bienvenido."),),
         "NAMED",
     ),
     PlantillaListada(
@@ -215,6 +249,119 @@ PLANTILLAS_EJEMPLO_STUB: tuple[PlantillaListada, ...] = (
         "PAUSED",
         (_cuerpo_ejemplo("Hola {{1}}, ya eres parte del equipo.", "Ana"),),
         "POSITIONAL",
+    ),
+    # Las siete plantillas reales de la cuenta compartida (variables con nombre, botones de
+    # respuesta rápida, un encabezado de imagen y tres en inglés).
+    PlantillaListada(
+        "900000000000007",
+        "hello_world",
+        "en_US",
+        "UTILITY",
+        "APPROVED",
+        (
+            _cuerpo_ejemplo(
+                "Welcome and congratulations!! This message demonstrates your ability to send a "
+                "WhatsApp message notification from the Cloud API."
+            ),
+            {"type": "FOOTER", "text": "WhatsApp Business Platform sample message"},
+        ),
+        "POSITIONAL",
+    ),
+    PlantillaListada(
+        "900000000000008",
+        "vida_aviso_checkout",
+        "es_MX",
+        "UTILITY",
+        "APPROVED",
+        (
+            _cuerpo_nombrado(
+                "Hola {{guest_name}}, tu salida es hoy a las {{checkout_time}}. Gracias por tu "
+                "estancia.",
+                guest_name="Juan",
+                checkout_time="12:00",
+            ),
+            _botones("Sí", "No"),
+        ),
+        "NAMED",
+    ),
+    PlantillaListada(
+        "900000000000009",
+        "vida_bienvenida_llegada",
+        "es_MX",
+        "UTILITY",
+        "APPROVED",
+        (
+            _cuerpo_nombrado(
+                "Bienvenido {{guest_name}}. Tu habitación está en la torre {{tower}}.",
+                guest_name="Juan",
+                tower="A",
+            ),
+            _botones("Gracias", "Necesito ayuda"),
+        ),
+        "NAMED",
+    ),
+    PlantillaListada(
+        "900000000000010",
+        "vida_recordatorio_prellegada",
+        "es_MX",
+        "UTILITY",
+        "APPROVED",
+        (
+            {"type": "HEADER", "format": "IMAGE", "example": {"header_handle": ["h"]}},
+            _cuerpo_nombrado(
+                "Hola {{guest_name}}, te esperamos el {{arrival_date}}. El registro es a las "
+                "{{checkin_time}}.",
+                guest_name="Juan",
+                arrival_date="lunes",
+                checkin_time="15:00",
+            ),
+        ),
+        "NAMED",
+    ),
+    PlantillaListada(
+        "900000000000011",
+        "vida_checkout_notice",
+        "en",
+        "UTILITY",
+        "APPROVED",
+        (
+            _cuerpo_nombrado(
+                "Hello {{guest_name}}, your checkout is today at {{checkout_time}}.",
+                guest_name="John",
+                checkout_time="12:00",
+            ),
+        ),
+        "NAMED",
+    ),
+    PlantillaListada(
+        "900000000000012",
+        "vida_prearrival_reminder",
+        "en",
+        "UTILITY",
+        "APPROVED",
+        (
+            _cuerpo_nombrado(
+                "Hello {{guest_name}}, we look forward to seeing you on {{arrival_date}}.",
+                guest_name="John",
+                arrival_date="Monday",
+            ),
+        ),
+        "NAMED",
+    ),
+    PlantillaListada(
+        "900000000000013",
+        "vida_welcome_greeting",
+        "en",
+        "UTILITY",
+        "APPROVED",
+        (
+            _cuerpo_nombrado(
+                "Welcome {{guest_name}}! Your room is in tower {{tower}}.",
+                guest_name="John",
+                tower="A",
+            ),
+        ),
+        "NAMED",
     ),
 )
 
@@ -278,16 +425,15 @@ class MetaPlantillasHttp:
     async def crear(
         self, *, nombre: str, categoria: str, idioma: str, texto: str, ejemplos: list[str]
     ) -> PlantillaMeta:
-        d = await self._llamar(
-            "POST",
-            "{waba}/message_templates",
-            json_={
-                "name": nombre,
-                "language": idioma,
-                "category": categoria,
-                "components": [componente_cuerpo(texto, ejemplos)],
-            },
-        )
+        cuerpo: dict[str, Any] = {
+            "name": nombre,
+            "language": idioma,
+            "category": categoria,
+            "components": [componente_cuerpo(texto, ejemplos)],
+        }
+        if formato_parametros(texto):
+            cuerpo["parameter_format"] = "NAMED"
+        d = await self._llamar("POST", "{waba}/message_templates", json_=cuerpo)
         if not d.get("id"):
             raise ErrorMeta("META_RESPUESTA_INVALIDA")
         return PlantillaMeta(str(d["id"]), str(d.get("status") or "PENDING").upper())

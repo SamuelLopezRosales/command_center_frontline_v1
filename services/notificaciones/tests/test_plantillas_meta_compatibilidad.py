@@ -1,6 +1,7 @@
 """Importar plantillas de Meta: reglas de compatibilidad (``servicios/plantillas_meta.evaluar``).
 
-Sin Docker ni red: cada motivo de "no compatible" y los casos que sí se importan.
+Sin Docker ni red: cada motivo de "no compatible" y los casos que sí se importan (variables
+numeradas y con nombre, cualquier idioma, botones estáticos y encabezado de texto fijo).
 """
 
 import pytest
@@ -19,31 +20,47 @@ def plantilla(
     formato="POSITIONAL",
     cuerpo="Hola {{1}}, bienvenido a {{2}}.",
     ejemplo=None,
+    ejemplo_nombrado=None,
 ):
     comp = []
     if cuerpo is not None:
         c = {"type": "BODY", "text": cuerpo}
         if ejemplo is not None:
             c["example"] = {"body_text": [ejemplo]}
+        if ejemplo_nombrado is not None:
+            c["example"] = {
+                "body_text_named_params": [
+                    {"param_name": n, "example": e} for n, e in ejemplo_nombrado.items()
+                ]
+            }
         comp.append(c)
     comp.extend(componentes)
     return PlantillaListada("1001", nombre, idioma, categoria, estado, tuple(comp), formato)
 
 
-def ev(p, idioma_envio=ES):
-    return evaluar(p, idioma_envio=idioma_envio)
+def botones(*tipos, **extra):
+    return {"type": "BUTTONS", "buttons": [{"type": t, "text": f"b-{t}", **extra} for t in tipos]}
+
+
+ev = evaluar
+
+
+def codigos(r):
+    return [c for c, _ in r.motivos]
 
 
 def test_bienvenida_de_solo_texto_es_compatible():
     r = ev(plantilla(ejemplo=["Ana", "Apodaca"]))
     assert r.compatible and r.codigo_incompatible is None and r.motivo_incompatible is None
-    assert r.texto == "Hola {{1}}, bienvenido a {{2}}." and r.num_variables == 2
+    assert r.motivos == () and r.texto == "Hola {{1}}, bienvenido a {{2}}."
+    assert r.num_variables == 2 and r.formato == "POSICIONAL" and r.variables == ("1", "2")
     assert r.ejemplos == ("Ana", "Apodaca") and r.advertencias == ()
+    assert r.botones == () and r.encabezado is None
 
 
 def test_sin_variables_y_formato_ausente_son_compatibles():
     r = ev(plantilla(cuerpo="Bienvenido a la empresa.", formato=None))
-    assert r.compatible and r.num_variables == 0 and r.ejemplos == ()
+    assert r.compatible and r.num_variables == 0 and r.ejemplos == () and r.variables == ()
 
 
 def test_una_variable_repetida_cuenta_una_vez():
@@ -84,16 +101,197 @@ def test_un_estado_distinto_de_aprobada_no_se_importa(estado, texto):
     assert r.texto  # el texto se informa aunque no sea importable
 
 
-@pytest.mark.parametrize("formato", ["IMAGE", "VIDEO", "DOCUMENT", "TEXT", "LOCATION"])
-def test_cualquier_encabezado_no_es_compatible(formato):
+# ------------------------------------------------------------------ variables con nombre
+
+
+def test_una_plantilla_nombrada_es_compatible_con_sus_variables_y_ejemplos():
+    r = ev(
+        plantilla(
+            cuerpo="Hola {{guest_name}}, tu salida es a las {{checkout_time}}.",
+            formato="NAMED",
+            ejemplo_nombrado={"checkout_time": "12:00", "guest_name": "Juan"},  # otro orden
+        )
+    )
+    assert r.compatible and r.num_variables == 2 and r.formato == "NOMBRADO"
+    assert r.variables == ("guest_name", "checkout_time")
+    assert r.ejemplos == ("Juan", "12:00")  # en el orden de aparición, no en el de Meta
+
+
+def test_un_nombre_repetido_cuenta_una_variable():
+    r = ev(plantilla(cuerpo="{{guest_name}}, hola {{guest_name}}.", formato="NAMED"))
+    assert r.compatible and r.num_variables == 1 and r.variables == ("guest_name",)
+
+
+def test_los_ejemplos_nombrados_incompletos_se_descartan():
+    r = ev(plantilla(cuerpo="Hola {{a}} y {{b}}.", formato="NAMED", ejemplo_nombrado={"a": "x"}))
+    assert r.compatible and r.ejemplos == ()
+
+
+def test_formato_ausente_con_nombres_se_infiere_del_texto():
+    r = ev(plantilla(cuerpo="Hola {{nombre}}, bienvenido.", formato=None))
+    assert r.compatible and r.formato == "NOMBRADO" and r.variables == ("nombre",)
+
+
+@pytest.mark.parametrize(
+    ("cuerpo", "formato"),
+    [
+        ("Hola {{nombre}}, bienvenido.", "POSITIONAL"),  # Meta declara otro formato que el texto
+        ("Hola {{1}}.", "NAMED"),
+    ],
+)
+def test_formato_declarado_que_no_coincide_con_el_texto_no_es_compatible(cuerpo, formato):
+    r = ev(plantilla(cuerpo=cuerpo, formato=formato))
+    assert not r.compatible and r.codigo_incompatible == "VARIABLES_FORMATO_INCONSISTENTE"
+
+
+@pytest.mark.parametrize(
+    ("cuerpo", "codigo"),
+    [
+        ("Hola {{1}} y {{nombre}}.", "VARIABLES_MEZCLADAS"),
+        ("Hola {{Nombre}}.", "NOMBRE_VARIABLE_INVALIDO"),
+        ("Hola {{guestName}}.", "NOMBRE_VARIABLE_INVALIDO"),
+        ("Hola {{ nombre_completo }}.", "VARIABLES_INVALIDAS"),
+        ("Hola {{2}}.", "VARIABLES_NO_CONSECUTIVAS"),
+        ("Hola {{1}} y {{3}}.", "VARIABLES_NO_CONSECUTIVAS"),
+        ("Hola {{0}}.", "VARIABLES_INVALIDAS"),
+        ("Hola {{1}", "VARIABLES_INVALIDAS"),
+        ("Hola {{1}} }}", "VARIABLES_INVALIDAS"),
+        ("Hola {{1}} " + " ".join(f"{{{{{i}}}}}" for i in range(2, 23)), "DEMASIADAS_VARIABLES"),
+        (" ".join(f"{{{{v{i}}}}}" for i in range(1, 22)), "DEMASIADAS_VARIABLES"),
+    ],
+)
+def test_variables_mal_formadas_o_mezcladas(cuerpo, codigo):
+    r = ev(plantilla(cuerpo=cuerpo, formato=None))
+    assert not r.compatible and r.codigo_incompatible == codigo
+
+
+# ------------------------------------------------------------------ idioma
+
+
+@pytest.mark.parametrize("idioma", ["es_MX", "en", "en_US", "pt_BR", "fil", "zh_CN"])
+def test_cualquier_idioma_con_formato_de_meta_es_compatible(idioma):
+    r = ev(plantilla(idioma=idioma))
+    assert r.compatible, idioma
+
+
+@pytest.mark.parametrize("idioma", ["", "ES", "es-MX", "es_mx", "español", "e", "en_USA"])
+def test_un_idioma_fuera_de_formato_no_es_compatible(idioma):
+    r = ev(plantilla(idioma=idioma))
+    assert not r.compatible and r.codigo_incompatible == "IDIOMA_INVALIDO"
+
+
+# ------------------------------------------------------------------ encabezados
+
+
+def test_un_encabezado_de_texto_fijo_es_compatible_y_se_informa():
+    r = ev(plantilla({"type": "HEADER", "format": "TEXT", "text": "Aviso importante"}))
+    assert r.compatible
+    assert r.encabezado == {"tipo": "TEXTO", "formato": "TEXT", "texto": "Aviso importante"}
+    assert any("encabezado de texto fijo" in a for a in r.advertencias)
+
+
+def test_un_encabezado_de_texto_con_variable_no_es_compatible():
+    r = ev(
+        plantilla({"type": "HEADER", "format": "TEXT", "text": "Hola {{1}}"}, cuerpo="Texto {{1}}")
+    )
+    assert not r.compatible and r.codigo_incompatible == "ENCABEZADO_TEXTO_CON_VARIABLE"
+
+
+@pytest.mark.parametrize(
+    ("formato", "codigo", "tipo", "frase"),
+    [
+        ("IMAGE", "ENCABEZADO_IMAGEN", "MEDIA", "Encabezado de imagen"),
+        ("VIDEO", "ENCABEZADO_VIDEO", "MEDIA", "Encabezado de video"),
+        ("DOCUMENT", "ENCABEZADO_DOCUMENTO", "MEDIA", "Encabezado de documento"),
+        ("LOCATION", "ENCABEZADO_UBICACION", "UBICACION", "Encabezado de ubicación"),
+    ],
+)
+def test_un_encabezado_de_medios_no_es_compatible_y_dice_cual_es(formato, codigo, tipo, frase):
     r = ev(plantilla({"type": "HEADER", "format": formato}))
-    assert not r.compatible and r.codigo_incompatible == "TIENE_ENCABEZADO"
-    assert r.motivo_incompatible == MOTIVOS["TIENE_ENCABEZADO"]
+    assert not r.compatible and r.codigo_incompatible == codigo
+    assert r.motivo_incompatible == MOTIVOS[codigo] and frase in r.motivo_incompatible
+    assert r.encabezado == {"tipo": tipo, "formato": formato, "texto": None}
 
 
-def test_botones_no_son_compatibles():
-    r = ev(plantilla({"type": "BUTTONS", "buttons": [{"type": "QUICK_REPLY", "text": "Sí"}]}))
-    assert not r.compatible and r.codigo_incompatible == "TIENE_BOTONES"
+def test_un_encabezado_de_otro_tipo_no_es_compatible():
+    r = ev(plantilla({"type": "HEADER", "format": "RARO"}))
+    assert codigos(r) == ["ENCABEZADO_NO_SOPORTADO"]
+
+
+# ------------------------------------------------------------------ botones
+
+
+def test_botones_estaticos_son_compatibles_y_se_informan():
+    r = ev(
+        plantilla(
+            {
+                "type": "BUTTONS",
+                "buttons": [
+                    {"type": "QUICK_REPLY", "text": "Sí"},
+                    {"type": "QUICK_REPLY", "text": "No"},
+                    {"type": "PHONE_NUMBER", "text": "Llamar", "phone_number": "+5218100000000"},
+                    {"type": "URL", "text": "Ver", "url": "https://empresa.mx/guia"},
+                ],
+            }
+        )
+    )
+    assert r.compatible
+    assert r.botones == (
+        {"tipo": "QUICK_REPLY", "texto": "Sí"},
+        {"tipo": "QUICK_REPLY", "texto": "No"},
+        {"tipo": "PHONE_NUMBER", "texto": "Llamar"},
+        {"tipo": "URL", "texto": "Ver"},
+    )
+    assert any("botones fijos" in a for a in r.advertencias)
+    # Las respuestas rápidas llegan al webhook de la cuenta en Meta (puede ser de otro proyecto).
+    assert any("webhook" in a for a in r.advertencias)
+
+
+def test_solo_las_respuestas_rapidas_avisan_del_webhook():
+    r = ev(
+        plantilla(
+            {"type": "BUTTONS", "buttons": [{"type": "URL", "text": "V", "url": "https://x.mx"}]}
+        )
+    )
+    assert r.compatible and not any("webhook" in a for a in r.advertencias)
+
+
+def test_un_boton_url_con_variable_no_es_compatible():
+    r = ev(
+        plantilla(
+            {
+                "type": "BUTTONS",
+                "buttons": [{"type": "URL", "text": "V", "url": "https://x.mx/{{1}}"}],
+            }
+        )
+    )
+    assert not r.compatible and r.codigo_incompatible == "BOTON_URL_CON_VARIABLE"
+
+
+@pytest.mark.parametrize(
+    ("tipo", "codigo"),
+    [
+        ("COPY_CODE", "BOTON_COPIAR_CODIGO"),
+        ("OTP", "BOTON_OTP"),
+        ("FLOW", "BOTON_FLOW"),
+        ("CATALOG", "BOTON_CATALOGO"),
+        ("MPM", "BOTON_MPM"),
+        ("SPM", "BOTON_SPM"),
+        ("VOICE_CALL", "BOTON_NO_SOPORTADO"),
+    ],
+)
+def test_botones_con_parametros_o_desconocidos_no_son_compatibles(tipo, codigo):
+    r = ev(plantilla(botones(tipo)))
+    assert not r.compatible and codigos(r) == [codigo]
+    assert r.motivo_incompatible == MOTIVOS[codigo]
+
+
+def test_una_plantilla_de_autenticacion_con_otp_no_es_compatible():
+    r = ev(plantilla(botones("OTP"), categoria="AUTHENTICATION", cuerpo="{{1}} es tu código."))
+    assert not r.compatible and codigos(r) == ["BOTON_OTP"]
+
+
+# ------------------------------------------------------------------ otros componentes
 
 
 def test_un_carrusel_no_es_compatible():
@@ -106,44 +304,9 @@ def test_un_componente_desconocido_no_es_compatible():
     assert not r.compatible and r.codigo_incompatible == "COMPONENTE_NO_SOPORTADO"
 
 
-def test_el_encabezado_gana_sobre_el_pie_que_se_tolera():
-    r = ev(plantilla({"type": "HEADER", "format": "IMAGE"}, {"type": "FOOTER", "text": "x"}))
-    assert r.codigo_incompatible == "TIENE_ENCABEZADO"
-
-
 def test_un_pie_con_variables_no_es_compatible():
     r = ev(plantilla({"type": "FOOTER", "text": "Folio {{1}}"}))
     assert not r.compatible and r.codigo_incompatible == "FOOTER_NO_SOPORTADO"
-
-
-@pytest.mark.parametrize(
-    ("cuerpo", "formato"),
-    [
-        ("Hola {{nombre}}, bienvenido.", "NAMED"),
-        ("Hola {{nombre}}, bienvenido.", "POSITIONAL"),  # Meta a veces omite el formato
-        ("Hola {{1}}.", "NAMED"),
-        ("Hola {{ nombre_completo }}.", None),
-    ],
-)
-def test_variables_con_nombre_no_son_compatibles(cuerpo, formato):
-    r = ev(plantilla(cuerpo=cuerpo, formato=formato))
-    assert not r.compatible and r.codigo_incompatible == "VARIABLES_CON_NOMBRE"
-
-
-@pytest.mark.parametrize(
-    ("cuerpo", "codigo"),
-    [
-        ("Hola {{2}}.", "VARIABLES_NO_CONSECUTIVAS"),
-        ("Hola {{1}} y {{3}}.", "VARIABLES_NO_CONSECUTIVAS"),
-        ("Hola {{0}}.", "VARIABLES_INVALIDAS"),
-        ("Hola {{1}", "VARIABLES_INVALIDAS"),
-        ("Hola {{1}} }}", "VARIABLES_INVALIDAS"),
-        ("Hola {{1}} " + " ".join(f"{{{{{i}}}}}" for i in range(2, 23)), "DEMASIADAS_VARIABLES"),
-    ],
-)
-def test_variables_mal_formadas(cuerpo, codigo):
-    r = ev(plantilla(cuerpo=cuerpo))
-    assert not r.compatible and r.codigo_incompatible == codigo
 
 
 def test_sin_cuerpo_o_con_cuerpo_vacio_no_es_compatible():
@@ -176,18 +339,50 @@ def test_una_categoria_desconocida_no_es_compatible():
     assert not r.compatible and r.codigo_incompatible == "CATEGORIA_NO_SOPORTADA"
 
 
-def test_un_idioma_distinto_del_de_envio_no_es_compatible():
-    r = ev(plantilla(idioma="en_US"))
-    assert not r.compatible and r.codigo_incompatible == "IDIOMA_NO_ENVIABLE"
-    assert "en_US" in r.motivo_incompatible and ES in r.motivo_incompatible
-    # Con otro idioma de envío configurado, ese sí es el enviable.
-    assert ev(plantilla(idioma="en_US"), idioma_envio="en_US").compatible
-    assert not ev(plantilla(idioma=ES), idioma_envio="en_US").compatible
+# ------------------------------------------------------------------ todos los motivos
 
 
-def test_el_estado_se_evalua_antes_que_la_estructura():
-    r = ev(plantilla({"type": "BUTTONS", "buttons": []}, estado="PAUSED"))
+def test_se_evaluan_todos_los_motivos_y_el_primero_es_el_de_siempre():
+    r = ev(
+        plantilla(
+            {"type": "HEADER", "format": "IMAGE"},
+            botones("OTP", "FLOW"),
+            estado="PAUSED",
+            idioma="en",
+            cuerpo="Hello {{1}} and {{name}}",
+            formato=None,
+        )
+    )
+    assert not r.compatible
+    assert codigos(r) == [
+        "ESTADO_NO_APROBADO",
+        "ENCABEZADO_IMAGEN",
+        "BOTON_OTP",
+        "BOTON_FLOW",
+        "VARIABLES_MEZCLADAS",
+    ]
     assert r.codigo_incompatible == "ESTADO_NO_APROBADO"
+    assert r.motivo_incompatible == r.motivos[0][1]
+
+
+def test_un_motivo_repetido_se_informa_una_sola_vez():
+    r = ev(plantilla(botones("OTP", "OTP", "OTP")))
+    assert codigos(r) == ["BOTON_OTP"]
+
+
+def test_una_plantilla_incompatible_informa_igual_su_formato_botones_y_encabezado():
+    r = ev(
+        plantilla(
+            {"type": "HEADER", "format": "IMAGE"},
+            botones("QUICK_REPLY"),
+            cuerpo="Hola {{guest_name}}",
+            formato="NAMED",
+        )
+    )
+    assert not r.compatible
+    assert r.formato == "NOMBRADO" and r.variables == ("guest_name",) and r.num_variables == 1
+    assert r.botones == ({"tipo": "QUICK_REPLY", "texto": "b-QUICK_REPLY"},)
+    assert r.encabezado is not None and r.encabezado["formato"] == "IMAGE"
 
 
 def test_todo_codigo_de_motivo_tiene_texto_en_espanol():

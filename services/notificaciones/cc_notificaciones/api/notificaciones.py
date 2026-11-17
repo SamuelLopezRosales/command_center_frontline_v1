@@ -61,7 +61,8 @@ class VariableAsignada(_Base):
 
 
 Titulo = Annotated[str, Field(min_length=1, max_length=150)]
-Variables = dict[Annotated[str, Field(max_length=3)], VariableAsignada]
+# La clave es la posición ("1".."20") o, en una plantilla con nombre, el nombre de la variable.
+Variables = dict[Annotated[str, Field(max_length=50)], VariableAsignada]
 
 
 class NotificacionCrear(_Base):

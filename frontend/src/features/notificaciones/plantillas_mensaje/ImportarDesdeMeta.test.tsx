@@ -22,9 +22,14 @@ function deMeta(sobre: Partial<PlantillaDeMeta> = {}): PlantillaDeMeta {
     id_plantilla_meta: "800000000000001",
     texto: "Hola {{1}}, te damos la bienvenida a {{2}}.",
     num_variables: 2,
+    formato_variables: "POSICIONAL",
+    variables: ["1", "2"],
     compatible: true,
     codigo_incompatible: null,
     motivo_incompatible: null,
+    motivos_incompatibles: [],
+    botones: [],
+    encabezado: null,
     advertencias: [],
     ya_importada: false,
     nombre_en_uso: false,
@@ -314,5 +319,109 @@ describe("accesibilidad de importar desde Meta (CC-NFR-012)", () => {
     const dialogo = await abrir();
     await within(dialogo).findByRole("alert");
     await esperarAccesible(baseElement);
+  });
+});
+
+describe("variables con nombre, botones, encabezado e idioma", () => {
+  const REALES: PlantillaDeMeta[] = [
+    deMeta({
+      nombre: "vida_aviso_checkout",
+      id_plantilla_meta: "800000000000008",
+      texto: "Hola {{guest_name}}, tu salida es hoy a las {{checkout_time}}.",
+      formato_variables: "NOMBRADO",
+      variables: ["guest_name", "checkout_time"],
+      botones: [
+        { tipo: "QUICK_REPLY", texto: "Sí" },
+        { tipo: "QUICK_REPLY", texto: "No" },
+      ],
+      advertencias: ["Tiene botones de respuesta rápida: las respuestas llegan al webhook que tenga configurado la cuenta en Meta."],
+    }),
+    deMeta({
+      nombre: "vida_recordatorio_prellegada",
+      id_plantilla_meta: "800000000000010",
+      texto: "Hola {{guest_name}}, te esperamos el {{arrival_date}}.",
+      num_variables: 2,
+      formato_variables: "NOMBRADO",
+      variables: ["guest_name", "arrival_date"],
+      encabezado: { tipo: "MEDIA", formato: "IMAGE", texto: null },
+      compatible: false,
+      codigo_incompatible: "ENCABEZADO_IMAGEN",
+      motivo_incompatible: "Encabezado de imagen: requiere adjuntar la imagen al enviar; aún no soportado.",
+      motivos_incompatibles: [{ codigo: "ENCABEZADO_IMAGEN", motivo: "Encabezado de imagen: requiere adjuntar la imagen al enviar; aún no soportado." }],
+    }),
+    deMeta({
+      nombre: "hello_world",
+      idioma: "en_US",
+      id_plantilla_meta: "800000000000007",
+      texto: "Welcome and congratulations!!",
+      num_variables: 0,
+      variables: [],
+      encabezado: { tipo: "TEXTO", formato: "TEXT", texto: "Aviso" },
+    }),
+    deMeta({
+      nombre: "otra_en_ingles",
+      idioma: "en",
+      id_plantilla_meta: "800000000000050",
+      estado_meta: "PAUSED",
+      compatible: false,
+      codigo_incompatible: "ESTADO_NO_APROBADO",
+      motivo_incompatible: "Está pausada en Meta: solo se importan las plantillas aprobadas.",
+      motivos_incompatibles: [
+        { codigo: "ESTADO_NO_APROBADO", motivo: "Está pausada en Meta: solo se importan las plantillas aprobadas." },
+        { codigo: "BOTON_OTP", motivo: "Tiene un botón de código de un solo uso (OTP): Command Center aún no lo soporta." },
+      ],
+      botones: [{ tipo: "OTP", texto: "Copiar" }],
+    }),
+  ];
+
+  it("muestra los nombres de las variables, la insignia «Variables con nombre», los botones y el encabezado", async () => {
+    simulador(base({ [URL_LISTA]: { items: REALES, truncado: false } }));
+    montar();
+    const dialogo = await abrir();
+    const tabla = await within(dialogo).findByRole("table", { name: "Plantillas de Meta" });
+    const fila = (nombre: string) => within(within(tabla).getAllByRole("row").find((r) => within(r).queryByText(nombre))!);
+
+    const aviso = fila("vida_aviso_checkout");
+    expect(aviso.getByText("Compatible")).toBeInTheDocument();
+    expect(aviso.getByText("Variables con nombre")).toBeInTheDocument();
+    expect(aviso.queryByText(/No compatible/)).not.toBeInTheDocument(); // ya no es «No compatible» por los nombres
+    expect(aviso.getByText("guest_name").tagName).toBe("CODE");
+    expect(aviso.getByText("checkout_time").tagName).toBe("CODE");
+    expect(aviso.getByText("Botones: Sí · No (respuesta rápida)")).toBeInTheDocument();
+    expect(aviso.getByText(/respuestas llegan al webhook/)).toBeInTheDocument();
+    expect(aviso.getByRole("checkbox", { name: "Seleccionar vida_aviso_checkout (es_MX)" })).toBeInTheDocument();
+
+    const hello = fila("hello_world");
+    expect(hello.getByText("en_US")).toBeInTheDocument();
+    expect(hello.getByText("Compatible")).toBeInTheDocument();
+    expect(hello.getByText("Encabezado de texto fijo: Aviso")).toBeInTheDocument();
+    expect(hello.queryByText("Variables con nombre")).not.toBeInTheDocument();
+    expect(hello.getByRole("checkbox", { name: "Seleccionar hello_world (en_US)" })).toBeInTheDocument();
+  });
+
+  it("dice qué tipo de encabezado es y por qué no se importa, y muestra todos los motivos", async () => {
+    simulador(base({ [URL_LISTA]: { items: REALES, truncado: false } }));
+    montar();
+    const dialogo = await abrir();
+    const tabla = await within(dialogo).findByRole("table", { name: "Plantillas de Meta" });
+    const fila = (nombre: string) => within(within(tabla).getAllByRole("row").find((r) => within(r).queryByText(nombre))!);
+
+    const pre = fila("vida_recordatorio_prellegada");
+    expect(pre.getByText("Encabezado de imagen")).toBeInTheDocument();
+    expect(pre.getByText(/No compatible: Encabezado de imagen: requiere adjuntar la imagen/)).toBeInTheDocument();
+    expect(pre.queryByRole("checkbox")).not.toBeInTheDocument();
+
+    const dos = fila("otra_en_ingles");
+    expect(dos.getByText(/No compatible: Está pausada en Meta/)).toBeInTheDocument();
+    expect(dos.getByText(/No compatible: Tiene un botón de código de un solo uso/)).toBeInTheDocument();
+    expect(dos.getByText("Botones: Copiar (código de un solo uso)")).toBeInTheDocument();
+  });
+
+  it("no tiene violaciones de axe con variables con nombre, botones y encabezado", async () => {
+    simulador(base({ [URL_LISTA]: { items: REALES, truncado: false } }));
+    montar();
+    const dialogo = await abrir();
+    await within(dialogo).findByRole("table", { name: "Plantillas de Meta" });
+    await esperarAccesible(dialogo);
   });
 });

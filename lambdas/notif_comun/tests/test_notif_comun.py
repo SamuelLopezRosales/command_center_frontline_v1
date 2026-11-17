@@ -71,6 +71,37 @@ def test_variables_de_la_plantilla():
     assert texto == "Hola Ana, el 20 nov "
 
 
+def test_variables_con_nombre_salen_en_el_orden_del_texto_con_su_lista_de_nombres():
+    texto = "Te esperamos en {{lugar}}, {{guest_name}}. {{guest_name}}, ¡hasta pronto!"
+    vj = {
+        "guest_name": {"origen": "COLABORADOR", "campo": "nombre_completo"},
+        "lugar": {"origen": "FIJO", "valor": "Recepción"},
+    }
+    assert plantilla.nombres_variables(texto) == ["lugar", "guest_name"]
+    assert plantilla.campos_colaborador(vj) == ["nombre_completo"]
+    variables = plantilla.armar_variables(vj, {"nombre_completo": "Ana"}, texto)
+    assert variables == ["Recepción", "Ana"]
+    assert plantilla.renderizar(texto, variables) == (
+        "Te esperamos en Recepción, Ana. Ana, ¡hasta pronto!"
+    )
+    # un dato faltante del colaborador queda vacío (el enviador lo rechaza antes de llamar a Meta)
+    assert plantilla.armar_variables(vj, {}, texto) == ["Recepción", ""]
+    # una variable del texto sin entrada en variables_json también queda vacía
+    assert plantilla.armar_variables({"lugar": vj["lugar"]}, {}, texto) == ["Recepción", ""]
+
+
+def test_las_posicionales_no_cambian_con_el_texto_ni_sin_el():
+    vj = {
+        "2": {"origen": "FIJO", "valor": "20 nov"},
+        "1": {"origen": "COLABORADOR", "campo": "nombre_completo"},
+    }
+    texto = "Hola {{1}}, el {{2}}"
+    assert plantilla.nombres_variables(texto) is None and plantilla.nombres_variables(None) is None
+    assert plantilla.armar_variables(vj, {"nombre_completo": "Ana"}) == ["Ana", "20 nov"]
+    assert plantilla.armar_variables(vj, {"nombre_completo": "Ana"}, texto) == ["Ana", "20 nov"]
+    assert plantilla.renderizar("sin variables", []) == "sin variables"
+
+
 def test_nombres_de_schedule():
     assert siguiente_nombre(7, "cc-notif-7") == "cc-notif-7-1"
     assert siguiente_nombre(7, "cc-notif-7-1") == "cc-notif-7-2"

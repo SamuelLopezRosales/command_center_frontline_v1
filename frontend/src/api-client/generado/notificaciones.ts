@@ -483,6 +483,16 @@ export interface components {
             /** Nombre */
             nombre: string;
         };
+        /** BotonDeMeta */
+        BotonDeMeta: {
+            /** Texto */
+            texto: string;
+            /**
+             * Tipo
+             * @description QUICK_REPLY, URL, PHONE_NUMBER, COPY_CODE, OTP, FLOW...
+             */
+            tipo: string;
+        };
         /** Cancelar */
         Cancelar: {
             /** Motivo */
@@ -577,6 +587,24 @@ export interface components {
             /** Seleccionados */
             seleccionados: number;
         };
+        /** EncabezadoDeMeta */
+        EncabezadoDeMeta: {
+            /**
+             * Formato
+             * @description Formato de Meta: TEXT, IMAGE, VIDEO, DOCUMENT...
+             */
+            formato: string | null;
+            /**
+             * Texto
+             * @description El texto, si el encabezado es de texto.
+             */
+            texto: string | null;
+            /**
+             * Tipo
+             * @enum {string}
+             */
+            tipo: "TEXTO" | "MEDIA" | "UBICACION" | "OTRO";
+        };
         /** EstadoMetaDto */
         EstadoMetaDto: {
             access_token: components["schemas"]["SecretoDto"];
@@ -657,6 +685,16 @@ export interface components {
              * @description Meta tiene más plantillas de las que se trajeron (500).
              */
             truncado: boolean;
+        };
+        /** MotivoIncompatible */
+        MotivoIncompatible: {
+            /** Codigo */
+            codigo: string;
+            /**
+             * Motivo
+             * @description El motivo, en español.
+             */
+            motivo: string;
         };
         /** NotificacionActualizar */
         NotificacionActualizar: {
@@ -875,13 +913,18 @@ export interface components {
              */
             advertencias: string[];
             /**
+             * Botones
+             * @description Los botones de la plantilla, en orden.
+             */
+            botones: components["schemas"]["BotonDeMeta"][];
+            /**
              * Categoria
              * @description UTILITY, MARKETING, AUTHENTICATION u otra de Meta.
              */
             categoria: string;
             /**
              * Codigo Incompatible
-             * @description TIENE_ENCABEZADO, TIENE_BOTONES, VARIABLES_CON_NOMBRE, ESTADO_NO_APROBADO...
+             * @description ESTADO_NO_APROBADO, ENCABEZADO_IMAGEN, BOTON_OTP, VARIABLES_MEZCLADAS...
              */
             codigo_incompatible: string | null;
             /**
@@ -889,11 +932,19 @@ export interface components {
              * @description Se puede importar y usar tal cual.
              */
             compatible: boolean;
+            /** @description El encabezado, si lo tiene. */
+            encabezado: components["schemas"]["EncabezadoDeMeta"] | null;
             /**
              * Estado Meta
              * @description Estado en Meta: APPROVED, PENDING, REJECTED, PAUSED...
              */
             estado_meta: string;
+            /**
+             * Formato Variables
+             * @description POSICIONAL ({{1}}) o NOMBRADO ({{guest_name}}), inferido del texto.
+             * @enum {string}
+             */
+            formato_variables: "POSICIONAL" | "NOMBRADO";
             /** Id Plantilla Meta */
             id_plantilla_meta: string;
             /** Idioma */
@@ -903,6 +954,11 @@ export interface components {
              * @description El motivo, en español.
              */
             motivo_incompatible: string | null;
+            /**
+             * Motivos Incompatibles
+             * @description Todos los motivos de incompatibilidad (el primero es codigo_incompatible).
+             */
+            motivos_incompatibles: components["schemas"]["MotivoIncompatible"][];
             /** Nombre */
             nombre: string;
             /**
@@ -914,9 +970,14 @@ export interface components {
             num_variables: number;
             /**
              * Texto
-             * @description Texto del cuerpo con las variables {{1}}, {{2}}...
+             * @description Texto del cuerpo con las variables {{1}}, {{2}}... o {{nombre}}.
              */
             texto: string;
+            /**
+             * Variables
+             * @description Las variables en orden de aparición: '1', '2'... o sus nombres.
+             */
+            variables: string[];
             /**
              * Ya Importada
              * @description Ya hay una plantilla local con ese id de Meta.
@@ -946,6 +1007,11 @@ export interface components {
              * Format: date-time
              */
             fecha_creacion: string;
+            /**
+             * Formato Variables
+             * @enum {string}
+             */
+            formato_variables: "POSICIONAL" | "NOMBRADO";
             /** Id */
             id: number;
             /** Id Plantilla Meta */
@@ -958,6 +1024,8 @@ export interface components {
             nombre: string;
             /** Texto Con Variables */
             texto_con_variables: string;
+            /** Variables */
+            variables: string[];
         };
         /** PlantillaInterna */
         PlantillaInterna: {
@@ -1013,7 +1081,7 @@ export interface components {
         ResultadoImportacion: {
             /**
              * Codigo
-             * @description Código del motivo (NO_ENCONTRADA_EN_META, TIENE_BOTONES...).
+             * @description Código del motivo (NO_ENCONTRADA_EN_META, NOMBRE_EN_USO...).
              */
             codigo: string | null;
             /** Idioma */

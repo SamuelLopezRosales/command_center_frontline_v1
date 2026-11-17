@@ -23,9 +23,21 @@ Sustituye a Meta mientras no hay cuenta vinculada:
   ``status``, ``components``, ``parameter_format``), filtra por ``name`` y ``language``, y **pagina**
   con ``limit`` y ``after`` (``paging.cursors.after`` y ``paging.next`` solo si hay más). El catálogo
   es ``catalogo_meta`` (``cargar_catalogo_ejemplo`` lo llena con una plantilla de bienvenida
-  compatible y otras con botones, encabezado, variable con nombre, rechazada y pausada) más las
+  compatible y otras con botones, encabezado, variables mezcladas, rechazada y pausada, más las siete
+  plantillas reales de la cuenta compartida: ``hello_world`` en ``en_US``, ``vida_*`` con variables
+  con nombre, botones de respuesta rápida, un encabezado de imagen y tres en inglés) más las
   creadas por ``POST``. ``listados`` guarda los parámetros de cada consulta. La consulta de
   sincronización (con ``name`` y sin ``components``) no cambia.
+
+- **Variables con nombre (``parameter_format`` ``NAMED``):** el catálogo de ejemplo trae plantillas
+  nombradas (``vida_*``) y una que mezcla formatos (incompatible). Los **envíos** de una plantilla que el simulador conoce se
+  validan como Meta: una plantilla nombrada exige ``parameter_name`` en **todos** los parámetros y
+  con los nombres exactos; una posicional no admite ``parameter_name``; si el formato no coincide
+  responde 400 con el código ``132012`` y si el número de parámetros no coincide, ``132000``. Una
+  plantilla que el simulador no conoce se acepta como siempre. Si el nombre existe pero no en el
+  idioma recibido (``language.code``), responde 400 con el código ``132001`` (la plantilla no
+  existe en esa traducción). ``rechazados`` guarda los cuerpos
+  rechazados por esa validación.
 
 Corre dentro del proceso de prueba: no necesita puertos ni red.
 """
@@ -39,6 +51,7 @@ import json
 from typing import Any
 
 import httpx
+from cc_common import plantillas_meta as pm
 
 ERROR_NUMERO_INVALIDO = (400, 131026)
 ERROR_VENTANA = (400, 131047)
@@ -78,6 +91,7 @@ class SimuladorMeta:
         # Plantillas "ya existentes" en la cuenta, en el formato de Graph (listado de plantillas).
         self.catalogo_meta: list[dict[str, Any]] = []
         self.listados: list[dict[str, str]] = []  # parámetros de cada listado, en orden
+        self.rechazados: list[dict[str, Any]] = []  # envíos de plantilla rechazados por formato
         self._n = 0
 
     # ------------------------------------------------------------------ secretos y eventos
@@ -197,6 +211,7 @@ class SimuladorMeta:
         ejemplo: list[str] | None = None,
         componentes: list[dict[str, Any]] | None = None,
         formato: str | None = "POSITIONAL",
+        ejemplo_nombrado: dict[str, str] | None = None,
     ) -> dict[str, Any]:
         """Agrega al catálogo una plantilla como la devuelve Graph. ``componentes`` se suma al
         ``BODY`` (``cuerpo`` en ``None`` lo omite)."""
@@ -206,6 +221,12 @@ class SimuladorMeta:
             c: dict[str, Any] = {"type": "BODY", "text": cuerpo}
             if ejemplo:
                 c["example"] = {"body_text": [ejemplo]}
+            if ejemplo_nombrado:
+                c["example"] = {
+                    "body_text_named_params": [
+                        {"param_name": n, "example": e} for n, e in ejemplo_nombrado.items()
+                    ]
+                }
             todos.append(c)
         todos.extend(componentes or [])
         p: dict[str, Any] = {
@@ -218,7 +239,8 @@ class SimuladorMeta:
         return p
 
     def cargar_catalogo_ejemplo(self) -> None:
-        """Una compatible (con pie de página) y una por cada motivo típico de no compatibilidad."""
+        """Una compatible (con pie de página), una por cada motivo típico de no compatibilidad y las
+        siete plantillas reales de la cuenta compartida (``hello_world``, ``vida_*``)."""
         self.agregar_catalogo(
             "bienvenida_colaborador", id_="800000000000001",
             cuerpo="Hola {{1}}, te damos la bienvenida a {{2}}. Tu primer día es el {{3}}.",
@@ -228,7 +250,10 @@ class SimuladorMeta:
         self.agregar_catalogo(
             "bienvenida_con_boton", id_="800000000000002", cuerpo="Bienvenido {{1}}.",
             ejemplo=["Ana"],
-            componentes=[{"type": "BUTTONS", "buttons": [{"type": "URL", "text": "Guía"}]}],
+            componentes=[{"type": "BUTTONS", "buttons": [
+                {"type": "URL", "text": "Guía", "url": "https://empresa.mx/guia/{{1}}",
+                 "example": ["https://empresa.mx/guia/x"]},
+            ]}],
         )  # fmt: skip
         self.agregar_catalogo(
             "bienvenida_con_imagen", id_="800000000000003", categoria="MARKETING",
@@ -236,7 +261,7 @@ class SimuladorMeta:
             componentes=[{"type": "HEADER", "format": "IMAGE"}],
         )  # fmt: skip
         self.agregar_catalogo(
-            "bienvenida_nombrada", id_="800000000000004", cuerpo="Hola {{nombre}}.",
+            "bienvenida_mezclada", id_="800000000000004", cuerpo="Hola {{1}}, {{nombre}}.",
             formato="NAMED",
         )  # fmt: skip
         self.agregar_catalogo(
@@ -246,6 +271,62 @@ class SimuladorMeta:
         self.agregar_catalogo(
             "bienvenida_pausada", id_="800000000000006", estado="PAUSED",
             cuerpo="Hola {{1}}.", ejemplo=["Ana"],
+        )  # fmt: skip
+        # Las plantillas reales de la cuenta compartida (con variables con nombre).
+        self.agregar_catalogo(
+            "hello_world", id_="800000000000007", idioma="en_US", formato=None,
+            cuerpo="Welcome and congratulations!! This message demonstrates your ability to send "
+            "a WhatsApp message notification from the Cloud API.",
+            componentes=[{"type": "FOOTER", "text": "WhatsApp Business Platform sample message"}],
+        )  # fmt: skip
+        self.agregar_catalogo(
+            "vida_aviso_checkout", id_="800000000000008", formato="NAMED",
+            cuerpo="Hola {{guest_name}}, tu salida es hoy a las {{checkout_time}}. Gracias por "
+            "tu estancia.",
+            ejemplo_nombrado={"guest_name": "Juan", "checkout_time": "12:00"},
+            componentes=[
+                {"type": "BUTTONS", "buttons": [
+                    {"type": "QUICK_REPLY", "text": "Sí"},
+                    {"type": "QUICK_REPLY", "text": "No"},
+                ]},
+            ],
+        )  # fmt: skip
+        self.agregar_catalogo(
+            "vida_bienvenida_llegada", id_="800000000000009", formato="NAMED",
+            cuerpo="Bienvenido {{guest_name}}. Tu habitación está en la torre {{tower}}.",
+            ejemplo_nombrado={"guest_name": "Juan", "tower": "A"},
+            componentes=[
+                {"type": "BUTTONS", "buttons": [
+                    {"type": "QUICK_REPLY", "text": "Gracias"},
+                    {"type": "QUICK_REPLY", "text": "Necesito ayuda"},
+                ]},
+            ],
+        )  # fmt: skip
+        self.agregar_catalogo(
+            "vida_recordatorio_prellegada", id_="800000000000010", formato="NAMED",
+            cuerpo="Hola {{guest_name}}, te esperamos el {{arrival_date}}. El registro es a las "
+            "{{checkin_time}}.",
+            ejemplo_nombrado={
+                "guest_name": "Juan", "arrival_date": "lunes", "checkin_time": "15:00",
+            },
+            componentes=[
+                {"type": "HEADER", "format": "IMAGE", "example": {"header_handle": ["h"]}},
+            ],
+        )  # fmt: skip
+        self.agregar_catalogo(
+            "vida_checkout_notice", id_="800000000000011", idioma="en", formato="NAMED",
+            cuerpo="Hello {{guest_name}}, your checkout is today at {{checkout_time}}.",
+            ejemplo_nombrado={"guest_name": "John", "checkout_time": "12:00"},
+        )  # fmt: skip
+        self.agregar_catalogo(
+            "vida_prearrival_reminder", id_="800000000000012", idioma="en", formato="NAMED",
+            cuerpo="Hello {{guest_name}}, we look forward to seeing you on {{arrival_date}}.",
+            ejemplo_nombrado={"guest_name": "John", "arrival_date": "Monday"},
+        )  # fmt: skip
+        self.agregar_catalogo(
+            "vida_welcome_greeting", id_="800000000000013", idioma="en", formato="NAMED",
+            cuerpo="Welcome {{guest_name}}! Your room is in tower {{tower}}.",
+            ejemplo_nombrado={"guest_name": "John", "tower": "A"},
         )  # fmt: skip
 
     def _catalogo_completo(self) -> list[dict[str, Any]]:
@@ -263,7 +344,7 @@ class SimuladorMeta:
                     "category": p["category"],
                     "status": p["status"],
                     "components": [cuerpo],
-                    "parameter_format": "POSITIONAL",
+                    "parameter_format": p.get("parameter_format", "POSITIONAL"),
                 }  # fmt: skip
             )
         return [*self.catalogo_meta, *creadas]
@@ -320,6 +401,7 @@ class SimuladorMeta:
                 "rejected_reason": "NONE",
                 "texto": cuerpo_texto["text"],
                 "ejemplo": cuerpo_texto.get("example"),
+                "parameter_format": cuerpo.get("parameter_format", "POSITIONAL"),
             }
             return httpx.Response(
                 200,
@@ -356,10 +438,82 @@ class SimuladorMeta:
         error = self.siguientes.pop(0) if self.siguientes else self.por_destino.get(cuerpo["to"])
         if error:
             return httpx.Response(error[0], json={"error": {"code": error[1], "message": "sim"}})
+        rechazo = self._validar_plantilla(cuerpo)
+        if rechazo:
+            self.rechazados.append(cuerpo)
+            return rechazo
         self._n += 1
         wamid = f"wamid.OUT{self._n}"
         self.enviados.append({**cuerpo, "wamid": wamid})
         return httpx.Response(200, json={"messages": [{"id": wamid}]})
+
+    def _plantilla_conocida(self, nombre: str, idioma: str) -> tuple[bool, list[str]] | None:
+        """``(nombrada, variables)`` de una plantilla que el simulador conoce (catálogo o creada
+        por ``POST``); ``None`` si no la conoce."""
+        for p in self._catalogo_completo():
+            if p["name"] == nombre and p["language"] == idioma:
+                texto = next((c.get("text") for c in p["components"] if c["type"] == "BODY"), "")
+                try:
+                    v = pm.analizar(texto or "", maximo=10_000)
+                except pm.ErrorVariables:
+                    return None
+                nombrada = p.get("parameter_format") == "NAMED" and v.nombrado
+                return nombrada, list(v.nombres)
+        return None
+
+    @staticmethod
+    def _error_plantilla(codigo: int, detalle: str) -> httpx.Response:
+        return httpx.Response(
+            400,
+            json={
+                "error": {
+                    "message": f"(#{codigo}) {detalle}",
+                    "type": "OAuthException",
+                    "code": codigo,
+                    "error_data": {"messaging_product": "whatsapp", "details": detalle},
+                }
+            },
+        )
+
+    def _validar_plantilla(self, cuerpo: dict[str, Any]) -> httpx.Response | None:
+        """Como Meta: el formato de los parámetros debe ser el de la plantilla (132012) y el
+        número de parámetros, el de sus variables (132000)."""
+        if cuerpo.get("type") != "template":
+            return None
+        t = cuerpo["template"]
+        todas = self._catalogo_completo()
+        if any(p["name"] == t["name"] for p in todas) and not any(
+            p["name"] == t["name"] and p["language"] == t["language"]["code"] for p in todas
+        ):
+            return self._error_plantilla(132001, "Template name does not exist in the translation")
+        conocida = self._plantilla_conocida(t["name"], t["language"]["code"])
+        if conocida is None:
+            return None
+        nombrada, variables = conocida
+        parametros: list[dict[str, Any]] = []
+        for c in t.get("components") or []:
+            if c.get("type") == "body":
+                parametros = list(c.get("parameters") or [])
+        con_nombre = [p for p in parametros if "parameter_name" in p]
+        if parametros and (
+            len(con_nombre) not in (0, len(parametros)) or bool(con_nombre) != nombrada
+        ):
+            esperado = "NAMED" if nombrada else "POSITIONAL"
+            return self._error_plantilla(
+                132012,
+                "Parameter format does not match format in the created template "
+                f"(expected {esperado})",
+            )
+        cantidad = "Number of parameters does not match the expected number of params"
+        if len(parametros) != len(variables):
+            return self._error_plantilla(132000, cantidad)
+        if nombrada and {p["parameter_name"] for p in parametros} != set(variables):
+            return self._error_plantilla(
+                132012, "Parameter name does not match the names in the created template"
+            )
+        if any(not str(p.get("text", "")).strip() for p in parametros):
+            return self._error_plantilla(132000, cantidad)
+        return None
 
     def _responder_consultas(self, peticion: httpx.Request) -> httpx.Response:
         ruta = peticion.url.path.rstrip("/")

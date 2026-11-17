@@ -2,7 +2,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { ErrorApi, mensajeDeError } from "@/shared/errores";
 import { enviarPlantilla, enviarTexto, listarPlantillasAprobadas } from "./api";
-import { armar, variablesDe } from "./formato";
+import { armar, esNombrada, variablesDe } from "./formato";
 import { t } from "./textos";
 
 const LIMITE = 1000;
@@ -28,7 +28,7 @@ export function Redactor({ conversacionId, ventanaAbierta, forzadaPorServidor, a
 
   const [texto, setTexto] = useState("");
   const [plantillaId, setPlantillaId] = useState("");
-  const [valores, setValores] = useState<string[]>([]);
+  const [valores, setValores] = useState<Record<string, string>>({});
 
   const plantillas = useQuery({ queryKey: ["chat", "plantillas"], queryFn: listarPlantillasAprobadas, enabled: modoPlantilla });
   const plantilla = plantillas.data?.find((p) => String(p.id) === plantillaId);
@@ -65,14 +65,16 @@ export function Redactor({ conversacionId, ventanaAbierta, forzadaPorServidor, a
 
   async function enviarConPlantilla() {
     if (!plantilla) return setAviso({ tipo: "error", texto: t.redactor.plantillaRequerida });
-    const lista = variables.map((n) => (valores[n - 1] ?? "").trim());
+    const lista = variables.map((n) => (valores[n] ?? "").trim());
     if (lista.some((v) => !v)) return setAviso({ tipo: "error", texto: t.redactor.variablesVacias });
+    // Con nombre se manda por nombre (Meta exige todos); numeradas, en orden.
+    const envio = esNombrada(variables) ? { variables_nombradas: Object.fromEntries(variables.map((n, i) => [n, lista[i]!])) } : { variables: lista };
     setEnviando(true);
     setAviso(null);
     try {
-      await enviarPlantilla(conversacionId, plantilla.id, lista);
+      await enviarPlantilla(conversacionId, plantilla.id, envio);
       setPlantillaId("");
-      setValores([]);
+      setValores({});
       setAviso({ tipo: "ok", texto: t.redactor.enviado });
       refrescar();
     } catch (e) {
@@ -138,7 +140,7 @@ export function Redactor({ conversacionId, ventanaAbierta, forzadaPorServidor, a
               value={plantillaId}
               onChange={(e) => {
                 setPlantillaId(e.target.value);
-                setValores([]);
+                setValores({});
               }}
             >
               <option value="">{t.redactor.elegirPlantilla}</option>
@@ -152,18 +154,16 @@ export function Redactor({ conversacionId, ventanaAbierta, forzadaPorServidor, a
           {plantilla &&
             variables.map((n) => (
               <div className="campo" key={n}>
-                <label htmlFor={`chat-var-${n}`}>{t.redactor.variable(n)}</label>
-                <input
-                  id={`chat-var-${n}`}
-                  value={valores[n - 1] ?? ""}
-                  onChange={(e) =>
-                    setValores((v) => {
-                      const copia = [...v];
-                      copia[n - 1] = e.target.value;
-                      return copia;
-                    })
-                  }
-                />
+                <label htmlFor={`chat-var-${n}`}>
+                  {esNombrada(variables) ? (
+                    <>
+                      {t.redactor.variableConNombre} <code className="chat-variable-nombre">{`{{${n}}}`}</code>
+                    </>
+                  ) : (
+                    t.redactor.variable(n)
+                  )}
+                </label>
+                <input id={`chat-var-${n}`} value={valores[n] ?? ""} onChange={(e) => setValores((v) => ({ ...v, [n]: e.target.value }))} />
               </div>
             ))}
           {plantilla && (

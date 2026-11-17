@@ -24,8 +24,10 @@ export const listarMensajes = (id: number, cursor?: string) =>
   solicitar<PaginaMensajes>(`${C}/${id}/mensajes`, { consulta: { cursor, limite: 50 } });
 export const enviarTexto = (id: number, texto: string) =>
   solicitar<{ mensaje_id: number }>(`${C}/${id}/mensajes`, { metodo: "POST", cuerpo: { texto } });
-export const enviarPlantilla = (id: number, plantilla_mensaje_id: number, variables: string[]) =>
-  solicitar<{ mensaje_id: number }>(`${C}/${id}/mensajes/plantilla`, { metodo: "POST", cuerpo: { plantilla_mensaje_id, variables } });
+/** Plantilla numerada: `variables` en orden. Plantilla con nombre: `variables_nombradas` por nombre. */
+export type ValoresPlantilla = { variables: string[] } | { variables_nombradas: Record<string, string> };
+export const enviarPlantilla = (id: number, plantilla_mensaje_id: number, valores: ValoresPlantilla) =>
+  solicitar<{ mensaje_id: number }>(`${C}/${id}/mensajes/plantilla`, { metodo: "POST", cuerpo: { plantilla_mensaje_id, ...valores } });
 export const asignarConversacion = (id: number, usuario_id: number) =>
   solicitar<Conversacion>(`${C}/${id}/asignacion`, { metodo: "PUT", cuerpo: { usuario_id } });
 

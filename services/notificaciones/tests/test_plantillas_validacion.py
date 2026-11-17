@@ -51,10 +51,28 @@ def test_variables_deben_ser_consecutivas_desde_uno():
 
 
 @pytest.mark.parametrize(
-    "texto", ["Hola {{a}}", "Hola {{0}}", "Hola {{ 1 }}", "Hola {{1}", "Hola {1}}"]
+    "texto", ["Hola {{0}}", "Hola {{ 1 }}", "Hola {{1}", "Hola {1}}", "Hola {{a b}}", "Hola {{}}"]
 )
 def test_variables_mal_formadas(texto):
     assert ("texto_con_variables", "VARIABLE_INVALIDA") in _codigos(texto=texto, ejemplos=["x"])
+
+
+def test_variables_con_nombre_validas_en_orden_de_aparicion():
+    assert _ok(texto="Hola {{guest_name}}, sales a las {{hora}}.", ejemplos=["Ana", "12:00"]) == 2
+    assert _ok(texto="{{guest_name}} y otra vez {{guest_name}}.", ejemplos=["x"]) == 1
+
+
+@pytest.mark.parametrize(
+    ("texto", "codigo"),
+    [
+        ("Hola {{1}} y {{nombre}}", "VARIABLES_MEZCLADAS"),
+        ("Hola {{Nombre}}", "NOMBRE_VARIABLE_INVALIDO"),
+        ("Hola {{_nombre}}", "NOMBRE_VARIABLE_INVALIDO"),
+        ("Hola {{ñandú}}", "VARIABLE_INVALIDA"),
+    ],
+)
+def test_variables_con_nombre_invalidas_o_mezcladas(texto, codigo):
+    assert ("texto_con_variables", codigo) in _codigos(texto=texto, ejemplos=["x", "y"])
 
 
 def test_un_ejemplo_por_variable():
@@ -72,7 +90,7 @@ def test_texto_e_idioma():
 
 def test_el_error_no_repite_el_texto_recibido():
     with pytest.raises(ErrorValidacion) as e:
-        _ok(texto="Dato secreto {{x}}", ejemplos=["a"])
+        _ok(texto="Dato secreto {{X}}", ejemplos=["a"])
     assert "secreto" not in repr(e.value.errores)
 
 

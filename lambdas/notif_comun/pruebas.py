@@ -150,6 +150,17 @@ class Mundo:
             "INSERT INTO identidad.empresa (razon_social) VALUES (%s) RETURNING id", (nombre,)
         ).fetchone()[0]
 
+    def crear_plantilla(
+        self, empresa: int, nombre: str, texto: str, idioma: str = "es_MX", estado="APROBADA"
+    ) -> int:
+        """Otra plantilla de la empresa (con variables numeradas o con nombre, en otro idioma)."""
+        return self.sql(
+            "INSERT INTO notificaciones.plantilla_mensaje (empresa_id, creada_por_usuario_id, "
+            "nombre, categoria, idioma, texto_con_variables, estado_meta, id_plantilla_meta) "
+            "VALUES (%s, %s, %s, 'UTILITY', %s, %s, %s, %s) RETURNING id",
+            (empresa, self.usuario[empresa], nombre, idioma, texto, estado, f"meta-{nombre}"),
+        )[0][0]
+
     def abrir(self) -> psycopg.Connection:
         """Conexión como ``svc_notificaciones`` (con RLS), como la abre la Lambda."""
         return psycopg.connect(self.url)
@@ -176,6 +187,7 @@ class Mundo:
         primer_colaborador: int = 1000,
         encolado_en: datetime | None = None,
         estado_envio: str = "PENDIENTE",
+        plantilla: int | None = None,
     ) -> int:
         empresa = empresa or self.a
         variables = (
@@ -197,7 +209,7 @@ class Mundo:
             (
                 empresa,
                 self.usuario[empresa],
-                self.plantilla[empresa],
+                plantilla or self.plantilla[empresa],
                 json.dumps(variables),
                 respaldo,
                 programada_para,

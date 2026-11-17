@@ -21,6 +21,8 @@ PERMANENTES: dict[str, str] = {
     "132001": "PLANTILLA_INEXISTENTE",
     "132000": "PLANTILLA_PARAMETROS",
     "132012": "PLANTILLA_PARAMETROS",
+    "132015": "PLANTILLA_PAUSADA",
+    "132016": "PLANTILLA_DESHABILITADA",
     "100": "PARAMETRO_INVALIDO",
 }
 TRANSITORIOS = {"130429", "131056", "131000", "131016", "80007", "4", "17", "32", "613"}
@@ -94,11 +96,26 @@ class ClienteMeta:
         return self._enviar({"to": destino, "type": "interactive", "interactive": interactivo})
 
     def enviar_plantilla(
-        self, destino: str, nombre: str, idioma: str, variables: list[str] | None = None
+        self,
+        destino: str,
+        nombre: str,
+        idioma: str,
+        variables: list[str] | None = None,
+        variables_nombres: list[str] | None = None,
     ) -> str:
+        """Envía una plantilla. Posicional: ``parameters`` solo con ``text``. Con nombre
+        (``variables_nombres``, paralela a ``variables``): cada parámetro lleva ``parameter_name``
+        (Meta exige enviarlos **todos** y rechaza mezclar formatos, 132000 o 132012)."""
         plantilla: dict[str, Any] = {"name": nombre, "language": {"code": idioma}}
         if variables:
-            plantilla["components"] = [
-                {"type": "body", "parameters": [{"type": "text", "text": v} for v in variables]}
-            ]
+            if variables_nombres is not None:
+                if len(variables_nombres) != len(variables):
+                    raise ErrorMeta("PLANTILLA_PARAMETROS", permanente=True, codigo="132000")
+                parametros = [
+                    {"type": "text", "parameter_name": n, "text": v}
+                    for n, v in zip(variables_nombres, variables, strict=True)
+                ]
+            else:
+                parametros = [{"type": "text", "text": v} for v in variables]
+            plantilla["components"] = [{"type": "body", "parameters": parametros}]
         return self._enviar({"to": destino, "type": "template", "template": plantilla})

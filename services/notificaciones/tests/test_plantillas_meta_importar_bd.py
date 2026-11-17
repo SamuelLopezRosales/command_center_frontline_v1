@@ -66,7 +66,7 @@ async def test_lista_lo_de_meta_con_compatibilidad_ordenado_y_sin_cache(http, h,
     d = r.json()
     assert d["truncado"] is False
     nombres = [i["nombre"] for i in d["items"]]
-    assert nombres == sorted(nombres) and len(nombres) == 6
+    assert nombres == sorted(nombres) and len(nombres) == 13
     items = por_nombre(r)
     b = items[BIENVENIDA]
     assert b == {
@@ -77,20 +77,26 @@ async def test_lista_lo_de_meta_con_compatibilidad_ordenado_y_sin_cache(http, h,
         "id_plantilla_meta": "800000000000001",
         "texto": "Hola {{1}}, te damos la bienvenida a {{2}}. Tu primer día es el {{3}}.",
         "num_variables": 3,
+        "formato_variables": "POSICIONAL",
+        "variables": ["1", "2", "3"],
         "compatible": True,
         "codigo_incompatible": None,
         "motivo_incompatible": None,
+        "motivos_incompatibles": [],
+        "botones": [],
+        "encabezado": None,
         "advertencias": b["advertencias"],
         "ya_importada": False,
         "nombre_en_uso": False,
     }
     assert len(b["advertencias"]) == 1  # pie de página
     esperados = {
-        "bienvenida_con_boton": "TIENE_BOTONES",
-        "bienvenida_con_imagen": "TIENE_ENCABEZADO",
-        "bienvenida_nombrada": "VARIABLES_CON_NOMBRE",
+        "bienvenida_con_boton": "BOTON_URL_CON_VARIABLE",
+        "bienvenida_con_imagen": "ENCABEZADO_IMAGEN",
+        "bienvenida_mezclada": "VARIABLES_MEZCLADAS",
         "bienvenida_rechazada": "ESTADO_NO_APROBADO",
         "bienvenida_pausada": "ESTADO_NO_APROBADO",
+        "vida_recordatorio_prellegada": "ENCABEZADO_IMAGEN",
     }
     for nombre, codigo in esperados.items():
         assert items[nombre]["compatible"] is False, nombre
@@ -222,7 +228,7 @@ async def test_cada_elemento_va_por_separado_y_se_reporta(http, h, datos, catalo
         "bienvenida_con_boton",
         BIENVENIDA,
         "bienvenida_con_imagen",
-        "bienvenida_nombrada",
+        "bienvenida_mezclada",
         "bienvenida_rechazada",
         "bienvenida_pausada",
         "no_existe_en_meta",
@@ -234,9 +240,9 @@ async def test_cada_elemento_va_por_separado_y_se_reporta(http, h, datos, catalo
     por = {i["nombre"]: i for i in items}
     assert por[BIENVENIDA]["resultado"] == "IMPORTADA"
     esperados = {
-        "bienvenida_con_boton": "TIENE_BOTONES",
-        "bienvenida_con_imagen": "TIENE_ENCABEZADO",
-        "bienvenida_nombrada": "VARIABLES_CON_NOMBRE",
+        "bienvenida_con_boton": "BOTON_URL_CON_VARIABLE",
+        "bienvenida_con_imagen": "ENCABEZADO_IMAGEN",
+        "bienvenida_mezclada": "VARIABLES_MEZCLADAS",
         "bienvenida_rechazada": "ESTADO_NO_APROBADO",
         "bienvenida_pausada": "ESTADO_NO_APROBADO",
         "no_existe_en_meta": "NO_ENCONTRADA_EN_META",
@@ -260,20 +266,21 @@ async def test_nombre_en_uso_con_otro_id_se_omite_sin_pisar_lo_local(http, h, da
     assert f[0] == local and f[4] == "Texto local {{1}}" and f[6] == f"TPL-{BIENVENIDA}"
 
 
-async def test_mismo_nombre_en_otro_idioma_no_se_importa_por_el_idioma_de_envio(
+async def test_mismo_nombre_en_otro_idioma_se_importa_el_primero_y_el_resto_se_omite(
     http, h, datos, sim
 ):
     sim.agregar_catalogo("aviso_general", id_="800000000000010", idioma=ES)
     sim.agregar_catalogo("aviso_general", id_="800000000000011", idioma="en_US")
     items = (await http.get(LISTA, headers=h)).json()["items"]
     por_idioma = {i["idioma"]: i for i in items if i["nombre"] == "aviso_general"}
-    assert por_idioma[ES]["compatible"] and not por_idioma["en_US"]["compatible"]
-    assert por_idioma["en_US"]["codigo_incompatible"] == "IDIOMA_NO_ENVIABLE"
+    assert por_idioma[ES]["compatible"] and por_idioma["en_US"]["compatible"]  # cualquier idioma
     r = await http.post(IMPORTAR, json=pedir("aviso_general", idioma="en_US"), headers=h)
-    assert r.json()["items"][0]["resultado"] == "OMITIDA"
-    r = await http.post(IMPORTAR, json=pedir("aviso_general"), headers=h)
     assert r.json()["items"][0]["resultado"] == "IMPORTADA"
-    assert [f[3] for f in locales(datos)] == [ES]
+    # La restricción única es (empresa, nombre): el mismo nombre en otro idioma no se puede usar.
+    r = await http.post(IMPORTAR, json=pedir("aviso_general"), headers=h)
+    (item,) = r.json()["items"]
+    assert item["resultado"] == "OMITIDA" and item["codigo"] == "NOMBRE_EN_USO"
+    assert [f[3] for f in locales(datos)] == ["en_US"]  # la fila guarda el idioma de Meta
 
 
 async def test_aislamiento_entre_empresas(http, h, hb, datos, catalogo):
@@ -435,7 +442,15 @@ async def test_con_el_sustituto_local_se_ve_y_se_importa_sin_llamar_a_meta(motor
     async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://t") as c:
         d = (await c.get(LISTA, headers=h)).json()
         compatibles = [i["nombre"] for i in d["items"] if i["compatible"]]
-        assert compatibles == [BIENVENIDA]
+        assert compatibles == [
+            BIENVENIDA,
+            "hello_world",
+            "vida_aviso_checkout",
+            "vida_bienvenida_llegada",
+            "vida_checkout_notice",
+            "vida_prearrival_reminder",
+            "vida_welcome_greeting",
+        ]
         r = await c.post(IMPORTAR, json=pedir(BIENVENIDA), headers=h)
         assert r.json()["items"][0]["resultado"] == "IMPORTADA"
         d = (await c.get(LISTA, headers=h)).json()

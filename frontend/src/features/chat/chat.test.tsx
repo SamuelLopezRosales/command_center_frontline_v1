@@ -170,6 +170,36 @@ describe("chat de RH: detalle y envío (WAP-02 a 04)", () => {
     expect(llamadas.filter((l) => l.metodo === "GET" && l.ruta === "/api/v1/plantillas-mensaje")[0]!.url).toContain("estado=APROBADA");
   });
 
+  it("una plantilla con nombre pide una variable por nombre y la manda en variables_nombradas", async () => {
+    const NOMBRADA = {
+      ...PLANTILLA,
+      id: 9,
+      nombre: "vida_aviso_checkout",
+      texto_con_variables: "Hola {{guest_name}}, tu salida es a las {{checkout_time}}. Adiós {{guest_name}}.",
+    };
+    const llamadas = simulador(
+      base({
+        "GET /api/v1/plantillas-mensaje": { items: [PLANTILLA, NOMBRADA], siguiente: null },
+        "POST /api/v1/conversaciones/2/mensajes/plantilla": () => json({ mensaje_id: 4 }, 202),
+      }),
+    );
+    montar();
+    await userEvent.click((await screen.findByText("Miguel Herrera")).closest("button")!);
+    await userEvent.selectOptions(await screen.findByLabelText("Plantilla aprobada"), "9");
+    // Una fila por nombre (guest_name aparece dos veces en el texto y cuenta una).
+    expect(screen.getAllByLabelText(/^Variable \{\{/)).toHaveLength(2);
+    await userEvent.click(screen.getByRole("button", { name: "Enviar plantilla" }));
+    expect(await screen.findByText("Completa todas las variables de la plantilla.")).toBeInTheDocument();
+
+    await userEvent.type(screen.getByLabelText("Variable {{guest_name}}"), "Miguel");
+    await userEvent.type(screen.getByLabelText("Variable {{checkout_time}}"), "12:00");
+    expect(screen.getByLabelText("Vista previa")).toHaveTextContent("Hola Miguel, tu salida es a las 12:00. Adiós Miguel.");
+    await userEvent.click(screen.getByRole("button", { name: "Enviar plantilla" }));
+    await screen.findByText("Mensaje enviado. Se entregará en unos segundos.");
+    const envio = llamadas.find((l) => l.ruta === "/api/v1/conversaciones/2/mensajes/plantilla")!;
+    expect(envio.cuerpo).toEqual({ plantilla_mensaje_id: 9, variables_nombradas: { guest_name: "Miguel", checkout_time: "12:00" } });
+  });
+
   it("si el servidor responde 409 VENTANA_24H_CERRADA la pantalla pasa a modo plantilla y lo explica", async () => {
     simulador(
       base({

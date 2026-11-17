@@ -55,6 +55,8 @@ class PlantillaDto(BaseModel):
     texto_con_variables: str
     ejemplos: list[str]
     cantidad_variables: int
+    formato_variables: Literal["POSICIONAL", "NOMBRADO"]
+    variables: list[str]
     estado_meta: Estado
     id_plantilla_meta: str | None
     motivo_rechazo: str | None
@@ -63,6 +65,7 @@ class PlantillaDto(BaseModel):
 
     @classmethod
     def de_fila(cls, f: dict[str, Any]) -> PlantillaDto:
+        v = servicio.variables_de(f["texto_con_variables"])
         return cls(
             id=f["id"],
             nombre=f["nombre"],
@@ -70,7 +73,9 @@ class PlantillaDto(BaseModel):
             idioma=f["idioma"],
             texto_con_variables=f["texto_con_variables"],
             ejemplos=f["ejemplos_json"] or [],
-            cantidad_variables=servicio.cantidad_variables(f["texto_con_variables"]),
+            cantidad_variables=v.cantidad,
+            formato_variables=v.formato,  # type: ignore[arg-type]
+            variables=list(v.nombres),
             estado_meta=f["estado_meta"],
             id_plantilla_meta=f["id_plantilla_meta"],
             motivo_rechazo=f["motivo_rechazo"],

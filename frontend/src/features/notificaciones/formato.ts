@@ -41,3 +41,15 @@ export function porcentaje(n: number): string {
 export function entero(n: number): string {
   return new Intl.NumberFormat("es-MX").format(n);
 }
+
+/**
+ * Las variables de una plantilla en orden de aparición: `"1"`, `"2"`... si es numerada o sus
+ * nombres (`"guest_name"`) si es con nombre. Una respuesta sin `variables` (antigua) cae a 1..n.
+ */
+export function nombresDeVariables(p: { variables?: string[]; cantidad_variables: number }): string[] {
+  if (p.variables && p.variables.length > 0) return p.variables;
+  return Array.from({ length: p.cantidad_variables }, (_, i) => String(i + 1));
+}
+
+/** La plantilla usa variables con nombre (`{{guest_name}}`). */
+export const esNombrada = (p: { formato_variables?: string }) => p.formato_variables === "NOMBRADO";

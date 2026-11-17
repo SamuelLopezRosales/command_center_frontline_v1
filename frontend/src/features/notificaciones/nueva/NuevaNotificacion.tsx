@@ -17,7 +17,7 @@ import {
   type VariableAsignada,
 } from "../api";
 import { Dialogo, esCodigo, HORARIO, mensajeError } from "../comun";
-import { aInstanteMexico, dentroDeHorario } from "../formato";
+import { aInstanteMexico, dentroDeHorario, nombresDeVariables } from "../formato";
 import { t } from "../textos";
 import { Audiencia, type ColaboradorElegido, type Modo } from "./Audiencia";
 import { aCriterios, construirCatalogo, desdeCriterios, grupoInicial, rutasDe, type Grupo } from "./criterios";
@@ -151,13 +151,13 @@ export function NuevaNotificacion() {
     if (!titulo.trim()) e.titulo = t.nueva.tituloRequerido;
     if (!plantilla) e.plantilla_mensaje_id = t.nueva.plantillaRequerida;
     const vars: Record<string, VariableAsignada> = {};
-    for (let i = 1; i <= (plantilla?.cantidad_variables ?? 0); i++) {
-      const v = variables[String(i)] ?? variableVacia();
+    for (const n of plantilla ? nombresDeVariables(plantilla) : []) {
+      const v = variables[n] ?? variableVacia();
       if (v.origen === "COLABORADOR") {
-        if (!v.campo) e[`variables.${i}`] = t.nueva.campoRequerido;
-        else vars[String(i)] = { origen: "COLABORADOR", campo: v.campo };
-      } else if (!v.valor.trim()) e[`variables.${i}`] = t.nueva.valorRequerido;
-      else vars[String(i)] = { origen: "FIJO", valor: v.valor.trim() };
+        if (!v.campo) e[`variables.${n}`] = t.nueva.campoRequerido;
+        else vars[n] = { origen: "COLABORADOR", campo: v.campo };
+      } else if (!v.valor.trim()) e[`variables.${n}`] = t.nueva.valorRequerido;
+      else vars[n] = { origen: "FIJO", valor: v.valor.trim() };
     }
     let audiencia: Pick<NotificacionCrear, "criterios" | "colaborador_id" | "audiencia_id"> = {};
     if (modo === "CRITERIOS") {

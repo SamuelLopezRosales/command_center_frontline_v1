@@ -35,6 +35,13 @@ procesado y la cola FIFO deduplica por ``mensaje_uuid``, así que repetir una in
 liberación del conciliador o un ``SendMessageBatch`` repetido no duplican envíos. Si la publicación
 de un lote falla, esos destinatarios vuelven a ``encolado_en = NULL`` y el mensaje se reintenta.
 
+**Plantillas con nombre e idioma**. ``MensajeSalida`` lleva ``idioma`` (el de la plantilla; el
+enviador lo usa como ``language.code``) y, solo si la plantilla usa variables con nombre
+(``{{guest_name}}``), ``variables_nombres``: la lista de ``parameter_name`` paralela a
+``variables``, en el orden de aparición en el texto. Si falta el dato de un colaborador el valor
+viaja vacío y el enviador deja al destinatario FALLIDO (``VARIABLE_SIN_VALOR``) sin llamar a Meta;
+este Lambda nunca escribe estados del destinatario. El ``mensaje_uuid`` no cambia.
+
 **Estados que escribe** (nada más): ``notificacion.estado`` ``PROGRAMADA``->``ENVIANDO`` y
 ``ENVIANDO``->``PROGRAMADA`` (solo al diferir por horario), ``programada_para``,
 ``schedule_nombre``, ``fecha_envio``; ``destinatario.encolado_en`` (y su vuelta a ``NULL`` si la
@@ -113,7 +120,8 @@ def validar(cuerpo: Any) -> dict[str, Any] | None:
 def _cargar(conn, notificacion_id: int) -> dict[str, Any] | None:
     r = conn.execute(
         "SELECT n.estado, n.zona_horaria, n.confirmada_fuera_horario, n.programada_para, "
-        "n.schedule_nombre, n.respaldo_correo, n.variables_json, p.nombre "
+        "n.schedule_nombre, n.respaldo_correo, n.variables_json, p.nombre, "
+        "p.texto_con_variables, p.idioma "
         "FROM notificaciones.notificacion n "
         "LEFT JOIN notificaciones.plantilla_mensaje p ON p.id = n.plantilla_mensaje_id "
         "WHERE n.id = %s FOR UPDATE OF n",
@@ -130,6 +138,8 @@ def _cargar(conn, notificacion_id: int) -> dict[str, Any] | None:
         "respaldo": r[5],
         "variables_json": r[6],
         "plantilla": r[7],
+        "texto": r[8],
+        "idioma": r[9],
     }
 
 
@@ -243,27 +253,27 @@ def _bloque(conn, cfg, m, n, *, sqs, contactos, ahora: datetime) -> tuple[str, i
             conn.rollback()
             raise
 
+    nombres = plantilla.nombres_variables(n.get("texto"))  # None si es posicional
     mensajes = []
     for dest_id, colaborador_id, ronda in filas:
         valores = (resueltos.get(colaborador_id) or {}).get("valores") or {}
-        mensajes.append(
-            {
-                "destinatario_id": dest_id,
-                "cuerpo": {
-                    "mensaje_uuid": mensaje_uuid(nid, dest_id, ronda),
-                    "origen_tipo": ORIGEN,
-                    "origen_id": nid,
-                    "colaborador_id": colaborador_id,
-                    "conversacion_id": None,
-                    "empresa_id": eid,
-                    "tipo": "PLANTILLA",
-                    "plantilla": n["plantilla"],
-                    "variables": plantilla.armar_variables(n["variables_json"], valores),
-                    "max_intentos": cfg.max_intentos_mensaje,
-                    "proposito": ORIGEN,
-                },
-            }
-        )
+        cuerpo: dict[str, Any] = {
+            "mensaje_uuid": mensaje_uuid(nid, dest_id, ronda),
+            "origen_tipo": ORIGEN,
+            "origen_id": nid,
+            "colaborador_id": colaborador_id,
+            "conversacion_id": None,
+            "empresa_id": eid,
+            "tipo": "PLANTILLA",
+            "plantilla": n["plantilla"],
+            "idioma": n.get("idioma"),
+            "variables": plantilla.armar_variables(n["variables_json"], valores, n.get("texto")),
+            "max_intentos": cfg.max_intentos_mensaje,
+            "proposito": ORIGEN,
+        }
+        if nombres is not None:  # plantilla con nombre: campo aditivo, paralelo a `variables`
+            cuerpo["variables_nombres"] = nombres
+        mensajes.append({"destinatario_id": dest_id, "cuerpo": cuerpo})
     conn.execute(
         "UPDATE notificaciones.notificacion_destinatario SET encolado_en = %s "
         "WHERE id = ANY(%s) AND estado_envio = 'PENDIENTE' AND encolado_en IS NULL",

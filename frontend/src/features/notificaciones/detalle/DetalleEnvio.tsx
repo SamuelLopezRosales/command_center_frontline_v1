@@ -256,7 +256,7 @@ export function DetalleEnvio() {
                             </Link>
                           ) : d.estado === "FALLIDO" && d.motivo_fallo ? (
                             <span className="not-rechazo" title={t.detalle.motivoFallo}>
-                              {d.motivo_fallo}
+                              {t.detalle.motivosFallo[d.motivo_fallo] ?? d.motivo_fallo}
                             </span>
                           ) : d.estado === "EXCLUIDO" && d.motivo_exclusion ? (
                             <span className="not-suave">{t.motivosExclusion[d.motivo_exclusion] ?? d.motivo_exclusion}</span>

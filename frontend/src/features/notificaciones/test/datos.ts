@@ -58,6 +58,8 @@ export function plantillaMensaje(sobre: Partial<PlantillaMensaje> = {}): Plantil
     texto_con_variables: "Hola {{1}}, te recordamos que mañana {{2}} se entregan uniformes.",
     ejemplos: ["Ana", "13 nov"],
     cantidad_variables: 2,
+    formato_variables: "POSICIONAL",
+    variables: ["1", "2"],
     estado_meta: "APROBADA",
     id_plantilla_meta: "meta-1",
     motivo_rechazo: null,

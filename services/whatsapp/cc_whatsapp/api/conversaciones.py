@@ -77,7 +77,14 @@ class EntradaTexto(BaseModel):
 class EntradaPlantilla(BaseModel):
     model_config = ConfigDict(extra="forbid")
     plantilla_mensaje_id: int = Field(gt=0)
-    variables: list[str] = Field(default_factory=list, max_length=20)
+    variables: list[str] = Field(
+        default_factory=list, max_length=20, description="Variables numeradas, en orden."
+    )
+    variables_nombradas: dict[str, str] | None = Field(
+        default=None,
+        max_length=20,
+        description="Valor por nombre de variable, si la plantilla usa variables con nombre.",
+    )
 
 
 class EntradaAsignacion(BaseModel):
@@ -167,6 +174,7 @@ async def enviar_plantilla(
     mensaje_id = await servicio.enviar_plantilla(
         m, request.app.state.config, cif, nots, u, conversacion_id, entrada.plantilla_mensaje_id,
         [v.strip() for v in entrada.variables], ip_cliente(request),
+        variables_nombradas=entrada.variables_nombradas,
     )  # fmt: skip
     return MensajeEncolado(mensaje_id=mensaje_id)
 

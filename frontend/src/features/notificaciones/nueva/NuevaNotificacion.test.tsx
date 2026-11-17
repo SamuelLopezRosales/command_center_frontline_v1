@@ -269,6 +269,102 @@ describe("modos de audiencia", () => {
   });
 });
 
+describe("plantillas con variables con nombre", () => {
+  const NOMBRADA = plantillaMensaje({
+    id: 6,
+    nombre: "vida_aviso_checkout",
+    texto_con_variables: "Hola {{guest_name}}, tu salida es a las {{checkout_time}}.",
+    ejemplos: ["Juan", "12:00"],
+    cantidad_variables: 2,
+    formato_variables: "NOMBRADO",
+    variables: ["guest_name", "checkout_time"],
+  });
+  const rutas = (extra: Rutas = {}): Rutas => ({ "GET /api/v1/plantillas-mensaje": { items: [plantillaMensaje(), NOMBRADA], siguiente: null }, ...extra });
+
+  async function elegirNombrada(user: ReturnType<typeof userEvent.setup>) {
+    await waitFor(() => expect(within(screen.getByLabelText("Plantilla")).getByRole("option", { name: /vida_aviso_checkout/ })).toBeInTheDocument());
+    await user.selectOptions(screen.getByLabelText("Plantilla"), "6");
+  }
+
+  it("muestra una fila por nombre de variable (en monoespaciado) en lugar de numeradas", async () => {
+    api(rutas());
+    const user = userEvent.setup();
+    montar();
+    await elegirNombrada(user);
+    expect(screen.getByText("Variables (con nombre)")).toBeInTheDocument();
+    for (const n of ["guest_name", "checkout_time"]) {
+      const etiqueta = screen.getByText(n);
+      expect(etiqueta.tagName).toBe("CODE");
+      expect(screen.getByLabelText(`Origen de {{${n}}}`)).toBeInTheDocument();
+    }
+    expect(screen.queryByLabelText("Origen de {{1}}")).not.toBeInTheDocument();
+  });
+
+  it("la vista previa sustituye por nombre y la notificación se guarda con variables por nombre", async () => {
+    const llamadas = api(rutas());
+    const user = userEvent.setup();
+    montar();
+    await esperarCatalogos();
+    await user.type(screen.getByLabelText("Título del envío"), "Aviso de salida");
+    await user.click(screen.getByRole("radio", { name: "Grupo guardado" }));
+    await user.selectOptions(await screen.findByLabelText("Grupo guardado", { selector: "select" }), "3");
+    await elegirNombrada(user);
+    await user.selectOptions(screen.getByLabelText("Campo de {{guest_name}}"), "nombre_completo");
+    await user.selectOptions(screen.getByLabelText("Origen de {{checkout_time}}"), "FIJO");
+    await user.type(screen.getByLabelText("Valor fijo de {{checkout_time}}"), "12:00");
+    expect(screen.getByText("Hola {{Nombre completo}}, tu salida es a las 12:00.")).toBeInTheDocument();
+    await user.click(guardar());
+    await waitFor(() => expect(ultima(llamadas, "POST", "/api/v1/notificaciones")).toBeDefined());
+    const cuerpo = ultima(llamadas, "POST", "/api/v1/notificaciones")!.cuerpo as { variables: Record<string, unknown>; plantilla_mensaje_id: number };
+    expect(cuerpo.plantilla_mensaje_id).toBe(6);
+    expect(cuerpo.variables).toEqual({
+      guest_name: { origen: "COLABORADOR", campo: "nombre_completo" },
+      checkout_time: { origen: "FIJO", valor: "12:00" },
+    });
+  });
+
+  it("valida cada nombre y muestra el error del servidor en la fila del nombre", async () => {
+    api(
+      rutas({
+        "POST /api/v1/notificaciones": () =>
+          problema(422, "VALIDACION", "Revisa los datos", [{ campo: "variables.checkout_time", codigo: "VARIABLE_FALTANTE", mensaje: "Asigne esta variable." }]),
+      }),
+    );
+    const user = userEvent.setup();
+    montar();
+    await esperarCatalogos();
+    await user.type(screen.getByLabelText("Título del envío"), "Aviso de salida");
+    await user.click(screen.getByRole("radio", { name: "Grupo guardado" }));
+    await user.selectOptions(await screen.findByLabelText("Grupo guardado", { selector: "select" }), "3");
+    await elegirNombrada(user);
+    await user.click(guardar());
+    expect(await screen.findAllByText("Elige un campo.")).toHaveLength(2); // una por nombre
+    await user.selectOptions(screen.getByLabelText("Campo de {{guest_name}}"), "nombre_completo");
+    await user.selectOptions(screen.getByLabelText("Campo de {{checkout_time}}"), "puesto");
+    await user.click(guardar());
+    expect(await screen.findByText("Asigne esta variable.")).toBeInTheDocument();
+  });
+
+  it("las numeradas siguen igual: una fila por posición, sin nombres", async () => {
+    api(rutas());
+    const user = userEvent.setup();
+    montar();
+    await esperarCatalogos();
+    await user.selectOptions(screen.getByLabelText("Plantilla"), "5");
+    expect(screen.getByText("Variables")).toBeInTheDocument();
+    expect(screen.getByLabelText("Origen de {{1}}")).toBeInTheDocument();
+    expect(screen.queryByText("Variables (con nombre)")).not.toBeInTheDocument();
+  });
+
+  it("no tiene violaciones de axe con variables con nombre", async () => {
+    api(rutas());
+    const user = userEvent.setup();
+    const { baseElement } = montar();
+    await elegirNombrada(user);
+    await esperarAccesible(baseElement);
+  });
+});
+
 describe("embudo y envío (cv1_09)", () => {
   it("muestra el embudo del ejemplo (61, 56, 54, 54) con los excluidos por motivo", async () => {
     const llamadas = api();

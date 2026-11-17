@@ -136,12 +136,29 @@
             "type": "integer"
           },
           "variables": {
+            "description": "Variables numeradas, en orden.",
             "items": {
               "type": "string"
             },
             "maxItems": 20,
             "title": "Variables",
             "type": "array"
+          },
+          "variables_nombradas": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "maxProperties": 20,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Valor por nombre de variable, si la plantilla usa variables con nombre.",
+            "title": "Variables Nombradas"
           }
         },
         "required": [

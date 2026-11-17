@@ -28,6 +28,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 from cc_common import bitacora, outbox
+from cc_common import plantillas_meta as pm
 from cc_common.auth import UsuarioActual, requerir_usuario_id
 from cc_common.crypto import ErrorCifrado
 from cc_common.db import transaccion
@@ -252,9 +253,58 @@ def armar(texto: str, variables: list[str]) -> str:
     return _VARIABLE.sub(lambda m: variables[int(m.group(1)) - 1], texto)
 
 
+def armar_nombradas(texto: str, valores: dict[str, str]) -> str:
+    """Rellena ``{{nombre}}`` con ``valores[nombre]`` (plantilla con nombre)."""
+    return pm.sustituir(texto, valores)
+
+
+_CINCO_ESPACIOS = re.compile(r" {5,}")
+MAX_VALOR_NOMBRADO = 200
+
+
+def _validar_nombradas(v: pm.Variables, variables: list[str], nombradas: dict[str, str] | None):
+    """Una plantilla con nombre se llena **por nombre**: exactamente sus variables, cada una con un
+    valor de una sola línea. 422 por campo ``variables_nombradas.<nombre>`` (sin valores)."""
+    errores: list[ErrorCampo] = []
+    if variables:
+        errores.append(
+            ErrorCampo("variables", "NO_APLICA", "Esta plantilla usa variables con nombre.")
+        )
+    dadas = nombradas or {}
+    for n in v.nombres:
+        if n not in dadas:
+            errores.append(
+                ErrorCampo(f"variables_nombradas.{n}", "VARIABLE_FALTANTE", "Asigne esta variable.")
+            )
+            continue
+        valor = dadas[n].strip()
+        if (
+            not valor
+            or len(valor) > MAX_VALOR_NOMBRADO
+            or any(c in valor for c in "\n\r\t")
+            or _CINCO_ESPACIOS.search(valor)
+        ):
+            errores.append(
+                ErrorCampo(
+                    f"variables_nombradas.{n}",
+                    "VALOR_INVALIDO",
+                    f"Use de 1 a {MAX_VALOR_NOMBRADO} caracteres en una sola línea.",
+                )
+            )
+    for n in sorted(set(dadas) - set(v.nombres)):
+        errores.append(
+            ErrorCampo(
+                f"variables_nombradas.{n}"[:60], "VARIABLE_NO_EXISTE", "La plantilla no la usa."
+            )
+        )
+    if errores:
+        raise ErrorValidacion("VARIABLES_INVALIDAS", errores=errores)
+
+
 async def enviar_plantilla(
     motor, cfg, cifrador, notificaciones, u: UsuarioActual, conversacion_id: int,
     plantilla_mensaje_id: int, variables: list[str], ip: str | None,
+    variables_nombradas: dict[str, str] | None = None,
 ) -> int:  # fmt: skip
     # La plantilla se consulta antes de abrir la transacción: no se retiene una conexión mientras
     # `notificaciones` responde.
@@ -278,24 +328,41 @@ async def enviar_plantilla(
                 )
             ],
         )  # fmt: skip
-    numeros = {int(n) for n in _VARIABLE.findall(p["texto_con_variables"])}
-    esperadas = max(numeros, default=0)
-    if numeros != set(range(1, esperadas + 1)) or len(variables) != esperadas:
+    try:
+        v = pm.analizar(p["texto_con_variables"], maximo=10_000)
+    except pm.ErrorVariables as exc:  # la plantilla local no se puede interpretar
         raise ErrorValidacion(
-            "VARIABLES_INVALIDAS",
-            errores=[
-                ErrorCampo(
-                    "variables", "CANTIDAD_INCORRECTA",
-                    f"La plantilla lleva {esperadas} variable(s).",
-                )
-            ],
-        )  # fmt: skip
+            "PLANTILLA_NO_ENVIABLE",
+            errores=[ErrorCampo("plantilla_mensaje_id", exc.codigo, "La plantilla no es válida.")],
+        ) from exc
+    extra: dict[str, Any]
+    if v.nombrado:
+        _validar_nombradas(v, variables, variables_nombradas)
+        valores = {n: (variables_nombradas or {})[n].strip() for n in v.nombres}
+        contenido = armar_nombradas(p["texto_con_variables"], valores)
+        extra = {
+            "variables": [valores[n] for n in v.nombres],
+            "variables_nombres": list(v.nombres),
+        }
+    else:
+        if variables_nombradas or len(variables) != v.cantidad:
+            raise ErrorValidacion(
+                "VARIABLES_INVALIDAS",
+                errores=[
+                    ErrorCampo(
+                        "variables", "CANTIDAD_INCORRECTA",
+                        f"La plantilla lleva {v.cantidad} variable(s).",
+                    )
+                ],
+            )  # fmt: skip
+        contenido = armar(p["texto_con_variables"], variables)
+        extra = {"variables": variables}
     async with transaccion(motor, u.empresa_id) as conn:
         conv = await _conversacion(conn, conversacion_id)
         return await _encolar(
             conn, cfg, cifrador, u, conv, tipo="PLANTILLA",
-            contenido=armar(p["texto_con_variables"], variables), plantilla=p["nombre"],
-            cuerpo_extra={"plantilla": p["nombre"], "variables": variables}, ip=ip,
+            contenido=contenido, plantilla=p["nombre"],
+            cuerpo_extra={"plantilla": p["nombre"], "idioma": p.get("idioma"), **extra}, ip=ip,
             detalle={"plantilla_id": plantilla_mensaje_id, "proposito": "PLANTILLA"},
         )  # fmt: skip
 

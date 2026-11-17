@@ -3,8 +3,10 @@ CC-REQ-117).
 
 Reglas:
 - Nombre en minúsculas, dígitos y guion bajo (regla de Meta; hasta 512 caracteres). Variables
-  ``{{1}}``, ``{{2}}``... **consecutivas desde 1** (una puede repetirse en el texto); cada variable
-  exige un ejemplo (Meta lo pide) y sin variables no hay ejemplos.
+  ``{{1}}``, ``{{2}}``... **consecutivas desde 1** (una puede repetirse en el texto) **o** con
+  nombre (``{{guest_name}}``: ``^[a-z][a-z0-9_]*$``; el formato se infiere del texto y mezclarlos
+  es inválido, ver ``cc_common.plantillas_meta``); cada variable exige un ejemplo (Meta lo pide, en
+  el orden de primera aparición) y sin variables no hay ejemplos.
 - Solo se edita en BORRADOR o RECHAZADA (otro estado: 409 ``ESTADO_INVALIDO``). Una plantilla que
   ya se envió a Meta (RECHAZADA con ``id_plantilla_meta``) conserva nombre, categoría e idioma:
   Meta no los deja cambiar al editar; solo el texto y los ejemplos. (La edición de una rechazada y
@@ -27,6 +29,7 @@ import logging
 import re
 from typing import Any
 
+from cc_common import plantillas_meta as pm
 from cc_common.auth import UsuarioActual, requerir_usuario_id
 from cc_common.db import transaccion
 from cc_common.errores import (
@@ -55,10 +58,8 @@ log = logging.getLogger("cc.notificaciones.plantillas")
 
 NOMBRE = re.compile(r"^[a-z0-9_]{1,512}$")
 IDIOMA = re.compile(r"^[a-z]{2,3}(_[A-Z]{2})?$")
-TOKEN = re.compile(r"\{\{[^{}]*\}\}")
-VARIABLE = re.compile(r"^\{\{([1-9][0-9]{0,1})\}\}$")
 MAX_TEXTO = 1024  # límite del cuerpo en Meta
-MAX_VARIABLES = 20
+MAX_VARIABLES = pm.MAX_VARIABLES
 MAX_EJEMPLO = 200
 ESTADOS = ("BORRADOR", "EN_REVISION", "APROBADA", "RECHAZADA")
 EDITABLES_ESTADOS = ("BORRADOR", "RECHAZADA")
@@ -66,52 +67,19 @@ EDITABLES_ESTADOS = ("BORRADOR", "RECHAZADA")
 ESTADO_DE_META = {"APPROVED": "APROBADA", "REJECTED": "RECHAZADA"}
 
 
-def posiciones(texto: str) -> list[int]:
-    """Números de variable del texto, en orden de aparición (una variable puede repetirse).
-    Lanza ``ErrorValidacion`` si hay llaves que no forman una variable ``{{n}}``."""
-    errores: list[ErrorCampo] = []
-    encontradas: list[int] = []
-    for t in TOKEN.findall(texto):
-        m = VARIABLE.match(t)
-        if m:
-            encontradas.append(int(m.group(1)))
-        else:
-            errores.append(
-                ErrorCampo(
-                    "texto_con_variables", "VARIABLE_INVALIDA", "Use variables como {{1}}, {{2}}."
-                )
-            )
-            break
-    resto = TOKEN.sub("", texto)
-    if not errores and ("{{" in resto or "}}" in resto):
-        errores.append(
-            ErrorCampo("texto_con_variables", "VARIABLE_INVALIDA", "Hay llaves sin cerrar.")
-        )
-    if not errores and encontradas:
-        distintas = sorted(set(encontradas))
-        if distintas != list(range(1, len(distintas) + 1)):
-            errores.append(
-                ErrorCampo(
-                    "texto_con_variables",
-                    "VARIABLES_NO_CONSECUTIVAS",
-                    "Las variables deben ser consecutivas desde {{1}}.",
-                )
-            )
-        elif len(distintas) > MAX_VARIABLES:
-            errores.append(
-                ErrorCampo(
-                    "texto_con_variables",
-                    "DEMASIADAS_VARIABLES",
-                    f"El máximo es de {MAX_VARIABLES} variables.",
-                )
-            )
-    if errores:
-        raise ErrorValidacion(errores=errores)
-    return encontradas
+def variables_de(texto: str) -> pm.Variables:
+    """Formato y variables del texto (posicional ``{{1}}`` o con nombre ``{{guest_name}}``).
+    Lanza ``ErrorValidacion`` (422 por campo ``texto_con_variables``) si no son válidas."""
+    try:
+        return pm.analizar(texto, maximo=MAX_VARIABLES)
+    except pm.ErrorVariables as exc:
+        raise ErrorValidacion(
+            errores=[ErrorCampo("texto_con_variables", exc.codigo, exc.mensaje)]
+        ) from exc
 
 
 def cantidad_variables(texto: str) -> int:
-    return len(set(posiciones(texto)))
+    return variables_de(texto).cantidad
 
 
 def validar(*, nombre: str, categoria: str, idioma: str, texto: str, ejemplos: list[str]) -> int:

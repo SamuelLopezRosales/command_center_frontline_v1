@@ -186,6 +186,25 @@
         "title": "AudienciaDto",
         "type": "object"
       },
+      "BotonDeMeta": {
+        "properties": {
+          "texto": {
+            "title": "Texto",
+            "type": "string"
+          },
+          "tipo": {
+            "description": "QUICK_REPLY, URL, PHONE_NUMBER, COPY_CODE, OTP, FLOW...",
+            "title": "Tipo",
+            "type": "string"
+          }
+        },
+        "required": [
+          "tipo",
+          "texto"
+        ],
+        "title": "BotonDeMeta",
+        "type": "object"
+      },
       "Cancelar": {
         "additionalProperties": false,
         "properties": {
@@ -471,6 +490,51 @@
         "title": "EmbudoDto",
         "type": "object"
       },
+      "EncabezadoDeMeta": {
+        "properties": {
+          "formato": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Formato de Meta: TEXT, IMAGE, VIDEO, DOCUMENT...",
+            "title": "Formato"
+          },
+          "texto": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "El texto, si el encabezado es de texto.",
+            "title": "Texto"
+          },
+          "tipo": {
+            "enum": [
+              "TEXTO",
+              "MEDIA",
+              "UBICACION",
+              "OTRO"
+            ],
+            "title": "Tipo",
+            "type": "string"
+          }
+        },
+        "required": [
+          "tipo",
+          "formato",
+          "texto"
+        ],
+        "title": "EncabezadoDeMeta",
+        "type": "object"
+      },
       "EstadoMetaDto": {
         "properties": {
           "access_token": {
@@ -701,6 +765,25 @@
         "title": "ListadoDeMeta",
         "type": "object"
       },
+      "MotivoIncompatible": {
+        "properties": {
+          "codigo": {
+            "title": "Codigo",
+            "type": "string"
+          },
+          "motivo": {
+            "description": "El motivo, en español.",
+            "title": "Motivo",
+            "type": "string"
+          }
+        },
+        "required": [
+          "codigo",
+          "motivo"
+        ],
+        "title": "MotivoIncompatible",
+        "type": "object"
+      },
       "NotificacionActualizar": {
         "additionalProperties": false,
         "properties": {
@@ -799,7 +882,7 @@
                   "$ref": "#/components/schemas/VariableAsignada"
                 },
                 "propertyNames": {
-                  "maxLength": 3
+                  "maxLength": 50
                 },
                 "type": "object"
               },
@@ -896,7 +979,7 @@
             },
             "default": {},
             "propertyNames": {
-              "maxLength": 3
+              "maxLength": 50
             },
             "title": "Variables",
             "type": "object"
@@ -1493,6 +1576,14 @@
             "title": "Advertencias",
             "type": "array"
           },
+          "botones": {
+            "description": "Los botones de la plantilla, en orden.",
+            "items": {
+              "$ref": "#/components/schemas/BotonDeMeta"
+            },
+            "title": "Botones",
+            "type": "array"
+          },
           "categoria": {
             "description": "UTILITY, MARKETING, AUTHENTICATION u otra de Meta.",
             "title": "Categoria",
@@ -1507,7 +1598,7 @@
                 "type": "null"
               }
             ],
-            "description": "TIENE_ENCABEZADO, TIENE_BOTONES, VARIABLES_CON_NOMBRE, ESTADO_NO_APROBADO...",
+            "description": "ESTADO_NO_APROBADO, ENCABEZADO_IMAGEN, BOTON_OTP, VARIABLES_MEZCLADAS...",
             "title": "Codigo Incompatible"
           },
           "compatible": {
@@ -1515,9 +1606,29 @@
             "title": "Compatible",
             "type": "boolean"
           },
+          "encabezado": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EncabezadoDeMeta"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "El encabezado, si lo tiene."
+          },
           "estado_meta": {
             "description": "Estado en Meta: APPROVED, PENDING, REJECTED, PAUSED...",
             "title": "Estado Meta",
+            "type": "string"
+          },
+          "formato_variables": {
+            "description": "POSICIONAL ({{1}}) o NOMBRADO ({{guest_name}}), inferido del texto.",
+            "enum": [
+              "POSICIONAL",
+              "NOMBRADO"
+            ],
+            "title": "Formato Variables",
             "type": "string"
           },
           "id_plantilla_meta": {
@@ -1540,6 +1651,14 @@
             "description": "El motivo, en español.",
             "title": "Motivo Incompatible"
           },
+          "motivos_incompatibles": {
+            "description": "Todos los motivos de incompatibilidad (el primero es codigo_incompatible).",
+            "items": {
+              "$ref": "#/components/schemas/MotivoIncompatible"
+            },
+            "title": "Motivos Incompatibles",
+            "type": "array"
+          },
           "nombre": {
             "title": "Nombre",
             "type": "string"
@@ -1554,9 +1673,17 @@
             "type": "integer"
           },
           "texto": {
-            "description": "Texto del cuerpo con las variables {{1}}, {{2}}...",
+            "description": "Texto del cuerpo con las variables {{1}}, {{2}}... o {{nombre}}.",
             "title": "Texto",
             "type": "string"
+          },
+          "variables": {
+            "description": "Las variables en orden de aparición: '1', '2'... o sus nombres.",
+            "items": {
+              "type": "string"
+            },
+            "title": "Variables",
+            "type": "array"
           },
           "ya_importada": {
             "description": "Ya hay una plantilla local con ese id de Meta.",
@@ -1572,9 +1699,14 @@
           "id_plantilla_meta",
           "texto",
           "num_variables",
+          "formato_variables",
+          "variables",
           "compatible",
           "codigo_incompatible",
           "motivo_incompatible",
+          "motivos_incompatibles",
+          "botones",
+          "encabezado",
           "advertencias",
           "ya_importada",
           "nombre_en_uso"
@@ -1623,6 +1755,14 @@
             "title": "Fecha Creacion",
             "type": "string"
           },
+          "formato_variables": {
+            "enum": [
+              "POSICIONAL",
+              "NOMBRADO"
+            ],
+            "title": "Formato Variables",
+            "type": "string"
+          },
           "id": {
             "title": "Id",
             "type": "integer"
@@ -1660,6 +1800,13 @@
           "texto_con_variables": {
             "title": "Texto Con Variables",
             "type": "string"
+          },
+          "variables": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Variables",
+            "type": "array"
           }
         },
         "required": [
@@ -1670,6 +1817,8 @@
           "texto_con_variables",
           "ejemplos",
           "cantidad_variables",
+          "formato_variables",
+          "variables",
           "estado_meta",
           "id_plantilla_meta",
           "motivo_rechazo",
@@ -1818,7 +1967,7 @@
                 "type": "null"
               }
             ],
-            "description": "Código del motivo (NO_ENCONTRADA_EN_META, TIENE_BOTONES...).",
+            "description": "Código del motivo (NO_ENCONTRADA_EN_META, NOMBRE_EN_USO...).",
             "title": "Codigo"
           },
           "idioma": {

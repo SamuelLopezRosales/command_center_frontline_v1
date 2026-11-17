@@ -198,8 +198,10 @@ a mandarlas a revisión. Está en **Notificaciones → Plantillas de mensaje →
 ### 9.1 Cómo se usa
 
 1. Pulse **«Importar desde Meta»**. El diálogo consulta a Meta (solo lectura) y lista todas las plantillas de la
-   cuenta con su texto (las variables se ven como `{{1}}`, `{{2}}`), idioma, categoría y estado.
-2. Cada plantilla muestra una insignia: **Compatible**, **No compatible: motivo** o **Ya importada**. Solo las
+   cuenta con su texto (las variables se ven como `{{1}}`, `{{2}}` o `{{guest_name}}`), idioma, categoría y estado,
+   y, si las tiene, sus variables con nombre, **botones** y **encabezado**.
+2. Cada plantilla muestra una insignia: **Compatible**, **No compatible: motivo** (una por cada problema), **Variables
+   con nombre** o **Ya importada**. Solo las
    compatibles y no importadas tienen casilla; **«Seleccionar todas las compatibles»** marca las que se puedan.
 3. Pulse **«Importar seleccionadas»**. El resumen dice, por plantilla, si quedó **importada**, **ya existía** o fue
    **omitida** (con el motivo). La lista de plantillas locales se actualiza sola.
@@ -209,28 +211,85 @@ Las plantillas importadas quedan en estado **Aprobada** y se pueden usar de inme
 
 ### 9.2 Qué se importa y qué no
 
-Command Center solo maneja **un cuerpo de texto con variables numeradas consecutivas** (`{{1}}`, `{{2}}`…). Una
-plantilla es **compatible** si cumple todo lo siguiente:
+Command Center maneja **un cuerpo de texto** con variables **numeradas** (`{{1}}`, `{{2}}`…, consecutivas desde 1)
+**o con nombre** (`{{guest_name}}`), más un encabezado de texto fijo, un pie fijo y botones estáticos. Una
+plantilla es **compatible** si cumple todo lo siguiente; la pantalla y la API informan **todos** los motivos de
+incompatibilidad (`motivos_incompatibles`), no solo el primero:
 
-| Condición | Si no se cumple (motivo mostrado) |
+| Condición | Si no se cumple (código del motivo) |
 |---|---|
 | Aprobada en Meta (`APPROVED`) | Las que están en revisión, rechazadas, **pausadas** o **deshabilitadas** se listan pero no se importan (`ESTADO_NO_APROBADO`, con su estado) |
 | Nombre solo con minúsculas, números y guion bajo | `NOMBRE_INVALIDO` |
 | Categoría Utilidad, Marketing o Autenticación | `CATEGORIA_NO_SOPORTADA` |
-| En el **idioma de envío** (`es_MX`) | `IDIOMA_NO_ENVIABLE` (ver 9.4) |
-| Sin **encabezado** (imagen, video, documento ni texto) | `TIENE_ENCABEZADO` |
-| Sin **botones** (respuesta rápida, URL, teléfono, código OTP) | `TIENE_BOTONES` |
+| Idioma con el formato de Meta (`es_MX`, `en`, `en_US`, `pt_BR`…): **cualquier idioma sirve** | `IDIOMA_INVALIDO` |
+| **Encabezado:** ninguno, o de **texto fijo** (sin variables) | `ENCABEZADO_IMAGEN`, `ENCABEZADO_VIDEO`, `ENCABEZADO_DOCUMENTO`, `ENCABEZADO_UBICACION`, `ENCABEZADO_TEXTO_CON_VARIABLE`, `ENCABEZADO_NO_SOPORTADO` |
+| **Botones:** ninguno, o todos **estáticos**: respuesta rápida (`QUICK_REPLY`), teléfono (`PHONE_NUMBER`) y URL **sin** variable | `BOTON_URL_CON_VARIABLE`, `BOTON_COPIAR_CODIGO`, `BOTON_OTP`, `BOTON_FLOW`, `BOTON_CATALOGO`, `BOTON_MPM`, `BOTON_SPM`, `BOTON_NO_SOPORTADO` |
 | Que no sea carrusel ni lleve otro componente especial | `TIENE_CARRUSEL`, `COMPONENTE_NO_SOPORTADO` |
 | Un cuerpo de texto de hasta 1024 caracteres | `SIN_CUERPO_TEXTO`, `TEXTO_DEMASIADO_LARGO` |
-| Variables **numeradas**, consecutivas desde 1 y hasta 20 | `VARIABLES_CON_NOMBRE` (por ejemplo `{{nombre}}`), `VARIABLES_NO_CONSECUTIVAS`, `VARIABLES_INVALIDAS`, `DEMASIADAS_VARIABLES` |
+| Variables **todas numeradas** (consecutivas desde 1) o **todas con nombre** (`^[a-z][a-z0-9_]*$`), hasta 20 | `VARIABLES_MEZCLADAS`, `NOMBRE_VARIABLE_INVALIDO`, `VARIABLES_NO_CONSECUTIVAS`, `VARIABLES_INVALIDAS`, `DEMASIADAS_VARIABLES`, `VARIABLES_FORMATO_INCONSISTENTE` |
 
-Un **pie de página** (footer) de texto sin variables **sí se tolera**: Meta lo agrega al enviar el mensaje, pero
-Command Center no lo muestra en la vista previa ni lo manda como parámetro; la pantalla lo avisa.
+Un **pie de página** (footer) de texto sin variables **sí se tolera**, igual que un **encabezado de texto fijo** y los
+**botones estáticos**: Meta los agrega al enviar el mensaje, pero Command Center no los muestra en la vista previa ni
+los manda como parámetros; la pantalla lo avisa. La API devuelve además `botones` (`{tipo, texto}`) y `encabezado`
+(`{tipo, formato, texto}`) para que el mensaje sea exacto, por ejemplo «Encabezado de imagen: requiere adjuntar la
+imagen al enviar; aún no soportado».
 
-**Plantillas con botones o encabezado.** No se pueden importar hoy: el envío de Command Center solo manda el
-cuerpo con sus variables, y una plantilla con encabezado variable o botones con parámetros exigiría esos
-componentes en cada envío. Opciones: crear en Meta una versión de solo texto (sin encabezado ni botones) y
-reimportar, o crearla desde Command Center (**«+ Nueva plantilla»**) y enviarla a revisión.
+**Plantillas con encabezado de medios** (imagen, video, documento) **o de ubicación** no se importan hoy: Meta exige
+mandar un enlace público o el id de un medio subido **en cada mensaje**, y Command Center no lo tiene. Diseño futuro
+(**no implementado**): guardar por plantilla una URL pública fija o un `media id` subido a Meta con
+`POST /{phone_number_id}/media` y agregar el componente `header` al enviar. Mientras tanto, cree en Meta una versión sin
+encabezado de medios o con encabezado de texto, o cree la plantilla desde Command Center (**«+ Nueva plantilla»**).
+
+### 9.2.1 Variables con nombre (`{{guest_name}}`)
+
+Las plantillas de Meta con `parameter_format` `NAMED` (por ejemplo `Hola {{guest_name}}, tu salida es a las
+{{checkout_time}}`) se importan y se envían de punta a punta:
+
+- **El formato se infiere del texto**, sin cambios en la base de datos: si todos los marcadores son números
+  consecutivos desde 1, es *posicional*; si todos son nombres, es *con nombre*. **Mezclarlos es inválido**
+  (`VARIABLES_MEZCLADAS`), igual que un nombre fuera de `^[a-z][a-z0-9_]*$` (hasta 50 caracteres) o que el
+  `parameter_format` que declara Meta no coincida con el texto. Un mismo nombre puede aparecer varias veces en el
+  texto y cuenta **una** variable. El código común es `cc_common/plantillas_meta.py`.
+- **La fila local guarda el texto tal cual** (`{{guest_name}}`) y los ejemplos salen de
+  `example.body_text_named_params` (en el orden de aparición).
+- **Notificaciones:** `variables_json` va **por nombre** y debe cubrir **exactamente** las variables de la plantilla
+  (faltantes y sobrantes dan 422 por campo, `variables.<nombre>`):
+
+  ```json
+  {"guest_name": {"origen": "COLABORADOR", "campo": "nombre_completo"},
+   "checkout_time": {"origen": "FIJO", "valor": "12:00"}}
+  ```
+
+  En las posicionales sigue siendo `{"1": ..., "2": ...}`. La pantalla «Nueva notificación» muestra una fila por
+  nombre (en letra monoespaciada) y la vista previa sustituye por nombre.
+- **El envío usa `parameter_name`:** el despachador arma `variables` en el orden de aparición de los nombres en el
+  texto y agrega `variables_nombres` (lista paralela); el enviador manda
+  `{"type":"body","parameters":[{"type":"text","parameter_name":"guest_name","text":"Juan"}, ...]}`. Meta exige enviar
+  **todos** los nombres y rechaza (códigos `132000` o `132012`, que el enviador guarda como `PLANTILLA_PARAMETROS`, sin
+  reintento) los parámetros posicionales en una plantilla con nombre y al revés. Si falta el dato de un colaborador
+  para una variable con nombre, el enviador no llama a Meta: el destinatario queda **FALLIDO** con
+  `VARIABLE_SIN_VALOR`.
+- **Chat de RH:** una plantilla con nombre se envía con `variables_nombradas` (`{"guest_name": "Juan"}`); la
+  posicional, con `variables` (lista). El servidor valida contra el texto de la plantilla (INT-NOT-01) y guarda cifrado
+  el texto ya renderizado.
+- **Plantillas nuevas** creadas en Command Center con variables con nombre se envían a revisión con
+  `parameter_format: "NAMED"` y `body_text_named_params` (no verificado contra Meta real, ver 9.4).
+
+### 9.2.2 Idioma por plantilla y botones estáticos
+
+- **Idioma:** el despachador lee el `idioma` de la fila de la plantilla y lo agrega a `MensajeSalida` (`idioma`); el
+  enviador manda `language.code` con ese idioma (si el mensaje no lo trae, constancias y bot, usa
+  `plantilla_idioma`, `es_MX`); el chat de RH usa el de la plantilla. Una plantilla importada en `en_US` o `en` se
+  envía en ese idioma. Si Meta no tiene la plantilla en el idioma enviado responde `132001` y el destinatario queda
+  **FALLIDO** con `PLANTILLA_INEXISTENTE`.
+- **Botones estáticos:** para enviar una plantilla con botones **no se agrega ningún componente `button`** al mensaje:
+  solo el cuerpo con sus parámetros (y nada si no tiene variables). **Supuesto no verificado con Meta real:** Meta
+  acepta el envío de plantillas con botones sin parámetros (respuesta rápida, URL fija, teléfono) sin ese
+  componente. Si Meta respondiera `132000` o `132012`, el error queda en el destinatario como
+  `PLANTILLA_PARAMETROS` (la pantalla de detalle lo explica), es **permanente** y **no se reintenta**.
+- **Respuestas a botones de respuesta rápida:** llegan al **webhook configurado en Meta** para la cuenta, que puede
+  ser el de otro proyecto, **no a Command Center**, mientras no registre el nuestro (ver sección 4). La pantalla de
+  importación y el catálogo lo advierten.
 
 ### 9.3 Cómo funciona por dentro (y cómo reimportar)
 
@@ -254,23 +313,29 @@ reimportar, o crearla desde Command Center (**«+ Nueva plantilla»**) y enviarl
 ### 9.4 Limitaciones conocidas
 
 - **Nombre repetido en varios idiomas.** Meta permite el mismo nombre en varios idiomas (`aviso` en `es_MX` y en
-  `en_US`), pero la tabla local es única por **(empresa, nombre)**. Si el nombre ya existe localmente con otro
-  identificador o idioma, la plantilla se **omite** (`NOMBRE_EN_USO`, y la lista lo marca). No se cambió la
-  restricción ni se hizo migración. Renombre o elimine la local, o use nombres distintos por idioma en Meta.
-- **Idioma de envío.** El enviador y el chat de RH mandan **siempre** el idioma configurado (`es_MX`), sin leer el
-  idioma de la fila. Una plantilla en otro idioma (`es`, `es_ES`, `en_US`…) se importaría pero **Meta rechazaría
-  su envío** ("la plantilla no existe en ese idioma"); por eso hoy se marca no compatible (`IDIOMA_NO_ENVIABLE`).
-  Si las suyas están en `es`, hay que crear la versión `es_MX` en Meta o cambiar el envío para que use el idioma
-  de la plantilla (tarea pendiente: despachador, enviador y chat). El valor `es_MX` es `CC_PLANTILLA_IDIOMA_ENVIO`
-  en `notificaciones` y debe coincidir con `plantilla_idioma` de `whatsapp`.
+  `en_US`), pero la tabla local es única por **(empresa, nombre)**. Se importa **el primero que se pida**; el
+  resto se **omite** (`NOMBRE_EN_USO`, y la lista lo marca) y **no se puede enviar el mismo nombre en otro
+  idioma**. No se cambió la restricción ni se hizo migración. Renombre o elimine la local, o use nombres distintos
+  por idioma en Meta.
+- **Encabezado de medios y botones con parámetros.** Imagen, video, documento, ubicación, encabezado de texto con
+  variable, botones URL con variable, copiar código, OTP, Flow, catálogo y multiproducto **no se soportan** (se
+  listan con su motivo exacto). Ver el diseño futuro en 9.2.
+- **No verificado contra Meta real:** (1) que Meta acepte enviar una plantilla con botones estáticos o encabezado de
+  texto fijo sin los componentes `button` / `header`; (2) el formato exacto de `parameter_format` y
+  `body_text_named_params` al **crear** una plantilla con nombre desde Command Center; (3) el límite real de la
+  longitud de un nombre de variable (se usa 50); (4) los textos de error `132000`, `132012` y `132001` (el simulador
+  los imita). La importación y el envío de plantillas ya aprobadas con nombre solo dependen de lo que Meta documenta
+  para el envío.
 - **Plantillas que Meta pausa o deshabilita después.** El estado local solo cambia desde "En revisión" (eventos
   `wa.plantilla_estado` y «Sincronizar estado»). Una plantilla **ya aprobada** (importada o no) que Meta pasa a
-  `PAUSED` o `DISABLED` por baja calidad **sigue "Aprobada" en Command Center**, y sus envíos fallarán en Meta.
-  El evento ignorado queda en el log del servicio (`evento de plantilla sin efecto (estado de Meta PAUSED)`,
-  sin nombre ni texto). Si empiezan a fallar los envíos de una plantilla, revise su estado en Meta; reflejar esos
+  `PAUSED` o `DISABLED` por baja calidad **sigue "Aprobada" en Command Center**, y sus envíos fallarán en Meta
+  (`PLANTILLA_PAUSADA` / `PLANTILLA_DESHABILITADA`, códigos `132015` y `132016`). El evento ignorado queda en el log
+  del servicio (`evento de plantilla sin efecto (estado de Meta PAUSED)`, sin nombre ni texto). Reflejar esos
   estados en la pantalla es un cambio de diseño pendiente.
 - **Ejemplos.** Si Meta no devuelve los ejemplos del cuerpo, la fila se guarda sin ejemplos (no afecta el envío,
   solo la edición de un borrador duplicado a partir de ella).
+- **Mezclas.** Una plantilla que mezcla `{{1}}` con `{{nombre}}` no se puede importar ni crear
+  (`VARIABLES_MEZCLADAS`): Meta no la admite y el envío fallaría.
 
 ### 9.5 Referencia técnica
 
@@ -282,7 +347,17 @@ reimportar, o crearla desde Command Center (**«+ Nueva plantilla»**) y enviarl
   veces con el token): solo se usa `CC_META_API_BASE`.
 - Código: `cc_notificaciones/meta.py` (`listar`, `obtener`), `servicios/plantillas_meta.py` (compatibilidad e
   importación), `api/plantillas_meta.py`. En local, con `CC_META_PLANTILLAS_STUB`, el listado devuelve datos de
-  ejemplo (una de bienvenida compatible y otras con botones, encabezado, variable con nombre, rechazada y
-  pausada) para ver la pantalla sin Meta.
+  ejemplo (una de bienvenida compatible; otras con botón con variable, encabezado de imagen, variables mezcladas,
+  rechazada y pausada; y las siete plantillas reales de la cuenta compartida: `hello_world` en `en_US`, `vida_*` con
+  variables con nombre y botones, y tres en inglés) para ver la pantalla sin Meta.
 - No hay cambios de permisos de IAM, ALB ni migraciones: se usa la lectura que ya tenía el servicio sobre
   `cc/{env}/meta` y las reglas de `/api/v1/plantillas-mensaje*`.
+- **Contrato de `MensajeSalida`** (cola `wa-salida.fifo`): dos campos **aditivos y opcionales** para plantillas:
+  `idioma` (código de idioma de la plantilla; ausente en constancias y bot, que usan `plantilla_idioma`) y
+  `variables_nombres` (lista de `parameter_name`, paralela a `variables`; solo en plantillas con nombre). Los mensajes
+  de plantillas posicionales conservan su forma (más `idioma`) y el mismo `mensaje_uuid`. Un enviador anterior ignora
+  los campos nuevos; un despachador anterior no los manda y el enviador nuevo se comporta como antes.
+- **Respuesta de `GET /plantillas-mensaje/meta`** (campos nuevos, aditivos): `formato_variables`
+  (`POSICIONAL` | `NOMBRADO`), `variables` (`["1","2"]` o los nombres), `motivos_incompatibles`
+  (`[{codigo, motivo}]`), `botones` (`[{tipo, texto}]`) y `encabezado` (`{tipo, formato, texto}` o `null`). Las
+  plantillas locales (`PlantillaDto`) también traen `formato_variables` y `variables`.

@@ -242,3 +242,23 @@ describe("fechas en la zona de México (CC-NFR-014)", () => {
     expect(await screen.findByText("Programada para 15 nov, 21:30")).toBeInTheDocument();
   });
 });
+
+describe("motivos de fallo del envío", () => {
+  it("traduce los códigos del enviador y deja tal cual los que no conoce", async () => {
+    api({
+      "GET /api/v1/notificaciones/1/destinatarios": {
+        items: [
+          destinatario({ id: 1, nombre: "Ana", estado: "FALLIDO", motivo_fallo: "PLANTILLA_PARAMETROS", conversacion_id: null }),
+          destinatario({ id: 2, nombre: "Beto", estado: "FALLIDO", motivo_fallo: "VARIABLE_SIN_VALOR", conversacion_id: null }),
+          destinatario({ id: 3, nombre: "Carla", estado: "FALLIDO", motivo_fallo: "OTRO_CODIGO", conversacion_id: null }),
+        ],
+        siguiente: null,
+      },
+    });
+    montar();
+    const tabla = await screen.findByRole("table", { name: "Destinatarios" });
+    expect(await within(tabla).findByText(/Meta rechazó los parámetros de la plantilla/)).toBeInTheDocument();
+    expect(within(tabla).getByText(/Falta el dato del colaborador/)).toBeInTheDocument();
+    expect(within(tabla).getByText("OTRO_CODIGO")).toBeInTheDocument();
+  });
+});

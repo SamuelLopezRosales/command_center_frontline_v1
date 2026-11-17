@@ -66,7 +66,7 @@ def llenar(sim, n):
 async def test_lista_lo_que_hay_y_lo_interpreta(sim, registro):
     sim.cargar_catalogo_ejemplo()
     r = await cliente_para(registro).listar()
-    assert not r.truncado and len(r.items) == 6
+    assert not r.truncado and len(r.items) == 13
     b = next(t for t in r.items if t.nombre == "bienvenida_colaborador")
     assert (b.id, b.idioma, b.categoria, b.estado) == (
         "800000000000001",
@@ -277,8 +277,23 @@ async def test_una_respuesta_que_no_es_json_no_rompe():
 async def test_el_sustituto_sin_red_devuelve_datos_de_ejemplo_coherentes():
     s = StubPlantillasMeta()
     r = await s.listar()
-    assert len(r.items) == 6 and not r.truncado
-    assert sum(t.estado == "APPROVED" for t in r.items) == 4
+    assert len(r.items) == 13 and not r.truncado
+    assert sum(t.estado == "APPROVED" for t in r.items) == 11
+    # las siete plantillas reales de la cuenta compartida
+    nombres = {t.nombre: t for t in r.items}
+    for real in (
+        "hello_world",
+        "vida_aviso_checkout",
+        "vida_bienvenida_llegada",
+        "vida_recordatorio_prellegada",
+        "vida_checkout_notice",
+        "vida_prearrival_reminder",
+        "vida_welcome_greeting",
+    ):
+        assert real in nombres, real
+    assert nombres["hello_world"].idioma == "en_US"
+    assert nombres["vida_aviso_checkout"].formato_parametros == "NAMED"
+    assert {nombres[n].idioma for n in ("vida_checkout_notice", "vida_welcome_greeting")} == {"en"}
     assert (await s.obtener(nombre="bienvenida_colaborador", idioma="es_MX")).id
     assert await s.obtener(nombre="bienvenida_colaborador", idioma="en_US") is None
     s.error = ErrorMeta("META_TRANSITORIO")

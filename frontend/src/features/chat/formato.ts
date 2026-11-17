@@ -11,13 +11,23 @@ export function partesDeTiempo(ms: number): { horas: number; minutos: number } {
   return { horas: Math.floor(total / 60), minutos: total % 60 };
 }
 
-/** Variables `{{n}}` de una plantilla de Meta, en orden. */
-export function variablesDe(texto: string): number[] {
-  const numeros = new Set<number>();
-  for (const m of texto.matchAll(/\{\{(\d+)\}\}/g)) numeros.add(Number(m[1]));
-  return [...numeros].sort((a, b) => a - b);
+/**
+ * Variables de una plantilla de Meta, en orden: las numeradas (`{{1}}`) de menor a mayor número y,
+ * si la plantilla las usa con nombre (`{{guest_name}}`), por primera aparición. Se devuelven como
+ * cadenas ("1", "guest_name").
+ */
+export function variablesDe(texto: string): string[] {
+  const vistas: string[] = [];
+  for (const m of texto.matchAll(/\{\{([^{}]+)\}\}/g)) if (!vistas.includes(m[1]!)) vistas.push(m[1]!);
+  return esNombrada(vistas) ? vistas : vistas.sort((a, b) => Number(a) - Number(b));
 }
 
-export function armar(texto: string, valores: string[]): string {
-  return texto.replace(/\{\{(\d+)\}\}/g, (_, n: string) => valores[Number(n) - 1] || `{{${n}}}`);
+/** La plantilla usa variables con nombre (alguna no es un número). */
+export function esNombrada(variables: string[]): boolean {
+  return variables.some((v) => !/^\d+$/.test(v));
+}
+
+/** Rellena cada `{{variable}}` con su valor; las vacías quedan como están. */
+export function armar(texto: string, valores: Record<string, string>): string {
+  return texto.replace(/\{\{([^{}]+)\}\}/g, (m, n: string) => valores[n]?.trim() || m);
 }

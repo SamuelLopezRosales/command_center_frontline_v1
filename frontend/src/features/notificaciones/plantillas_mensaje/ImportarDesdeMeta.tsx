@@ -18,6 +18,21 @@ import "../notificaciones.css";
 import "./importar.css";
 
 const CLASE_ESTADO: Record<string, string> = { APPROVED: "ok", PENDING: "proceso", PAUSED: "proceso", REJECTED: "error", DISABLED: "error" };
+/** «Botones: Sí · No (respuesta rápida)» */
+function textoBotones(p: PlantillaDeMeta): string | null {
+  const botones = p.botones ?? [];
+  if (botones.length === 0) return null;
+  const tipos = [...new Set(botones.map((b) => ti.tiposBoton[b.tipo] ?? b.tipo.toLowerCase()))];
+  return ti.botones(`${botones.map((b) => b.texto || "—").join(" · ")} (${tipos.join(", ")})`);
+}
+
+function textoEncabezado(p: PlantillaDeMeta): string | null {
+  const e = p.encabezado;
+  if (!e) return null;
+  if (e.tipo === "TEXTO") return ti.encabezadoTexto(e.texto);
+  return (e.formato && ti.encabezadoFormato[e.formato]) || ti.encabezadoOtro;
+}
+
 const CLASE_RESULTADO: Record<string, string> = { IMPORTADA: "ok", YA_EXISTIA: "info", OMITIDA: "proceso" };
 
 /** Mensaje en español de un error de la consulta o de la importación. */
@@ -31,16 +46,28 @@ function describirError(e: unknown, porDefecto: string): { noConfigurada: boolea
   return { noConfigurada: false, texto: porDefecto };
 }
 
+/** Todos los motivos de incompatibilidad (el primero, si el servidor aún no manda la lista). */
+function motivosDe(p: PlantillaDeMeta): string[] {
+  const todos = (p.motivos_incompatibles ?? []).map((m) => m.motivo);
+  return todos.length > 0 ? todos : p.motivo_incompatible ? [p.motivo_incompatible] : [];
+}
+
 function InsigniasImportacion({ p }: { p: PlantillaDeMeta }) {
+  const motivos = motivosDe(p);
   return (
     <div className="imp-insignias">
       {p.compatible ? (
         <span className="insignia not-ok">{ti.compatible}</span>
+      ) : motivos.length === 0 ? (
+        <span className="insignia not-neutro">{ti.noCompatibleSinMotivo}</span>
       ) : (
-        <span className="insignia not-neutro">
-          {p.motivo_incompatible ? ti.noCompatible(p.motivo_incompatible) : ti.noCompatibleSinMotivo}
-        </span>
+        motivos.map((m) => (
+          <span key={m} className="insignia not-neutro">
+            {ti.noCompatible(m)}
+          </span>
+        ))
       )}
+      {p.formato_variables === "NOMBRADO" && <span className="insignia not-info">{ti.variablesConNombre}</span>}
       {p.ya_importada && <span className="insignia not-info">{ti.yaImportada}</span>}
       {p.nombre_en_uso && <span className="insignia not-proceso">{ti.nombreEnUso}</span>}
     </div>
@@ -256,7 +283,22 @@ export function ImportarDesdeMeta({ alCerrar, alImportar }: Props) {
                           <td>
                             <div className="imp-nombre">{p.nombre}</div>
                             <p className="imp-texto">{p.texto}</p>
-                            <p className="imp-texto">{ti.variables(p.num_variables)}</p>
+                            <p className="imp-texto imp-variables-nombres">
+                              {ti.variables(p.num_variables)}
+                              {p.variables.length > 0 && p.formato_variables === "NOMBRADO" && (
+                                <>
+                                  {": "}
+                                  {p.variables.map((v, i) => (
+                                    <span key={v}>
+                                      {i > 0 && ", "}
+                                      <code>{v}</code>
+                                    </span>
+                                  ))}
+                                </>
+                              )}
+                            </p>
+                            {textoEncabezado(p) && <p className="imp-texto">{textoEncabezado(p)}</p>}
+                            {textoBotones(p) && <p className="imp-texto">{textoBotones(p)}</p>}
                             {p.advertencias.map((a) => (
                               <p key={a} className="imp-aviso">
                                 {a}

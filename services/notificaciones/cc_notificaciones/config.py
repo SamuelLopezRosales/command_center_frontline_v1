@@ -41,10 +41,6 @@ class ConfigNotificaciones(Configuracion):
     # Solo local: con ``CC_META_SECRETO_ID`` fijo (para guardar credenciales en LocalStack), las
     # plantillas siguen usando el sustituto sin red en lugar de llamar a Meta.
     meta_plantillas_stub: bool = False
-    # Idioma con el que el sistema ENVÍA las plantillas: `whatsapp` (enviador y chat de RH) manda
-    # siempre ``plantilla_idioma`` (``es_MX``) sin leer el de la fila. Al importar desde Meta solo
-    # son enviables las de este idioma; debe coincidir con ``plantilla_idioma`` de `whatsapp`.
-    plantilla_idioma_envio: str = "es_MX"
 
     # Programación (EventBridge Scheduler) y despacho (design.md §4.5, §6.3). El destino del
     # schedule único es la cola ``notif-despacho``; el rol lo asume Scheduler para publicar en ella.

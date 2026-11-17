@@ -121,6 +121,27 @@ def test_el_correo_solo_lleva_las_variables_de_la_plantilla(mundo):
     assert set(e["etiquetas"]) == {"notificacion_id", "destinatario_id", "empresa_id"}
 
 
+def test_el_correo_de_una_plantilla_con_nombre_sustituye_por_nombre(mundo):
+    plantilla = mundo.crear_plantilla(
+        mundo.a, "aviso_llegada", "Hola {{guest_name}}, te esperamos en {{lugar}}."
+    )
+    nid = notificacion(
+        mundo,
+        destinatarios=1,
+        plantilla=plantilla,
+        variables={
+            "lugar": {"origen": "FIJO", "valor": "Recepción"},
+            "guest_name": {"origen": "COLABORADOR", "campo": "nombre_completo"},
+        },
+    )
+    c = Ctx(mundo)
+    c.correr(c.mensaje(nid, mundo.a))
+    [e] = c.correo.enviados
+    assert e["texto"].startswith("Hola Persona ") and ", te esperamos en Recepción." in e["texto"]
+    assert "{{" not in e["texto"] and "SECRETO" not in e["texto"]
+    assert c.contactos.llamadas == [(mundo.a, 1, "CORREO", ("nombre_completo",))]
+
+
 def test_no_envia_antes_de_24_horas(mundo):
     nid = notificacion(mundo, destinatarios=2, encolado_en=AHORA - timedelta(hours=23))
     c = Ctx(mundo)

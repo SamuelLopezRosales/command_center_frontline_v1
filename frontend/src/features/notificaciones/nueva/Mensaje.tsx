@@ -1,6 +1,7 @@
 import { useId } from "react";
 import { BurbujaMensaje } from "../comun";
 import type { CampoDto, PlantillaMensaje } from "../api";
+import { esNombrada, nombresDeVariables } from "../formato";
 import { t } from "../textos";
 
 export interface VariableUI {
@@ -22,7 +23,7 @@ interface Props {
 
 /** Texto de la plantilla con las variables fijas ya sustituidas (como `vista_previa` de la API). */
 export function vistaPrevia(texto: string, variables: Record<string, VariableUI>, etiquetaCampo: (c: string) => string): string {
-  return texto.replace(/\{\{(\d+)\}\}/g, (_m, n: string) => {
+  return texto.replace(/\{\{([^{}]+)\}\}/g, (_m, n: string) => {
     const v = variables[n];
     if (!v) return `{{${n}}}`;
     if (v.origen === "FIJO") return v.valor.trim() || `{{${n}}}`;
@@ -34,7 +35,8 @@ export function vistaPrevia(texto: string, variables: Record<string, VariableUI>
 export function Mensaje({ plantillas, plantillaId, alElegirPlantilla, variables, alCambiarVariable, camposDinamicos, errores }: Props) {
   const idPlantilla = useId();
   const plantilla = plantillas.find((p) => String(p.id) === plantillaId);
-  const numeros = plantilla ? Array.from({ length: plantilla.cantidad_variables }, (_, i) => String(i + 1)) : [];
+  const numeros = plantilla ? nombresDeVariables(plantilla) : [];
+  const nombrada = plantilla ? esNombrada(plantilla) : false;
   const etiquetaCampo = (c: string) => t.variablesFijas[c] ?? camposDinamicos.find((d) => d.codigo_interno === c)?.nombre_campo ?? c;
 
   return (
@@ -71,12 +73,17 @@ export function Mensaje({ plantillas, plantillaId, alElegirPlantilla, variables,
 
       {numeros.length > 0 && (
         <>
-          <p className="not-etiqueta-seccion">{t.nueva.variables}</p>
+          <p className="not-etiqueta-seccion">{nombrada ? t.nueva.variablesConNombre : t.nueva.variables}</p>
           {numeros.map((n) => {
             const v = variables[n] ?? variableVacia();
             const error = errores[`variables.${n}`];
             return (
-              <div key={n} className="not-variable">
+              <div key={n} className={nombrada ? "not-variable not-variable-nombrada" : "not-variable"}>
+                {nombrada && (
+                  <code className="not-variable-nombre" title={t.nueva.variableConNombre}>
+                    {n}
+                  </code>
+                )}
                 <select
                   aria-label={t.nueva.variableOrigen(n)}
                   value={v.origen}

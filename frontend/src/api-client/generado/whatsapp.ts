@@ -118,8 +118,18 @@ export interface components {
         EntradaPlantilla: {
             /** Plantilla Mensaje Id */
             plantilla_mensaje_id: number;
-            /** Variables */
+            /**
+             * Variables
+             * @description Variables numeradas, en orden.
+             */
             variables?: string[];
+            /**
+             * Variables Nombradas
+             * @description Valor por nombre de variable, si la plantilla usa variables con nombre.
+             */
+            variables_nombradas?: {
+                [key: string]: string;
+            } | null;
         };
         /** EntradaTexto */
         EntradaTexto: {

@@ -190,7 +190,22 @@ export function PlantillasMensaje() {
                       <div className="not-suave not-texto-plantilla">{p.texto_con_variables}</div>
                     </td>
                     <td>{t.plantillas.categorias[p.categoria] ?? p.categoria}</td>
-                    <td>{t.plantillas.variables(p.cantidad_variables)}</td>
+                    <td className="not-variables-nombres">
+                      {t.plantillas.variables(p.cantidad_variables)}
+                      {p.formato_variables === "NOMBRADO" && (
+                        <>
+                          <br />
+                          <span className="insignia not-info">{t.plantillas.variablesConNombre}</span>
+                          <br />
+                          {p.variables.map((v, i) => (
+                            <span key={v}>
+                              {i > 0 && ", "}
+                              <code>{v}</code>
+                            </span>
+                          ))}
+                        </>
+                      )}
+                    </td>
                     <td>
                       <InsigniaMeta estado={p.estado_meta} />
                       {p.estado_meta === "RECHAZADA" && p.motivo_rechazo && (

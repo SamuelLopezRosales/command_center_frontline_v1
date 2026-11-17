@@ -260,3 +260,155 @@ def test_la_lista_interactiva_del_menu_se_envia_dentro_de_la_ventana(mundo):
         mensaje(d, m["mensaje_uuid"])[0] == "ENVIADO"
         and mensaje(d, m["mensaje_uuid"])[4] == "INTERACTIVO"
     )
+
+
+# ------------------------------------------------------------------ variables con nombre e idioma
+
+
+def notificacion(d, plantilla, variables, **extra):
+    return salida(
+        d,
+        origen_tipo="NOTIFICACION", tipo="PLANTILLA", plantilla=plantilla,
+        variables=variables, proposito="NOTIFICACION", **extra,
+    )  # fmt: skip
+
+
+def parametros(enviado):
+    (cuerpo,) = enviado["template"]["components"]
+    assert cuerpo["type"] == "body"
+    return cuerpo["parameters"]
+
+
+def test_plantilla_con_nombre_se_envia_con_parameter_name(mundo, caplog):
+    d, sim = mundo["d"], mundo["sim"]
+    sim.cargar_catalogo_ejemplo()
+    crear_conversacion(d, d["colaborador"])
+    m = notificacion(
+        d, "vida_aviso_checkout", ["Juan Pérez", "12:00"],
+        variables_nombres=["guest_name", "checkout_time"], idioma="es_MX",
+    )  # fmt: skip
+    with caplog.at_level("DEBUG"):
+        assert mundo["enviar"](m) == {"batchItemFailures": []}
+    assert mensaje(d, m["mensaje_uuid"])[0] == "ENVIADO"
+    (enviado,) = sim.enviados
+    assert enviado["template"]["name"] == "vida_aviso_checkout"
+    assert enviado["template"]["language"] == {"code": "es_MX"}
+    assert parametros(enviado) == [
+        {"type": "text", "parameter_name": "guest_name", "text": "Juan Pérez"},
+        {"type": "text", "parameter_name": "checkout_time", "text": "12:00"},
+    ]
+    # El enviador nunca registra los valores de las variables.
+    assert "Juan" not in caplog.text and "12:00" not in caplog.text
+    # Una plantilla con botones estáticos no agrega ningún componente `button`.
+    assert [c["type"] for c in enviado["template"]["components"]] == ["body"]
+
+
+def test_el_orden_de_los_nombres_no_importa_para_meta_pero_se_conserva_el_emparejamiento(mundo):
+    d, sim = mundo["d"], mundo["sim"]
+    sim.cargar_catalogo_ejemplo()
+    crear_conversacion(d, d["colaborador"])
+    m = notificacion(
+        d, "vida_bienvenida_llegada", ["A", "Ana"], variables_nombres=["tower", "guest_name"]
+    )  # fmt: skip
+    mundo["enviar"](m)
+    assert mensaje(d, m["mensaje_uuid"])[0] == "ENVIADO"
+    assert parametros(sim.enviados[0]) == [
+        {"type": "text", "parameter_name": "tower", "text": "A"},
+        {"type": "text", "parameter_name": "guest_name", "text": "Ana"},
+    ]
+
+
+def test_enviar_posicionales_a_una_plantilla_nombrada_lo_rechaza_meta_y_no_se_reintenta(mundo):
+    d, sim = mundo["d"], mundo["sim"]
+    sim.cargar_catalogo_ejemplo()
+    crear_conversacion(d, d["colaborador"])
+    m = notificacion(d, "vida_aviso_checkout", ["Juan", "12:00"])  # sin variables_nombres
+    assert mundo["enviar"](m) == {"batchItemFailures": []}  # error permanente: se consume
+    assert mensaje(d, m["mensaje_uuid"])[:2] == ("FALLIDO", "PLANTILLA_PARAMETROS")
+    assert sim.enviados == [] and len(sim.rechazados) == 1
+    assert mundo["cola"].visibilidad == []
+
+
+def test_enviar_nombres_a_una_plantilla_posicional_tambien_lo_rechaza_meta(mundo):
+    d, sim = mundo["d"], mundo["sim"]
+    sim.cargar_catalogo_ejemplo()
+    crear_conversacion(d, d["colaborador"])
+    m = notificacion(
+        d, "bienvenida_colaborador", ["Ana", "Apodaca", "lunes"], variables_nombres=["a", "b", "c"]
+    )
+    mundo["enviar"](m)
+    assert mensaje(d, m["mensaje_uuid"])[:2] == ("FALLIDO", "PLANTILLA_PARAMETROS")
+    assert sim.enviados == []
+
+
+def test_nombres_distintos_a_los_de_la_plantilla_los_rechaza_meta(mundo):
+    d, sim = mundo["d"], mundo["sim"]
+    sim.cargar_catalogo_ejemplo()
+    crear_conversacion(d, d["colaborador"])
+    m = notificacion(
+        d, "vida_aviso_checkout", ["Juan", "12:00"], variables_nombres=["guest_name", "hora"]
+    )
+    mundo["enviar"](m)
+    assert mensaje(d, m["mensaje_uuid"])[:2] == ("FALLIDO", "PLANTILLA_PARAMETROS")
+
+
+def test_una_variable_nombrada_sin_valor_no_llega_a_meta(mundo):
+    d, sim = mundo["d"], mundo["sim"]
+    sim.cargar_catalogo_ejemplo()
+    crear_conversacion(d, d["colaborador"])
+    m = notificacion(
+        d, "vida_aviso_checkout", ["Juan", ""], variables_nombres=["guest_name", "checkout_time"]
+    )  # fmt: skip
+    mundo["enviar"](m)
+    assert mensaje(d, m["mensaje_uuid"])[:2] == ("FALLIDO", "VARIABLE_SIN_VALOR")
+    assert sim.enviados == [] and sim.rechazados == []  # ni siquiera se llamó a Meta
+    assert mundo["cola"].visibilidad == []
+
+
+def test_la_plantilla_se_envia_en_su_propio_idioma(mundo):
+    d, sim = mundo["d"], mundo["sim"]
+    sim.cargar_catalogo_ejemplo()
+    crear_conversacion(d, d["colaborador"])
+    hola = notificacion(d, "hello_world", [], idioma="en_US")
+    en = notificacion(
+        d, "vida_checkout_notice", ["John", "12:00"],
+        variables_nombres=["guest_name", "checkout_time"], idioma="en",
+    )  # fmt: skip
+    mundo["enviar"](hola, en)
+    assert mensaje(d, hola["mensaje_uuid"])[0] == "ENVIADO"
+    assert mensaje(d, en["mensaje_uuid"])[0] == "ENVIADO"
+    assert [e["template"]["language"]["code"] for e in sim.enviados] == ["en_US", "en"]
+    assert "components" not in sim.enviados[0]["template"]  # sin variables no hay parámetros
+
+
+def test_sin_idioma_en_el_mensaje_se_usa_el_de_la_configuracion(mundo, cfg):
+    d, sim = mundo["d"], mundo["sim"]
+    sim.cargar_catalogo_ejemplo()
+    crear_conversacion(d, d["colaborador"])
+    m = notificacion(d, "bienvenida_colaborador", ["Ana", "Apodaca", "lunes"])  # sin `idioma`
+    mundo["enviar"](m)
+    assert sim.enviados[0]["template"]["language"] == {"code": cfg.plantilla_idioma}
+
+
+def test_un_idioma_que_la_plantilla_no_tiene_da_132001_y_motivo_legible(mundo):
+    d, sim = mundo["d"], mundo["sim"]
+    sim.cargar_catalogo_ejemplo()
+    crear_conversacion(d, d["colaborador"])
+    # `hello_world` solo existe en en_US: mandarla en es_MX (lo que se hacía antes) falla.
+    m = notificacion(d, "hello_world", [])
+    assert mundo["enviar"](m) == {"batchItemFailures": []}
+    assert mensaje(d, m["mensaje_uuid"])[:2] == ("FALLIDO", "PLANTILLA_INEXISTENTE")
+    assert sim.enviados == []
+
+
+def test_las_posicionales_siguen_mandando_solo_text(mundo):
+    d, sim = mundo["d"], mundo["sim"]
+    sim.cargar_catalogo_ejemplo()
+    crear_conversacion(d, d["colaborador"])
+    m = notificacion(d, "bienvenida_colaborador", ["Ana", "Apodaca", "lunes"], idioma="es_MX")
+    mundo["enviar"](m)
+    assert parametros(sim.enviados[0]) == [
+        {"type": "text", "text": "Ana"},
+        {"type": "text", "text": "Apodaca"},
+        {"type": "text", "text": "lunes"},
+    ]

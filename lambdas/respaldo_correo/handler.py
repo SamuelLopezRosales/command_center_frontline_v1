@@ -182,7 +182,7 @@ def _bloque(conn, cfg, m, n, *, contactos, correo, sns, ahora: datetime) -> tupl
     enviados = rechazados = 0
     transitorio = False
     for dest_id, _colaborador_id, c in con_correo:
-        variables = plantilla.armar_variables(n["variables_json"], c.get("valores"))
+        variables = plantilla.armar_variables(n["variables_json"], c.get("valores"), n["texto"])
         texto = plantilla.renderizar(n["texto"], variables) + PIE
         try:
             correo.enviar(

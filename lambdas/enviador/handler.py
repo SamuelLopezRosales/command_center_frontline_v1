@@ -187,6 +187,16 @@ def procesar(
         metrica("ventana_cerrada")
         return _fallido(conn, cfg, fila_id, m, decision.motivo or "VENTANA_CERRADA")
 
+    if decision.accion == PLANTILLA and m.get("variables_nombres") is not None:
+        # Plantilla con nombre: Meta exige TODOS los parámetros y con valor. Se comprueba antes de
+        # llamar (un dato faltante del colaborador no gasta un envío). Sin valores en el motivo.
+        nombres, valores = m["variables_nombres"], m.get("variables") or []
+        if len(nombres) != len(valores) or any(
+            not isinstance(v, str) or not v.strip() for v in valores
+        ):
+            metrica("variables_nombradas_incompletas")
+            return _fallido(conn, cfg, fila_id, m, "VARIABLE_SIN_VALOR")
+
     # `intentos` queda guardado antes de llamar a Meta (DS-09).
     conn.execute(
         "UPDATE whatsapp.mensaje_whatsapp SET intentos = intentos + 1, tipo = %s, "
@@ -203,9 +213,16 @@ def procesar(
     bd_lambda.fijar_empresa(conn, m["empresa_id"])  # la empresa es local a la transacción
     try:
         if decision.accion == PLANTILLA:
-            wamid = meta.enviar_plantilla(
-                destino, m["plantilla"], cfg.plantilla_idioma, m.get("variables")
-            )
+            # El idioma es el de la plantilla (el despachador y el chat lo mandan); constancias y
+            # bot no lo traen y usan el de la configuración.
+            idioma = m.get("idioma") or cfg.plantilla_idioma
+            if m.get("variables_nombres") is not None:  # plantilla con nombre
+                wamid = meta.enviar_plantilla(
+                    destino, m["plantilla"], idioma, m.get("variables"),
+                    variables_nombres=m["variables_nombres"],
+                )  # fmt: skip
+            else:
+                wamid = meta.enviar_plantilla(destino, m["plantilla"], idioma, m.get("variables"))
         elif m.get("tipo") == "INTERACTIVO":
             wamid = meta.enviar_interactivo(destino, m["interactivo"])
         else:

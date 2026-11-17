@@ -42,6 +42,34 @@ const fila = async (nombre: string) => {
   return within(f);
 };
 
+describe("catálogo: variables con nombre", () => {
+  it("muestra los nombres de las variables y la insignia «Variables con nombre»", async () => {
+    simulador({
+      "GET /api/v1/plantillas-mensaje": {
+        items: [
+          plantillaMensaje(),
+          plantillaMensaje({
+            id: 12,
+            nombre: "vida_aviso_checkout",
+            texto_con_variables: "Hola {{guest_name}}, tu salida es a las {{checkout_time}}.",
+            formato_variables: "NOMBRADO",
+            variables: ["guest_name", "checkout_time"],
+          }),
+        ],
+        siguiente: null,
+      },
+    });
+    montar();
+    const nombrada = await fila("vida_aviso_checkout");
+    expect(nombrada.getByText("2 variables")).toBeInTheDocument();
+    expect(nombrada.getByText("Variables con nombre")).toBeInTheDocument();
+    expect(nombrada.getByText("guest_name").tagName).toBe("CODE");
+    expect(nombrada.getByText("checkout_time")).toBeInTheDocument();
+    const numerada = await fila("recordatorio_uniformes_v1");
+    expect(numerada.queryByText("Variables con nombre")).not.toBeInTheDocument();
+  });
+});
+
 describe("catálogo de plantillas de mensaje (cv1_08)", () => {
   it("muestra el estado de Meta de cada plantilla y el motivo de rechazo", async () => {
     simulador({ "GET /api/v1/plantillas-mensaje": { items: PLANTILLAS, siguiente: null } });

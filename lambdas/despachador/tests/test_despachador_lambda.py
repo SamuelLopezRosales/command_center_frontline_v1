@@ -437,3 +437,101 @@ def test_publica_en_una_cola_fifo_real_y_la_deduplicacion_absorbe_una_liberacion
             break
     assert len(recibidos) == 35 == len({m["mensaje_uuid"] for m in recibidos})
     assert {m["empresa_id"] for m in recibidos} == {mundo.a}
+
+
+# ------------------------------------------------------------------ variables con nombre e idioma
+
+
+def test_plantilla_posicional_no_agrega_variables_nombres_y_lleva_el_idioma(mundo):
+    nid = programada(mundo, destinatarios=1)
+    c = Ctx(mundo)
+    c.correr(c.inicio(nid, mundo.a))
+    [m] = c.salida
+    assert "variables_nombres" not in m  # la forma de las posicionales no cambia
+    assert m["idioma"] == "es_MX" and m["plantilla"] == "aviso_uniformes"
+    assert m["variables"] == [f"Nombre {m['colaborador_id']}", "20 nov 2026"]
+
+
+def test_plantilla_con_nombre_arma_variables_por_nombre_en_el_orden_del_texto(mundo):
+    # `variables_json` es JSONB: no conserva el orden, el del texto manda ({{lugar}} antes que {{guest_name}}).
+    plantilla = mundo.crear_plantilla(
+        mundo.a,
+        "aviso_llegada",
+        "Te esperamos en {{lugar}}, {{guest_name}}. {{guest_name}}, ¡hasta pronto!",
+    )
+    nid = programada(
+        mundo,
+        destinatarios=2,
+        plantilla=plantilla,
+        variables={
+            "guest_name": {"origen": "COLABORADOR", "campo": "nombre_completo"},
+            "lugar": {"origen": "FIJO", "valor": "Recepción"},
+        },
+    )
+    c = Ctx(mundo)
+    c.correr(c.inicio(nid, mundo.a))
+    assert len(c.salida) == 2
+    for m in c.salida:
+        assert m["plantilla"] == "aviso_llegada"
+        assert m["variables_nombres"] == ["lugar", "guest_name"]
+        assert m["variables"][0] == "Recepción" and m["variables"][1].startswith("Nombre ")
+        assert len(m["variables"]) == len(m["variables_nombres"])
+    # solo se piden a `colaboradores` los campos de colaborador (no la numeración ni los nombres)
+    assert c.contactos.llamadas == [(mundo.a, 2, "NOTIFICACION", ("nombre_completo",))]
+
+
+def test_con_nombre_no_cambia_el_uuid_ni_la_forma_de_las_posicionales(mundo):
+    pos = programada(mundo, destinatarios=1)
+    c = Ctx(mundo)
+    c.correr(c.inicio(pos, mundo.a))
+    [m] = c.salida
+    destino = mundo.sql(
+        "SELECT id FROM notificaciones.notificacion_destinatario WHERE notificacion_id = %s", (pos,)
+    )[0][0]
+    assert m["mensaje_uuid"] == mensaje_uuid(pos, destino)
+
+
+def test_el_idioma_de_la_plantilla_viaja_en_el_mensaje(mundo):
+    plantilla = mundo.crear_plantilla(
+        mundo.a, "checkout_notice", "Hello {{guest_name}}, your checkout is today.", idioma="en"
+    )
+    nid = programada(
+        mundo,
+        destinatarios=1,
+        plantilla=plantilla,
+        variables={"guest_name": {"origen": "COLABORADOR", "campo": "nombre_completo"}},
+    )
+    c = Ctx(mundo)
+    c.correr(c.inicio(nid, mundo.a))
+    [m] = c.salida
+    assert m["idioma"] == "en" and m["variables_nombres"] == ["guest_name"]
+
+
+def test_plantilla_sin_variables_con_idioma_en_us(mundo):
+    plantilla = mundo.crear_plantilla(mundo.a, "hello_world", "Hello World", idioma="en_US")
+    nid = programada(mundo, destinatarios=1, plantilla=plantilla, variables={})
+    c = Ctx(mundo)
+    c.correr(c.inicio(nid, mundo.a))
+    [m] = c.salida
+    assert m["idioma"] == "en_US" and m["variables"] == [] and "variables_nombres" not in m
+    assert c.contactos.llamadas == []  # sin campos de colaborador no se llama a `colaboradores`
+
+
+def test_dato_faltante_de_una_variable_nombrada_viaja_vacio_para_que_el_enviador_lo_rechace(mundo):
+    plantilla = mundo.crear_plantilla(
+        mundo.a, "aviso_puesto", "Hola {{guest_name}}, tu puesto es {{puesto}}."
+    )
+    nid = programada(
+        mundo,
+        destinatarios=1,
+        plantilla=plantilla,
+        variables={
+            "guest_name": {"origen": "COLABORADOR", "campo": "nombre_completo"},
+            "puesto": {"origen": "COLABORADOR", "campo": "puesto"},
+        },
+    )
+    c = Ctx(mundo)  # el doble de colaboradores no trae `puesto`
+    c.correr(c.inicio(nid, mundo.a))
+    [m] = c.salida
+    assert m["variables_nombres"] == ["guest_name", "puesto"]
+    assert m["variables"][0].startswith("Nombre ") and m["variables"][1] == ""
